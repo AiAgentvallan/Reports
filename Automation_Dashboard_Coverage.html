@@ -1,0 +1,206 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.outer{display:flex;justify-content:center;padding:10px 0}
+.dash{width:100%;max-width:900px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+.header{background:linear-gradient(135deg,#1a1a3e 0%,#2d1b69 50%,#1a1a3e 100%);border-radius:14px;padding:14px 20px;margin-bottom:12px}
+.header-row1{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.hdr-left{display:flex;align-items:center;gap:12px}
+.robot-icon{width:46px;height:46px;background:#fff;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.hdr-title{font-size:15px;font-weight:700;color:#fff}
+.hdr-sub{font-size:11px;color:rgba(255,255,255,0.6);margin-top:2px}
+.sd-btn{display:flex;align-items:center;border-top:2.5px solid #cc2222;border-bottom:2.5px solid #1a237e;border-left:2.5px solid #cc2222;border-right:2.5px solid #1a237e;border-radius:9px;padding:7px 20px;background:#fff;flex-shrink:0}
+.sd-s{font-size:14px;font-weight:800;color:#cc2222}
+.sd-d{font-size:14px;font-weight:800;color:#1a237e}
+.header-row2{display:flex;align-items:center;gap:8px;margin-top:11px;flex-wrap:wrap}
+.badge{background:rgba(255,255,255,0.13);border:0.5px solid rgba(255,255,255,0.28);border-radius:20px;padding:5px 13px;font-size:11.5px;color:rgba(255,255,255,0.92);display:flex;align-items:center;gap:5px;white-space:nowrap}
+.badge svg{width:13px;height:13px}
+.history-section{background:linear-gradient(145deg,#e8eef8 0%,#dce8f5 50%,#e4edf8 100%);border-radius:14px;border:0.5px solid #c5d5ea;padding:14px 16px;margin-bottom:12px}
+.sec-lh{font-size:11.5px;font-weight:500;color:#1565c0;background:rgba(255,255,255,0.82);padding:4px 12px;border-radius:20px;display:inline-flex;align-items:center;gap:5px;margin-bottom:12px;border:0.5px solid #b3d9f7}
+.sec-lh svg{width:12px;height:12px}
+.history-tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:11px}
+.htile{background:linear-gradient(160deg,#f5f8ff 0%,#eef4ff 100%);border-radius:11px;border:1px solid #c8d8f0;padding:14px 16px}
+.htitle{font-size:12px;font-weight:700;color:#2c3e6e;margin-bottom:10px}
+.pie-wrap{display:flex;flex-direction:column;align-items:center;gap:5px}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.sc-n{background:#fff;border-radius:9px;padding:12px;text-align:center;border:0.5px solid #ddd}
+.sc-r{background:linear-gradient(135deg,#fff5f5,#ffe8e8);border-radius:9px;padding:12px;text-align:center;border:0.5px solid #ffcdd2}
+.sc-g{background:linear-gradient(135deg,#f1faf5,#e6f7ee);border-radius:9px;padding:12px;text-align:center;border:0.5px solid #c8e6c9}
+.sv{font-size:20px;font-weight:700;color:#222}
+.sl{font-size:10.5px;color:#888;margin-top:3px}
+.section{background:#fff;border-radius:14px;border:0.5px solid #e0e0e0;padding:14px 16px;margin-bottom:10px}
+.sec-l{font-size:11.5px;font-weight:500;color:#1565c0;background:#e8f0fe;padding:3px 11px;border-radius:20px;display:inline-flex;align-items:center;gap:4px}
+.sec-l svg{width:12px;height:12px}
+.sph{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px}
+.spl{display:flex;align-items:center;gap:8px}
+.cpill{background:#f5f5f2;border:0.5px solid #ddd;border-radius:20px;padding:3px 10px;font-size:11px;color:#888;white-space:nowrap}
+.sbody{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center}
+.bul{list-style:none;display:flex;flex-direction:column;gap:5px}
+.bul li{font-size:11.5px;color:#555;display:flex;align-items:flex-start;gap:6px}
+.bul li::before{content:'';width:6px;height:6px;border-radius:50%;background:#1d9e75;flex-shrink:0;margin-top:4px}
+.dtag{background:#e8f5e9;color:#2e7d32;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
+.dtag svg{width:11px;height:11px}
+.vmtag{background:#e8f5e9;color:#2e7d32;font-size:11px;padding:7px 11px;border-radius:9px;font-weight:500;display:inline-flex;align-items:center;gap:5px;line-height:1.5;text-align:center}
+.s3m{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.s3tile{border-radius:9px;padding:9px;text-align:center}
+.s3v{font-size:18px;font-weight:700}
+.s3l{font-size:10px;color:#888;margin-top:2px}
+.s3body{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.s3col h4{font-size:12px;font-weight:600;color:#555;margin-bottom:8px}
+.s3col ul{list-style:none;display:flex;flex-direction:column;gap:5px}
+.s3col ul li{font-size:11.5px;color:#555;display:flex;align-items:flex-start;gap:6px}
+.dg::before,.dy::before,.db::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:4px;display:inline-block}
+.dg::before{background:#1d9e75}.dy::before{background:#f5a623}.db::before{background:#4da8e0}
+.nbox{background:#e8f0fe;border-radius:9px;padding:12px}
+.nbox h4{font-size:12px;font-weight:600;color:#1565c0;margin-bottom:8px}
+.cov{display:flex;align-items:center;gap:7px;margin-bottom:6px;font-size:11.5px}
+.clbl{width:52px;color:#777}
+.cbg{flex:1;height:6px;background:#e8e8e8;border-radius:3px;overflow:hidden}
+.cbar{height:100%;border-radius:3px}
+.cpct{width:32px;text-align:right;color:#777;font-size:11px}
+.cdone{font-size:10px;padding:1px 7px;border-radius:10px;background:#e8f5e9;color:#2e7d32}
+.cscr{font-size:10px;padding:1px 7px;border-radius:10px;background:#fff8e1;color:#f57c00}
+.s3warn{background:#fff8e1;color:#f57c00;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+.efrow{display:flex;align-items:center;gap:12px;background:#f7f7f4;border-radius:9px;padding:10px 14px;margin-bottom:12px}
+.footer{display:flex;align-items:center;justify-content:space-between;margin-top:8px;font-size:11.5px;color:#888}
+.fbtn{background:#1565c0;color:#fff;padding:5px 14px;border-radius:20px;font-size:11.5px;font-weight:600}
+</style>
+
+<div class="outer"><div class="dash">
+
+<div class="header">
+  <div class="header-row1">
+    <div class="hdr-left">
+      <div class="robot-icon">🤖</div>
+      <div>
+        <div class="hdr-title">Automation Testing Progress Status</div>
+        <div class="hdr-sub">QA Automation · Task Rule Creation · All Sprints Overview</div>
+      </div>
+    </div>
+    <div class="sd-btn"><span class="sd-s">Storage</span><span class="sd-d">Defender</span></div>
+  </div>
+  <div class="header-row2">
+    <div class="badge"><svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M4.5 7l2 2L9.5 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Automation Testing Engineer</div>
+    <div class="badge"><svg viewBox="0 0 14 14" fill="none"><rect x="1.5" y="2.5" width="11" height="9" rx="2" stroke="currentColor" stroke-width="1.3"/><circle cx="7" cy="7" r="1.8" fill="currentColor"/></svg>VM-based execution</div>
+    <div class="badge"><svg viewBox="0 0 14 14" fill="none"><path d="M2 12V5l5-4 5 4v7l-5 1.5L2 12z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M7 12V8.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>CI/CD Pipeline</div>
+  </div>
+</div>
+
+<div class="history-section">
+  <!-- UPDATED LABEL -->
+  <div class="sec-lh">
+    <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M4.5 7l2 2L9.5 5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Automation Coverage — 410 test cases completed
+  </div>
+  <div class="history-tiles">
+    <div class="htile">
+      <div class="htitle">Total cases automated</div>
+      <div class="pie-wrap">
+        <div style="position:relative;width:150px;height:150px">
+          <canvas id="pieChart" width="150" height="150"></canvas>
+          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none">
+            <div style="font-size:26px;font-weight:700;color:#1d9e75;line-height:1">410</div>
+            <div style="font-size:10px;color:#888;margin-top:2px">cases</div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:#555;margin-top:6px">Total test cases automated</div>
+        <div style="display:flex;gap:8px;margin-top:5px;font-size:11px;color:#555"><span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:50%;background:#1d9e75;display:inline-block"></span>Automated 410</span></div>
+      </div>
+    </div>
+    <div class="htile">
+      <div class="htitle">Effort comparison — manual vs automation</div>
+      <div style="position:relative;height:165px"><canvas id="barChart"></canvas></div>
+      <div style="display:flex;gap:14px;margin-top:6px;font-size:11px;color:#555">
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#e05c3a;display:inline-block"></span>Manual 110 hrs</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#1d9e75;display:inline-block"></span>Auto 3.9 hrs/day</span>
+      </div>
+    </div>
+  </div>
+  <div style="background:rgba(255,255,255,0.78);border-radius:9px;padding:7px 14px;margin-bottom:11px;font-size:11.5px;color:#2e7d32;font-weight:500;border:0.5px solid #c8e6c9">~97% time reduction · VM runs daily without human intervention</div>
+  <div class="stat-row">
+    <div class="sc-n"><div class="sv">410</div><div class="sl">Total cases</div></div>
+    <div class="sc-r"><div class="sv" style="color:#c62828">110 hrs</div><div class="sl">Manual effort</div></div>
+    <div class="sc-g"><div class="sv" style="color:#1d9e75">3.9 hrs</div><div class="sl">Auto/day VM</div></div>
+  </div>
+</div>
+
+<!-- Sprint 1 -->
+<div class="section">
+  <div class="sph">
+    <div class="spl"><div class="sec-l"><svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M4.5 7l2 2L9.5 5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Sprint 1 — API testing initiated</div><span class="cpill">36 cases</span></div>
+    <span class="dtag"><svg viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" fill="#2e7d32" opacity=".18"/><path d="M3.5 6l2 2 3-3.5" stroke="#2e7d32" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Successfully Completed</span>
+  </div>
+  <div class="sbody">
+    <ul class="bul"><li>API testing initiated &amp; automated endpoints set up</li><li>Related test cases automated end-to-end</li><li>36 test cases — all verified &amp; passing</li></ul>
+    <div style="display:flex;align-items:center;gap:9px">
+      <div style="text-align:center"><div style="font-size:13px;font-weight:700;color:#e05c3a">7.8 hrs</div><div style="font-size:10px;color:#999">Manual · 36×13min</div></div>
+      <span style="color:#bbb;font-size:16px">→</span>
+      <div class="vmtag"><svg width="12" height="12" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="2.5" width="11" height="9" rx="2" stroke="currentColor" stroke-width="1.3"/><circle cx="7" cy="7" r="1.8" fill="currentColor"/></svg>VM run<br><span style="font-size:9px;font-weight:400">Daily auto CI/CD</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Sprint 2 -->
+<div class="section">
+  <div class="sph">
+    <div class="spl"><div class="sec-l"><svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M4.5 7l2 2L9.5 5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Sprint 2 — API endpoint expansion</div><span class="cpill">40 cases</span></div>
+    <span class="dtag"><svg viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" fill="#2e7d32" opacity=".18"/><path d="M3.5 6l2 2 3-3.5" stroke="#2e7d32" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Successfully Completed</span>
+  </div>
+  <div class="sbody">
+    <ul class="bul"><li>API endpoint expansion — org device cases</li><li>Paginated &amp; extra endpoint cases automated</li><li>40 test cases — all verified &amp; passing</li></ul>
+    <div style="display:flex;align-items:center;gap:9px">
+      <div style="text-align:center"><div style="font-size:13px;font-weight:700;color:#e05c3a">8.7 hrs</div><div style="font-size:10px;color:#999">Manual · 40×13min</div></div>
+      <span style="color:#bbb;font-size:16px">→</span>
+      <div class="vmtag"><svg width="12" height="12" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="2.5" width="11" height="9" rx="2" stroke="currentColor" stroke-width="1.3"/><circle cx="7" cy="7" r="1.8" fill="currentColor"/></svg>VM run<br><span style="font-size:9px;font-weight:400">Daily auto CI/CD</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Sprint 3 -->
+<div class="section" style="border:1.5px solid #b3cde8">
+  <div class="sph">
+    <div class="spl"><div class="sec-l" style="background:#fff8e1;color:#f57c00"><svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M7 4.5v3M7 9.5v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Sprint 3 — Task rule creation (current)</div><span class="cpill">50+ cases</span></div>
+    <span class="s3warn"><svg viewBox="0 0 12 12" fill="none" style="width:11px;height:11px"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.2"/><path d="M6 3.5v3M6 8.5v.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>In Progress — 80%</span>
+  </div>
+  <div class="s3m">
+    <div class="s3tile" style="background:#f5f5f5;border:0.5px solid #e0e0e0"><div class="s3v" style="color:#333">50+</div><div class="s3l">Total cases</div></div>
+    <div class="s3tile" style="background:linear-gradient(135deg,#f1faf5,#e6f7ee);border:0.5px solid #c8e6c9"><div class="s3v" style="color:#1d9e75">40</div><div class="s3l">✓ Completed</div></div>
+    <div class="s3tile" style="background:linear-gradient(135deg,#fffdf0,#fff8e1);border:0.5px solid #ffe082"><div class="s3v" style="color:#f5a623">10</div><div class="s3l">⚠ In progress</div></div>
+    <div class="s3tile" style="background:linear-gradient(135deg,#f0f4ff,#e8eeff);border:0.5px solid #c5cae9"><div class="s3v" style="color:#1565c0">80%</div><div class="s3l">Sprint progress</div></div>
+  </div>
+  <div class="efrow">
+    <div style="text-align:center"><div style="font-size:15px;font-weight:700;color:#e05c3a">8h 40m</div><div style="font-size:10px;color:#999">Manual effort · 40×13 min</div></div>
+    <span style="color:#bbb;font-size:18px">→</span>
+    <div class="vmtag" style="padding:8px 14px"><svg width="12" height="12" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="2.5" width="11" height="9" rx="2" stroke="currentColor" stroke-width="1.3"/><circle cx="7" cy="7" r="1.8" fill="currentColor"/></svg><div><div style="font-size:13px;font-weight:700">30 min</div><div style="font-size:9px;font-weight:400">Daily VM auto · ~94% saved</div></div></div>
+  </div>
+  <div class="s3body">
+    <div class="s3col">
+      <h4>✓ Completed</h4>
+      <ul><li class="dg">One-time task rule scripts — done</li><li class="dg">Daily task rule automation — done</li><li class="dy">Weekly scripts — in progress (~10 left)</li></ul>
+      <div style="margin-top:12px">
+        <div style="font-size:11.5px;font-weight:600;color:#555;margin-bottom:7px">Test case coverage by type</div>
+        <div class="cov"><span class="clbl">One-time</span><div class="cbg"><div class="cbar" style="width:100%;background:#1d9e75"></div></div><span class="cpct">100%</span><span class="cdone">done</span></div>
+        <div class="cov"><span class="clbl">Daily</span><div class="cbg"><div class="cbar" style="width:100%;background:#1d9e75"></div></div><span class="cpct">100%</span><span class="cdone">done</span></div>
+        <div class="cov"><span class="clbl">Weekly</span><div class="cbg"><div class="cbar" style="width:60%;background:#f5a623"></div></div><span class="cpct">~60%</span><span class="cscr">scripting</span></div>
+      </div>
+    </div>
+    <div class="s3col">
+      <div class="nbox">
+        <h4>Next sprint plan</h4>
+        <ul><li class="db">Complete remaining 10 weekly scripts</li><li class="db">Introduce API endpoint automation</li><li class="db">Expand monthly &amp; yearly scenarios</li><li class="db">CI/CD pipeline integration for reporting</li><li class="db">Custom trigger type automation next</li><li class="db">End-to-end regression suite planned</li></ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <span><span style="width:8px;height:8px;border-radius:50%;background:#1d9e75;display:inline-block;margin-right:6px"></span>Sprint active · QA Automation Space</span>
+  <span class="fbtn">Sprint #3</span>
+</div>
+
+</div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+new Chart(document.getElementById('pieChart'),{type:'doughnut',data:{datasets:[{data:[410,1],backgroundColor:['#1d9e75','#1d9e75'],borderWidth:0}]},options:{responsive:false,cutout:'58%',plugins:{legend:{display:false},tooltip:{enabled:false}}}});
+new Chart(document.getElementById('barChart'),{type:'bar',data:{labels:['Manual','Automation'],datasets:[{data:[110,3.9],backgroundColor:['#e05c3a','#1d9e75'],borderRadius:7,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataIndex===0?'110 hrs (manual)':'3.9 hrs/day (auto)'}}},scales:{y:{beginAtZero:true,grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'#999',font:{size:11}}},x:{grid:{display:false},ticks:{color:'#999',font:{size:11}}}}}});
+</script>
