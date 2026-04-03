@@ -1,0 +1,250 @@
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#efefef;padding:16px 40px}
+.page{background:#efefef;max-width:780px;margin:0 auto}
+
+.header-card{background:#0d2a4a;border-radius:14px;padding:14px 18px;margin-bottom:12px;position:relative}
+.sprint-pill{position:absolute;top:0;left:16px;background:#1a6faf;color:#fff;font-size:10px;font-weight:700;padding:3px 10px 4px;border-radius:0 0 8px 8px}
+.sd-tab{position:absolute;top:0;right:16px;background:#fff;font-size:12px;font-weight:700;padding:3px 13px 5px;border-radius:0 0 9px 9px;line-height:1}
+.sd-r{color:#e8312a}.sd-b{color:#0a1a8a}
+.hdr-row{display:flex;align-items:center;gap:14px;margin-top:14px}
+.robot-box{width:48px;height:48px;background:#1a6faf;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+.hdr-text h1{font-size:19px;font-weight:700;color:#fff}
+.hdr-text p{font-size:11px;color:#8ab4d4;margin-top:3px}
+.success-pill{margin-left:auto;background:#1a5e32;color:#a0f0c0;font-size:11px;font-weight:700;padding:6px 14px;border-radius:20px;white-space:nowrap;border:1px solid #4a9a6a}
+
+.tags{display:flex;justify-content:center;gap:7px;margin-bottom:12px}
+.tag{background:#fff;border:1px solid #d0d0d0;border-radius:16px;padding:4px 14px;font-size:10.5px;color:#333;white-space:nowrap;flex:1;text-align:center}
+
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.mc{border-radius:12px;padding:16px;text-align:center;background:#fff;border:1px solid #ddd;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80px}
+.mc .n{font-size:28px;font-weight:700;color:#1a1a2e;line-height:1.1}
+.mc .l{font-size:11px;margin-top:5px;font-weight:600;color:#555}
+
+.grid4{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+
+.card{background:#fef6fc;border-radius:13px;padding:16px;border:1px solid #eed8ea;display:flex;flex-direction:column}
+.ctitle{font-size:13px;font-weight:700;color:#4a0a3a;margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid #f0dcea;flex-shrink:0}
+.ctitle-g{font-size:13px;font-weight:700;color:#1e5e32;margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid #f0dcea;flex-shrink:0}
+
+.pie-row{display:flex;flex-direction:column;align-items:center;gap:12px;flex-shrink:0}
+.pie-legend-row{display:flex;justify-content:center;gap:16px;flex-wrap:wrap}
+.pie-wrap{position:relative;width:120px;height:120px;flex-shrink:0}
+.pie-c{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+.pie-c .pn{font-size:22px;font-weight:700;color:#4a0a3a}
+.pie-c .ps{font-size:9px;color:#9a6a8a}
+.leg-item{display:flex;align-items:center;gap:7px;margin-bottom:7px;font-size:11.5px;color:#2a1a3a}
+.ld{width:11px;height:11px;border-radius:2px;flex-shrink:0}
+
+.bars{margin-top:9px;padding-top:9px;border-top:1px solid #f0dcea;flex-shrink:0}
+.br{display:flex;align-items:center;gap:7px;margin-bottom:6px}
+.bl{font-size:10.5px;color:#3a0a2a;width:58px;flex-shrink:0}
+.bt{background:#f5e0f0;border-radius:100px;height:8px;flex:1;overflow:hidden}
+.bf{height:8px;border-radius:100px}
+.bp{font-size:10px;color:#7a2a6a;width:32px;text-align:right}
+
+.eboxes{display:flex;align-items:center;gap:9px;margin-bottom:10px;flex-shrink:0}
+.eb{flex:1;border-radius:10px;padding:10px;text-align:center}
+.eb-m{background:#fff2f2;border:1px solid #f5c8c8}
+.eb-a{background:#f2faf2;border:1px solid #b0deb0}
+.eb .en{font-size:16px;font-weight:700}
+.eb-m .en{color:#7a1010}.eb-a .en{color:#0a4a1a}
+.eb .es{font-size:9.5px;color:#555;margin-top:3px;line-height:1.45}
+.earr{font-size:15px;color:#c090b0;flex-shrink:0}
+
+.bul{list-style:none}
+.bul li{font-size:11px;color:#2a1a3a;margin-bottom:5px;display:flex;gap:7px;align-items:flex-start;line-height:1.4}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.dg{background:#1e8a4a}.dr{background:#c0392b}.db{background:#1a6faf}.dp{background:#7c3aed}.dm{background:#c0507a}
+
+.flow{display:flex;align-items:center;gap:3px;margin-top:10px;padding:7px;background:#f8eef6;border-radius:8px;border:1px solid #e2c8da;flex-shrink:0}
+.fb{background:#fff;border:1px solid #ddbad0;border-radius:7px;padding:5px 4px;text-align:center;flex:1}
+.fb .fi{font-size:13px;line-height:1}
+.fb .ft{font-size:8px;color:#6a2a5a;margin-top:2px;line-height:1.2}
+.fa{font-size:9px;color:#c080a8;flex-shrink:0}
+
+.ni{background:#f0ecff;border-radius:9px;padding:10px;border:1px solid #cfc8f0;flex:1}
+.ni .bul li{color:#2a0a5a}
+
+.stats-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px;flex-shrink:0}
+.sbox{background:#f0ecff;border:1px solid #cfc8f0;border-radius:8px;padding:7px 6px;text-align:center}
+.sbox .sv{font-size:15px;font-weight:700;color:#3a0a6a}
+.sbox .sl{font-size:8.5px;color:#6a4a9a;margin-top:2px;line-height:1.2}
+
+.footer{display:flex;justify-content:space-between;font-size:10.5px;color:#666;padding-top:9px;border-top:1px solid #d8d8d8;align-items:center}
+.fdot{width:7px;height:7px;background:#1e8a4a;border-radius:50%;display:inline-block;margin-right:5px}
+</style>
+
+<div class="page" id="dashPage">
+
+  <div class="header-card">
+    <div class="sprint-pill">✅ Sprint 3</div>
+    <div class="sd-tab"><span class="sd-r">Storage</span><span class="sd-b">Defender</span></div>
+    <div class="hdr-row">
+      <div class="robot-box">🤖</div>
+      <div class="hdr-text">
+        <h1>Automation Testing Sprint Status</h1>
+        <p>QA Automation · Task Rule Creation Sprint</p>
+      </div>
+      <div class="success-pill">🎉 Sprint 3 Completed!</div>
+    </div>
+  </div>
+
+  <div class="tags">
+    <span class="tag">📅 Completed Sprint</span>
+    <span class="tag">🔁 One-time · Daily · Weekly</span>
+    <span class="tag">⚙️ CI/CD Pipeline</span>
+    <span class="tag">💻 VM-based Execution</span>
+  </div>
+
+  <div class="metrics">
+    <div class="mc"><div class="n">50</div><div class="l">Total test cases</div></div>
+    <div class="mc"><div class="n">50 ✅</div><div class="l">Completed</div></div>
+    <div class="mc"><div class="n">100% 🎯</div><div class="l">Sprint progress</div></div>
+  </div>
+
+  <div class="grid4">
+
+    <div class="card">
+      <div class="ctitle">🥧 Test cases — total count (50)</div>
+      <div class="pie-row">
+        <div class="pie-wrap">
+          <canvas id="pieB" width="130" height="130"></canvas>
+          <div class="pie-c"><div class="pn">50</div><div class="ps">total</div></div>
+        </div>
+        <div class="pie-legend-row">
+          <div class="leg-item"><span class="ld" style="background:#1a6faf"></span>One-time — 20</div>
+          <div class="leg-item"><span class="ld" style="background:#1e8a4a"></span>Daily — 20</div>
+          <div class="leg-item"><span class="ld" style="background:#d47a00"></span>Weekly — 10</div>
+        </div>
+      </div>
+      <div class="bars">
+        <div class="br"><span class="bl">One-time</span><div class="bt"><div class="bf" style="width:100%;background:#1a6faf"></div></div><span class="bp">100%</span></div>
+        <div class="br"><span class="bl">Daily</span><div class="bt"><div class="bf" style="width:100%;background:#1e8a4a"></div></div><span class="bp">100%</span></div>
+        <div class="br"><span class="bl">Weekly</span><div class="bt"><div class="bf" style="width:100%;background:#d47a00"></div></div><span class="bp">100%</span></div>
+      </div>
+      <ul class="bul" style="margin-top:9px">
+        <li><span class="dot dg"></span>5 test scenarios per card — trigger-based conditions ✅</li>
+        <li><span class="dot db"></span>Task rule creations: automated script per trigger type</li>
+        <li><span class="dot dp"></span>One-time, daily, weekly schedule types fully covered</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="ctitle">⏱️ Effort comparison (50 cases)</div>
+      <div class="eboxes">
+        <div class="eb eb-m"><div class="en">13h 00m</div><div class="es">Manual effort<br>50 × 13 min = 780 min</div></div>
+        <div class="earr">→</div>
+        <div class="eb eb-a"><div class="en">~30 min 🚀</div><div class="es">Automation run<br>Daily on VM</div></div>
+      </div>
+      <ul class="bul">
+        <li><span class="dot dr"></span><strong>~96% time reduction</strong> via automation scripts</li>
+        <li><span class="dot dg"></span>VM runs 50 cases daily — zero human intervention ✅</li>
+        <li><span class="dot db"></span>750 min saved per run — engineer time fully freed</li>
+        <li><span class="dot dp"></span>Scripts auto-trigger on schedule via CI/CD pipeline</li>
+        <li><span class="dot dg"></span>Each test validates task rule trigger & execution flow</li>
+        <li><span class="dot dm"></span>Pass/fail results auto-logged — no manual tracking needed</li>
+        <li><span class="dot db"></span>Scripts reusable across future sprint scenarios</li>
+        <li><span class="dot dg"></span>Zero setup time — VM pre-configured & always ready</li>
+      </ul>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px;flex-shrink:0">
+        <div style="background:#fff2f2;border:1px solid #f5c8c8;border-radius:8px;padding:7px 6px;text-align:center">
+          <div style="font-size:15px;font-weight:700;color:#7a1010">780</div>
+          <div style="font-size:8.5px;color:#9a3a3a;margin-top:2px;line-height:1.2">Manual<br>mins/run</div>
+        </div>
+        <div style="background:#f2faf2;border:1px solid #b0deb0;border-radius:8px;padding:7px 6px;text-align:center">
+          <div style="font-size:15px;font-weight:700;color:#0a4a1a">30</div>
+          <div style="font-size:8.5px;color:#1a6a2a;margin-top:2px;line-height:1.2">Auto<br>mins/run</div>
+        </div>
+        <div style="background:#eaedff;border:1px solid #a8b4f0;border-radius:8px;padding:7px 6px;text-align:center">
+          <div style="font-size:15px;font-weight:700;color:#0a1a6a">96%</div>
+          <div style="font-size:8.5px;color:#2a3a9a;margin-top:2px;line-height:1.2">Time<br>saved</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="c3">
+      <div class="ctitle-g">✅ Completed this sprint</div>
+      <ul class="bul">
+        <li><span class="dot dg"></span>All one-time task rule scripts written & verified ✅</li>
+        <li><span class="dot dg"></span>All daily task rule automation scripts completed ✅</li>
+        <li><span class="dot dg"></span>All weekly test case scripts completed ✅</li>
+        <li><span class="dot dg"></span>Incident & task scenario analysis completed ✅</li>
+        <li><span class="dot dg"></span>50/50 cases done — 100% sprint coverage 🏆</li>
+        <li><span class="dot db"></span>All scripts peer-reviewed & merged to repo</li>
+        <li><span class="dot dp"></span>VM execution validated — all runs green ✅</li>
+      </ul>
+      <div class="flow">
+        <div class="fb"><div class="fi">📝</div><div class="ft">Write<br>Script</div></div>
+        <span class="fa">▶</span>
+        <div class="fb"><div class="fi">🔍</div><div class="ft">Review<br>Script</div></div>
+        <span class="fa">▶</span>
+        <div class="fb"><div class="fi">⚙️</div><div class="ft">VM<br>Execute</div></div>
+        <span class="fa">▶</span>
+        <div class="fb"><div class="fi">✅</div><div class="ft">Validate<br>Pass</div></div>
+        <span class="fa">▶</span>
+        <div class="fb"><div class="fi">📊</div><div class="ft">Log<br>Report</div></div>
+      </div>
+    </div>
+
+    <div class="card" id="c4">
+      <div class="ctitle">🚀 Next sprint plan</div>
+      <div class="ni">
+        <ul class="bul">
+          <li><span class="dot db"></span>Monthly trigger scenarios — script & validate</li>
+          <li><span class="dot db"></span>Yearly trigger scenarios — end-to-end coverage</li>
+          <li><span class="dot db"></span>Custom trigger scenarios — flexible rule testing</li>
+          <li><span class="dot db"></span>2 API endpoint automation (planning phase)</li>
+          <li><span class="dot dp"></span>CI/CD pipeline integration & auto-reporting</li>
+          <li><span class="dot dg"></span>Expand StorageDefender VM test coverage</li>
+          <li><span class="dot dm"></span>Performance benchmarking on all VM runs</li>
+        </ul>
+      </div>
+      <div class="stats-strip">
+        <div class="sbox"><div class="sv">3</div><div class="sl">Trigger<br>Types</div></div>
+        <div class="sbox"><div class="sv">2</div><div class="sl">API<br>Endpoints</div></div>
+        <div class="sbox"><div class="sv">100+</div><div class="sl">New<br>Scenarios</div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <span><span class="fdot"></span>Sprint 3 Completed · QA Automation Space 🎊</span>
+    <span>Generated · April 2026</span>
+  </div>
+
+</div>
+
+<div style="margin-top:12px;text-align:center">
+  <button id="dlBtn" style="background:#0d2a4a;color:#fff;font-size:13px;font-weight:700;padding:10px 32px;border-radius:10px;cursor:pointer;border:none">⬇ Download PNG</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+var done=false;
+new Chart(document.getElementById('pieB'),{
+  type:'doughnut',
+  data:{labels:['One-time','Daily','Weekly'],datasets:[{data:[20,20,10],backgroundColor:['#1a6faf','#1e8a4a','#d47a00'],borderColor:'#fff',borderWidth:2}]},
+  options:{responsive:false,cutout:'55%',animation:{onComplete:function(){done=true;}},plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return ' '+c.label+': '+c.parsed+' cases';}}}}}
+});
+function equalH(){
+  var a=document.getElementById('c3'),b=document.getElementById('c4');
+  a.style.height='auto';b.style.height='auto';
+  var h=Math.max(a.scrollHeight,b.scrollHeight);
+  a.style.height=h+'px';b.style.height=h+'px';
+}
+window.addEventListener('load',function(){setTimeout(equalH,300);});
+window.addEventListener('resize',equalH);
+document.getElementById('dlBtn').addEventListener('click',function(){
+  var btn=this;btn.textContent='Generating…';btn.disabled=true;
+  function cap(){
+    html2canvas(document.getElementById('dashPage'),{scale:2,useCORS:true,allowTaint:true,backgroundColor:'#efefef',logging:false}).then(function(cv){
+      var a=document.createElement('a');a.download='Sprint3_Dashboard.png';a.href=cv.toDataURL('image/png');a.click();
+      btn.textContent='⬇ Download PNG';btn.disabled=false;
+    }).catch(function(){btn.textContent='⬇ Download PNG';btn.disabled=false;});
+  }
+  done?setTimeout(cap,100):setTimeout(cap,900);
+});
+</script>
