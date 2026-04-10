@@ -253,11 +253,12 @@ window.addEventListener('load',function(){setTimeout(equalH,200);});
 window.addEventListener('resize',equalH);
 document.getElementById('dlBtn').addEventListener('click',function(){
   var btn=this;btn.textContent='Generating…';btn.disabled=true;
-  setTimeout(function(){
+  function cap(){
     html2canvas(document.getElementById('dashPage'),{scale:2,useCORS:true,allowTaint:true,backgroundColor:'#efefef',logging:false}).then(function(cv){
       var a=document.createElement('a');a.download='Sprint4_Dashboard.png';a.href=cv.toDataURL('image/png');a.click();
       btn.textContent='⬇ Download PNG';btn.disabled=false;
     }).catch(function(){btn.textContent='⬇ Download PNG';btn.disabled=false;});
-  },300);
+  }
+  done?setTimeout(cap,100):setTimeout(cap,900);
 });
 </script>
