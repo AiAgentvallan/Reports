@@ -1,0 +1,602 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+function downloadPNG(){
+  const btn=document.querySelector('button');
+  btn.textContent='Generating PNG...';
+  btn.disabled=true;
+  html2canvas(document.querySelector('.page'),{
+    scale:2,
+    useCORS:true,
+    backgroundColor:'#fdf0f3',
+    logging:false
+  }).then(canvas=>{
+    const link=document.createElement('a');
+    link.download='QMetry_Automation_Dashboard.png';
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+    btn.textContent='⬇ Download PNG';
+    btn.disabled=false;
+  });
+}
+</script><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>QMetry Automation Feasibility Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#222;min-height:100vh}
+.page{padding:22px;max-width:1100px;margin:0 auto;background:#fdf0f3;border-radius:18px;box-shadow:0 0 0 1px #f5d8de}
+
+/* HEADER */
+.header{background:linear-gradient(135deg,#1a1a3e 0%,#2d1b69 55%,#1a1a3e 100%);border-radius:14px;padding:16px 22px;margin-bottom:18px}
+.hdr-row1{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.hdr-left{display:flex;align-items:center;gap:14px}
+.robot{width:48px;height:48px;background:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+.hdr-title{font-size:17px;font-weight:600;color:#fff;line-height:1.3}
+.hdr-sub{font-size:11px;color:rgba(255,255,255,0.55);margin-top:3px}
+.sd-btn{border-top:2.5px solid #cc2222;border-bottom:2.5px solid #1a237e;border-left:2.5px solid #cc2222;border-right:2.5px solid #1a237e;border-radius:9px;padding:7px 18px;background:#fff;flex-shrink:0}
+.sd-s{font-size:14px;font-weight:800;color:#cc2222}
+.sd-d{font-size:14px;font-weight:800;color:#1a237e}
+.hdr-badges{display:flex;gap:8px;margin-top:11px;flex-wrap:wrap}
+.hdr-badge{background:rgba(255,255,255,0.13);border:0.5px solid rgba(255,255,255,0.25);border-radius:20px;padding:4px 12px;font-size:11px;color:rgba(255,255,255,0.9)}
+
+/* SECTION LABEL */
+.sec-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#a0848c;margin:0 0 10px}
+
+/* METRIC CARDS */
+.metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+.mc{border-radius:12px;padding:15px 16px;text-align:center;border:1px solid transparent}
+.mc-val{font-size:30px;font-weight:700;line-height:1}
+.mc-lbl{font-size:11px;color:#777;margin-top:5px}
+.mc-sub{font-size:11px;font-weight:600;margin-top:3px}
+.mc-total{background:#fff;border-color:#e8dde0}
+.mc-auto{background:linear-gradient(135deg,#e8f5e9,#f1faf5);border-color:#c8e6c9}
+.mc-done{background:linear-gradient(135deg,#e3f0fb,#f0f7ff);border-color:#b3d4f0}
+.mc-non{background:linear-gradient(135deg,#fff8f0,#fff3e8);border-color:#ffd9a0}
+
+/* HISTORY SECTION */
+.history-bg{background:linear-gradient(145deg,#e8eef8,#dce8f5,#e4edf8);border-radius:14px;border:1px solid #c5d5ea;padding:16px;margin-bottom:18px}
+.history-tiles{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:12px}
+.h-tile{background:linear-gradient(160deg,#f5f8ff,#eef4ff);border-radius:12px;border:1px solid #c8d8f0;padding:16px;display:flex;flex-direction:column;align-items:center}
+.h-tile-left{align-items:center}
+.h-tile-title{font-size:12px;font-weight:700;color:#2c3e6e;margin-bottom:12px;align-self:flex-start;width:100%}
+.pie-center{position:relative;width:170px;height:170px}
+.pie-center canvas{position:absolute;top:0;left:0}
+.pie-inner{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.sc-n{background:#fff;border-radius:10px;padding:13px;text-align:center;border:1px solid #e0e0e0}
+.sc-r{background:linear-gradient(135deg,#fff5f5,#ffe8e8);border-radius:10px;padding:13px;text-align:center;border:1px solid #ffcdd2}
+.sc-g{background:linear-gradient(135deg,#f1faf5,#e6f7ee);border-radius:10px;padding:13px;text-align:center;border:1px solid #c8e6c9}
+.sv{font-size:22px;font-weight:700}
+.sl{font-size:11px;color:#888;margin-top:3px}
+
+/* PROGRESS TRACKER */
+.prog-section{background:#fff;border-radius:14px;border:1px solid #e8dde0;padding:18px;margin-bottom:18px}
+.prog-row{display:flex;align-items:center;gap:12px;margin-bottom:13px}
+.prog-row:last-child{margin-bottom:0}
+.prog-label{font-size:12px;font-weight:700;width:130px;flex-shrink:0}
+.prog-bar-bg{flex:1;height:13px;background:#f5edf0;border-radius:7px;overflow:hidden;border:0.5px solid #e8d8dc}
+.prog-bar{height:100%;border-radius:7px}
+.prog-right{font-size:12px;color:#555;white-space:nowrap;min-width:210px;text-align:right}
+
+/* CHARTS ROW */
+.charts-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:18px}
+.chart-card{background:#fff;border:1px solid #e8dde0;border-radius:14px;padding:16px}
+.chart-title{font-size:12px;font-weight:700;color:#222;margin-bottom:8px}
+.legend-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;font-size:11px;color:#555}
+.leg-sq{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:3px;vertical-align:middle}
+
+/* TABLE — light blue bg */
+.tbl-wrap{border-radius:14px;overflow:hidden;margin-bottom:18px;border:1px solid #b3cde8}
+.tbl{width:100%;border-collapse:collapse;font-size:11.5px;table-layout:fixed;background:#eaf2fb}
+.tbl thead tr{background:linear-gradient(135deg,#1a1a3e,#2d1b69)}
+.tbl th{color:#fff;font-weight:500;padding:10px 8px;text-align:center;font-size:11px;border-right:0.5px solid rgba(255,255,255,0.15)}
+.tbl th:nth-child(2){text-align:left}
+.tbl th:last-child{border-right:none}
+.tbl td{padding:8px 8px;border-bottom:0.5px solid #c5ddf0;text-align:center;vertical-align:middle;font-size:11px;background:#eaf2fb}
+.tbl td:nth-child(2){text-align:left;font-weight:500;font-size:11.5px}
+.tbl tr:nth-child(even) td{background:#ddeef9}
+.tbl tr:hover td{background:#cfe4f5}
+.tbl tfoot td{background:linear-gradient(135deg,#b3cde8,#c5ddf0);font-weight:700;font-size:12px;border-top:2px solid #378add}
+.bd{background:#e8f5e9;color:#2e7d32;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600}
+.bc{background:#e3f0fb;color:#1565c0;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600}
+.bp{background:#f5f5f0;color:#666;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:500}
+.bz{color:#bbb;font-size:11px}
+
+/* NON-AUTO REASONS */
+.reasons-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.r-card{background:#fff;border:1px solid #e8dde0;border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between}
+.r-name{font-size:11.5px;color:#333;font-weight:500}
+.r-sub{font-size:10px;color:#888;margin-top:2px}
+.r-count{font-size:18px;font-weight:700;color:#222;text-align:right}
+.r-pct{font-size:10px;color:#888;text-align:right}
+
+/* API UPCOMING */
+.api-box{background:linear-gradient(135deg,#fff8e1,#fffdf0);border:1.5px solid #ffe082;border-radius:14px;padding:16px;margin-bottom:18px}
+.api-title{font-size:13px;font-weight:700;color:#f57c00;margin-bottom:8px}
+
+/* DISCLAIMER with mini chart */
+.disc-outer{background:linear-gradient(135deg,#e8f0fe,#f0f7ff);border:1.5px solid #b3cde8;border-radius:14px;padding:18px;margin-bottom:18px}
+.disc-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:stretch}
+.disc-text{font-size:12px;color:#1565c0;line-height:1.9}
+.disc-chart-wrap{background:#fff;border-radius:12px;border:1px solid #c5ddf0;padding:14px}
+.disc-chart-title{font-size:11px;font-weight:700;color:#1565c0;margin-bottom:10px;text-align:center}
+
+/* SPRINTS */
+.sprints-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+.sp-card{background:#fff;border-radius:14px;border:1px solid #e8dde0;padding:14px;border-top:3px solid #ccc}
+.sp-done{border-top-color:#1d9e75}
+.sp-prog{border-top-color:#378add}
+.sp-num{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#888;margin-bottom:4px}
+.sp-name{font-size:12px;font-weight:600;color:#222;margin-bottom:10px;line-height:1.3}
+.sp-pct{font-size:28px;font-weight:700;line-height:1;margin-bottom:5px}
+.sp-bar-bg{height:7px;background:#f5edf0;border-radius:4px;overflow:hidden;margin-bottom:8px}
+.sp-bar{height:100%;border-radius:4px}
+.sp-meta{font-size:10.5px;color:#888;line-height:1.6}
+.sp-tag{font-size:10px;padding:2px 9px;border-radius:10px;font-weight:600;display:inline-block;margin-top:6px}
+.tag-done{background:#e8f5e9;color:#2e7d32}
+.tag-prog{background:#e3f0fb;color:#1565c0}
+
+/* PAGE DIVIDER */
+.page-div{border:none;border-top:2px dashed #e0c8cc;margin:26px 0;position:relative}
+.page-div::after{content:'— page 2 —';position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#fdf0f3;padding:0 14px;font-size:11px;color:#c0a0a8;letter-spacing:.05em}
+
+/* FOOTER */
+.footer{display:flex;align-items:center;justify-content:space-between;padding:12px 0 0;border-top:1px solid #e8dde0;font-size:11px;color:#a08090}
+.f-dot{width:8px;height:8px;border-radius:50%;background:#1d9e75;display:inline-block;margin-right:6px}
+.f-badge{background:#1565c0;color:#fff;padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- HEADER -->
+<div class="header">
+  <div class="hdr-row1">
+    <div class="hdr-left">
+      <div class="robot">🤖</div>
+      <div>
+        <div class="hdr-title">QMetry Automation Feasibility — Overall Dashboard</div>
+        <div class="hdr-sub">StorageDefender · QA Automation · All Sprints · April 2026</div>
+      </div>
+    </div>
+    <div class="sd-btn"><span class="sd-s">Storage</span><span class="sd-d">Defender</span></div>
+  </div>
+  <div class="hdr-badges" style="justify-content:center;width:100%">
+    <span class="hdr-badge">✅ Automation Testing Engineer</span>
+    <span class="hdr-badge">🖥 VM-based Execution</span>
+    <span class="hdr-badge">🏗 CI/CD Pipeline</span>
+    <span class="hdr-badge">📋 QMetry Integrated</span>
+  </div>
+</div>
+
+<!-- EXEC METRICS -->
+<div class="sec-lbl">Executive summary</div>
+<div class="metric-grid">
+  <div class="mc mc-total"><div class="mc-val" style="color:#222">1,999</div><div class="mc-lbl">Total test cases</div><div class="mc-sub" style="color:#888">in QMetry / Jira</div></div>
+  <div class="mc mc-auto"><div class="mc-val" style="color:#1d9e75">~1,276</div><div class="mc-lbl">Automatable total</div><div class="mc-sub" style="color:#1d9e75">64% of all TCs</div></div>
+  <div class="mc mc-done"><div class="mc-val" style="color:#378add">~504</div><div class="mc-lbl">Already automated</div><div class="mc-sub" style="color:#378add">39% of automatable</div></div>
+  <div class="mc mc-non"><div class="mc-val" style="color:#f5a623">~723</div><div class="mc-lbl">Non-automatable</div><div class="mc-sub" style="color:#f5a623">36% of all TCs</div></div>
+</div>
+
+<!-- HISTORY SECTION -->
+<div class="sec-lbl">Automation coverage — 504 test cases automated</div>
+<div class="history-bg">
+  <div class="history-tiles">
+    <!-- Pie: full green solid -->
+    <div class="h-tile h-tile-left">
+      <div class="h-tile-title">Total cases automated</div>
+      <div class="pie-center">
+        <canvas id="pieAuto" width="170" height="170" role="img" aria-label="504 test cases fully automated shown as complete green circle">504 of 1999 test cases automated.</canvas>
+        <div class="pie-inner">
+          <div style="font-size:30px;font-weight:700;color:#1d9e75;line-height:1">504</div>
+          <div style="font-size:11px;color:#888;margin-top:2px">cases</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:#555;margin-top:10px;text-align:center">Total test cases automated</div>
+      <div style="display:flex;gap:10px;margin-top:5px;font-size:11px;color:#555;justify-content:center">
+        <span><span style="width:9px;height:9px;border-radius:50%;background:#1d9e75;display:inline-block;margin-right:3px;vertical-align:middle"></span>Automated 504</span>
+      </div>
+    </div>
+    <!-- Bar chart -->
+    <div class="h-tile" style="align-items:stretch">
+      <div class="h-tile-title">Effort comparison — manual vs automation</div>
+      <div style="position:relative;flex:1;min-height:175px"><canvas id="effortBar" role="img" aria-label="Manual 140 hrs vs automation 4.3 hrs per day">Manual 140 hrs vs Auto 4.3 hrs/day.</canvas></div>
+      <div style="display:flex;gap:14px;margin-top:8px;font-size:11px;color:#555">
+        <span><span class="leg-sq" style="background:#e05c3a"></span>Manual 140 hrs</span>
+        <span><span class="leg-sq" style="background:#1d9e75"></span>Auto 4.3 hrs/day</span>
+      </div>
+    </div>
+  </div>
+  <div style="background:rgba(255,255,255,0.78);border-radius:9px;padding:8px 14px;margin-bottom:12px;font-size:12px;color:#2e7d32;font-weight:600;border:0.5px solid #c8e6c9">
+    ~97% time reduction · VM runs daily without human intervention
+  </div>
+  <div class="stat-row">
+    <div class="sc-n"><div class="sv" style="color:#222">504</div><div class="sl">Total automated</div></div>
+    <div class="sc-r"><div class="sv" style="color:#c62828">140 hrs</div><div class="sl">Manual effort</div></div>
+    <div class="sc-g"><div class="sv" style="color:#1d9e75">4.3 hrs</div><div class="sl">Auto/day VM</div></div>
+  </div>
+</div>
+
+<!-- PROGRESS TRACKER -->
+<div class="sec-lbl">Automation progress tracker — 1,276 automatable TCs</div>
+<div class="prog-section">
+  <div class="prog-row">
+    <div class="prog-label" style="color:#1d9e75">Done</div>
+    <div class="prog-bar-bg"><div class="prog-bar" style="width:39%;background:#1d9e75"></div></div>
+    <div class="prog-right">504 / 1,276 &nbsp;<span style="color:#888">(39% of automatable)</span></div>
+  </div>
+  <div class="prog-row">
+    <div class="prog-label" style="color:#378add">In Progress</div>
+    <div class="prog-bar-bg"><div class="prog-bar" style="width:19%;background:#378add"></div></div>
+    <div class="prog-right">245 / 1,276 &nbsp;<span style="color:#888">(19% of automatable)</span></div>
+  </div>
+  <div class="prog-row">
+    <div class="prog-label" style="color:#f5a623">Not Yet Started</div>
+    <div class="prog-bar-bg"><div class="prog-bar" style="width:41%;background:#f5a623"></div></div>
+    <div class="prog-right">527 / 1,276 &nbsp;<span style="color:#888">(41% of automatable)</span></div>
+  </div>
+</div>
+
+<!-- 3 CHARTS -->
+<div class="sec-lbl">Visual breakdown charts</div>
+<div class="charts-row">
+  <div class="chart-card">
+    <div class="chart-title">Overall automation coverage (1,999 TCs)</div>
+    <div class="legend-row">
+      <span><span class="leg-sq" style="background:#1d9e75"></span>Done 25%</span>
+      <span><span class="leg-sq" style="background:#378add"></span>In Progress 12%</span>
+      <span><span class="leg-sq" style="background:#f5a623"></span>Not Started 26%</span>
+      <span><span class="leg-sq" style="background:#d3d1c7"></span>Non-auto 36%</span>
+    </div>
+    <div style="position:relative;height:190px"><canvas id="coverageDonut" role="img" aria-label="Donut chart showing 504 done, 245 in progress, 527 not started, 723 non-automatable">504 done, 245 in progress, 527 not started, 723 non-automatable.</canvas></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">TC count by automation status</div>
+    <div class="legend-row">
+      <span><span class="leg-sq" style="background:#1d9e75"></span>Done</span>
+      <span><span class="leg-sq" style="background:#378add"></span>In Progress</span>
+      <span><span class="leg-sq" style="background:#f5a623"></span>Not Yet Started</span>
+    </div>
+    <div style="position:relative;height:190px"><canvas id="statusBar" role="img" aria-label="Bar chart: 504 done, 245 in progress, 527 not started">504 done, 245 in progress, 527 not started.</canvas></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">API endpoint testing — upcoming pipeline</div>
+    <div class="legend-row">
+      <span><span class="leg-sq" style="background:#1d9e75"></span>Done</span>
+      <span><span class="leg-sq" style="background:#378add"></span>In Progress</span>
+      <span><span class="leg-sq" style="background:#f5a623"></span>500+ remaining</span>
+    </div>
+    <div style="position:relative;height:190px"><canvas id="apiBar" role="img" aria-label="API TCs: 101 done, 245 in progress, 500+ not yet created">101 done, 245 in progress, 500+ not created yet.</canvas></div>
+  </div>
+</div>
+
+<!-- PAGE DIVIDER -->
+<hr class="page-div"/>
+
+<!-- TABLE -->
+<div class="sec-lbl">Module-by-module breakdown — QMetry feasibility table</div>
+<div class="tbl-wrap">
+  <table class="tbl">
+    <colgroup>
+      <col style="width:30px"><col style="width:158px"><col style="width:58px">
+      <col style="width:72px"><col style="width:82px">
+      <col style="width:65px"><col style="width:75px"><col style="width:90px">
+    </colgroup>
+    <thead>
+      <tr>
+        <th>#</th><th>Module</th><th>Total TCs</th>
+        <th>Automatable</th><th>Non-Automatable</th>
+        <th>Done</th><th>In Progress</th><th>Not Yet Started</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>API Automation</td><td>346</td><td>346</td><td class="bz">0</td><td><span class="bd">101</span></td><td><span class="bc">245</span></td><td class="bz">0</td></tr>
+      <tr><td>2</td><td>Front Office UI</td><td>525</td><td>~430</td><td>~95</td><td><span class="bd">~293</span></td><td class="bz">0</td><td><span class="bp">~137</span></td></tr>
+      <tr><td>3</td><td>Backoffice UI</td><td>324</td><td>~270</td><td>~54</td><td><span class="bd">~87</span></td><td class="bz">0</td><td><span class="bp">~183</span></td></tr>
+      <tr><td>4</td><td>Motion / Escalation</td><td>317</td><td>~180</td><td>~137</td><td><span class="bd">~23</span></td><td class="bz">0</td><td><span class="bp">~157</span></td></tr>
+      <tr><td>5</td><td>PMS — SiteLink</td><td>126</td><td class="bz">0</td><td>126</td><td class="bz">0</td><td class="bz">0</td><td class="bz">0</td></tr>
+      <tr><td>6</td><td>PMS — StorEDGE</td><td>100</td><td class="bz">0</td><td>100</td><td class="bz">0</td><td class="bz">0</td><td class="bz">0</td></tr>
+      <tr><td>7</td><td>PMS — SSM</td><td>35</td><td class="bz">0</td><td>35</td><td class="bz">0</td><td class="bz">0</td><td class="bz">0</td></tr>
+      <tr><td>8</td><td>PMS — Monument</td><td>14</td><td class="bz">0</td><td>14</td><td class="bz">0</td><td class="bz">0</td><td class="bz">0</td></tr>
+      <tr><td>9</td><td>PMS — General/Other</td><td>34</td><td class="bz">0</td><td>34</td><td class="bz">0</td><td class="bz">0</td><td class="bz">0</td></tr>
+      <tr><td>10</td><td>EEN Integration</td><td>70</td><td class="bz">0</td><td>70</td><td class="bz">0</td><td class="bz">0</td><td class="bz">0</td></tr>
+      <tr><td>11</td><td>2FA / OTP</td><td>63</td><td class="bz">0</td><td>63</td><td class="bz">0</td><td class="bz">0</td><td class="bz">0</td></tr>
+      <tr><td>12</td><td>PTI</td><td>17</td><td class="bz">0</td><td>17</td><td class="bz">0</td><td class="bz">0</td><td class="bz">0</td></tr>
+      <tr><td>13</td><td>Radio Bridge</td><td>17</td><td class="bz">0</td><td>17</td><td class="bz">0</td><td class="bz">0</td><td class="bz">0</td></tr>
+      <tr><td>14</td><td>Webhooks &amp; GraphQL</td><td>24</td><td>24</td><td class="bz">0</td><td class="bz">0</td><td class="bz">0</td><td><span class="bp">~24</span></td></tr>
+      <tr><td>15</td><td>Reporting / KPI Dashboard</td><td>29</td><td>~20</td><td>~9</td><td class="bz">0</td><td class="bz">0</td><td><span class="bp">~20</span></td></tr>
+      <tr><td>16</td><td>Notification Center (BO)</td><td>4</td><td class="bz">0</td><td>4</td><td class="bz">0</td><td class="bz">0</td><td class="bz">0</td></tr>
+      <tr><td>17</td><td>Message Processor</td><td>1</td><td class="bz">0</td><td>1</td><td class="bz">0</td><td class="bz">0</td><td class="bz">0</td></tr>
+      <tr><td>18</td><td>E-commerce</td><td>3</td><td>~2</td><td>~1</td><td class="bz">0</td><td class="bz">0</td><td><span class="bp">~2</span></td></tr>
+      <tr><td>19</td><td>External / HTTP API</td><td>4</td><td>4</td><td class="bz">0</td><td class="bz">0</td><td class="bz">0</td><td><span class="bp">~4</span></td></tr>
+    </tbody>
+    <tfoot>
+      <tr><td colspan="2">TOTAL</td><td>1,999</td><td>~1,276</td><td>~723</td><td><span class="bd">~504</span></td><td><span class="bc">~245</span></td><td><span class="bp">~527</span></td></tr>
+    </tfoot>
+  </table>
+</div>
+
+<!-- NON-AUTO REASONS -->
+<div class="sec-lbl">Non-automatable reasons (~723 TCs — 36% of total)</div>
+<div class="reasons-grid" style="margin-bottom:18px">
+  <div class="r-card" style="border-left:4px solid #e05c3a"><div><div class="r-name">Third-party PMS (SiteLink, StorEDGE, SSM, Monument)</div><div class="r-sub">External system — no API control</div></div><div style="margin-left:12px;flex-shrink:0;text-align:right"><div class="r-count">309</div><div class="r-pct">43%</div></div></div>
+  <div class="r-card" style="border-left:4px solid #f5a623"><div><div class="r-name">Physical hardware / sensor triggers</div><div class="r-sub">Requires physical interaction</div></div><div style="margin-left:12px;flex-shrink:0;text-align:right"><div class="r-count">~137</div><div class="r-pct">19%</div></div></div>
+  <div class="r-card" style="border-left:4px solid #e05c3a"><div><div class="r-name">Third-party hardware/camera (EEN, PTI, Radio Bridge)</div><div class="r-sub">Hardware integration limits</div></div><div style="margin-left:12px;flex-shrink:0;text-align:right"><div class="r-count">104</div><div class="r-pct">14%</div></div></div>
+  <div class="r-card" style="border-left:4px solid #888"><div><div class="r-name">Visual-only / manual inspection required</div><div class="r-sub">No verifiable assertion possible</div></div><div style="margin-left:12px;flex-shrink:0;text-align:right"><div class="r-count">~53</div><div class="r-pct">7%</div></div></div>
+  <div class="r-card" style="border-left:4px solid #9c27b0"><div><div class="r-name">OTP / 2FA flows</div><div class="r-sub">Dynamic code, external auth dependency</div></div><div style="margin-left:12px;flex-shrink:0;text-align:right"><div class="r-count">63</div><div class="r-pct">9%</div></div></div>
+  <div class="r-card" style="border-left:4px solid #378add"><div><div class="r-name">Email / SMS / push notification delivery</div><div class="r-sub">External delivery verification</div></div><div style="margin-left:12px;flex-shrink:0;text-align:right"><div class="r-count">~34</div><div class="r-pct">5%</div></div></div>
+  <div class="r-card" style="border-left:4px solid #ccc"><div><div class="r-name">Message Processor (third-party)</div><div class="r-sub">Third-party processor dependency</div></div><div style="margin-left:12px;flex-shrink:0;text-align:right"><div class="r-count">1</div><div class="r-pct">&lt;1%</div></div></div>
+  <div class="r-card" style="background:#f5edf0;border-left:4px solid #1d9e75"><div><div class="r-name" style="font-weight:700">Total non-automatable</div><div class="r-sub">36% of all 1,999 test cases</div></div><div style="margin-left:12px;flex-shrink:0;text-align:right"><div class="r-count" style="font-size:22px;color:#e05c3a">~723</div><div class="r-pct">100%</div></div></div>
+</div>
+
+<!-- API UPCOMING -->
+<div class="sec-lbl">API endpoint testing — upcoming scope</div>
+<div class="api-box">
+  <div class="api-title">⚡ 500+ API endpoint test cases not yet created</div>
+  <div style="font-size:12px;color:#555;line-height:1.8">
+    Currently, API Automation module has <strong>346 test cases</strong> in QMetry with <strong>101 done</strong> and <strong>245 in progress</strong>.<br>
+    However, <strong>500+ additional API endpoint test cases</strong> are not yet created in Jira/QMetry and are not in the current count.<br>
+    These include: <strong>organisation endpoints · paginated flows · device management APIs · edge case validations · webhook triggers · GraphQL mutations</strong>.<br>
+    These will be created and added across <strong>upcoming sprints and months</strong> as the API surface expands.
+  </div>
+</div>
+
+<!-- SPRINT STATUS -->
+<div class="sec-lbl">Sprint status — all 4 sprints overview</div>
+<div class="sprints-grid">
+  <div class="sp-card sp-done">
+    <div class="sp-num">Sprint 1</div>
+    <div class="sp-name">API testing initiated</div>
+    <div class="sp-pct" style="color:#1d9e75">100%</div>
+    <div class="sp-bar-bg"><div class="sp-bar" style="width:100%;background:#1d9e75"></div></div>
+    <div class="sp-meta">36 cases · All verified &amp; passing<br>Daily VM auto CI/CD running</div>
+    <span class="sp-tag tag-done">Completed</span>
+  </div>
+  <div class="sp-card sp-done">
+    <div class="sp-num">Sprint 2</div>
+    <div class="sp-name">API endpoint expansion</div>
+    <div class="sp-pct" style="color:#1d9e75">100%</div>
+    <div class="sp-bar-bg"><div class="sp-bar" style="width:100%;background:#1d9e75"></div></div>
+    <div class="sp-meta">40 cases · All verified &amp; passing<br>Paginated &amp; org device coverage</div>
+    <span class="sp-tag tag-done">Completed</span>
+  </div>
+  <div class="sp-card sp-done">
+    <div class="sp-num">Sprint 3</div>
+    <div class="sp-name">Task rule creation</div>
+    <div class="sp-pct" style="color:#1d9e75">100%</div>
+    <div class="sp-bar-bg"><div class="sp-bar" style="width:100%;background:#1d9e75"></div></div>
+    <div class="sp-meta">50+ cases · One-time, daily &amp; weekly<br>Weekly scripts fully scripted</div>
+    <span class="sp-tag tag-done">Completed</span>
+  </div>
+  <div class="sp-card sp-prog">
+    <div class="sp-num">Sprint 4 — current</div>
+    <div class="sp-name">Pre-install &amp; CI/CD integration</div>
+    <div class="sp-pct" style="color:#378add">80%</div>
+    <div class="sp-bar-bg"><div class="sp-bar" style="width:80%;background:#378add"></div></div>
+    <div class="sp-meta">70 planned · 54 scripts done<br>Backlog: 10 cases next sprint</div>
+    <span class="sp-tag tag-prog">In Progress</span>
+  </div>
+</div>
+
+<!-- DISCLAIMER with mini chart -->
+<div class="sec-lbl">Important note on data coverage</div>
+<div class="disc-outer">
+  <div class="disc-grid">
+    <div>
+      <div class="disc-text">
+        ⚠️ <strong>All data is based only on test cases currently in Jira &amp; QMetry</strong><br>
+        🚀 New features will be added — the TC count will keep increasing<br>
+        📈 New modules, API endpoints &amp; UI flows will bring new test cases<br>
+        🔄 This dashboard will be updated regularly to reflect latest coverage<br>
+        ⚡ 500+ API endpoint TCs are not yet in QMetry — will be added soon<br>
+        📊 Automation scripts will be written progressively in upcoming sprints<br>
+        🎯 Target: automate all 1,276 automatable TCs across future sprints
+      </div>
+    </div>
+    <div class="disc-chart-wrap" style="display:flex;flex-direction:column">
+      <div class="disc-chart-title">Automation growth — sprint-by-sprint trend</div>
+      <div style="position:relative;flex:1;min-height:200px"><canvas id="projChart" role="img" aria-label="Growing bar chart with upward trend line showing automation increasing sprint by sprint">Automation growing from Sprint 1 through upcoming sprints toward 1276 target.</canvas></div>
+      <div style="display:flex;gap:10px;margin-top:8px;font-size:10px;color:#555;justify-content:center;flex-wrap:wrap">
+        <span><span class="leg-sq" style="background:#378add"></span>TCs automated</span>
+        <span><span class="leg-sq" style="background:#e05c3a;height:3px;border-radius:1px;display:inline-block;vertical-align:middle;width:16px;margin-bottom:1px"></span>Growth trend</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AUTOMATION FLOW ARCHITECTURE -->
+<div class="sec-lbl">Automation running flow — architecture</div>
+<div style="background:#fff;border:1px solid #e8dde0;border-radius:14px;padding:24px 20px;margin-bottom:18px">
+  <div style="font-size:13px;font-weight:600;color:#444;margin-bottom:20px">Automation execution pipeline — end-to-end flow</div>
+  <div style="display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px">
+
+    <!-- Step 1: Write Script -->
+    <div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:90px;max-width:120px">
+      <div style="background:linear-gradient(145deg,#ede9fe,#ddd6fe);border:1.5px solid #c4b5fd;border-radius:16px;padding:16px 8px;text-align:center;width:100%">
+        <div style="font-size:24px;margin-bottom:6px">📝</div>
+        <div style="font-size:13px;font-weight:700;color:#5b21b6">Write</div>
+        <div style="font-size:11px;color:#7c3aed;margin-top:2px">Script</div>
+      </div>
+    </div>
+    <div style="font-size:20px;color:#aaa;flex-shrink:0;margin-bottom:10px">→</div>
+
+    <!-- Step 2: Review Script -->
+    <div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:90px;max-width:120px">
+      <div style="background:linear-gradient(145deg,#ede9fe,#ddd6fe);border:1.5px solid #c4b5fd;border-radius:16px;padding:16px 8px;text-align:center;width:100%">
+        <div style="font-size:24px;margin-bottom:6px">🔍</div>
+        <div style="font-size:13px;font-weight:700;color:#5b21b6">Review</div>
+        <div style="font-size:11px;color:#7c3aed;margin-top:2px">Script</div>
+      </div>
+    </div>
+    <div style="font-size:20px;color:#aaa;flex-shrink:0;margin-bottom:10px">→</div>
+
+    <!-- Step 3: VM Execute -->
+    <div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:90px;max-width:120px">
+      <div style="background:linear-gradient(145deg,#d1fae5,#a7f3d0);border:1.5px solid #6ee7b7;border-radius:16px;padding:16px 8px;text-align:center;width:100%">
+        <div style="font-size:24px;margin-bottom:6px">🖥️</div>
+        <div style="font-size:13px;font-weight:700;color:#065f46">VM</div>
+        <div style="font-size:11px;color:#059669;margin-top:2px">Execute</div>
+      </div>
+    </div>
+    <div style="font-size:20px;color:#aaa;flex-shrink:0;margin-bottom:10px">→</div>
+
+    <!-- Step 4: CI/CD Pipeline -->
+    <div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:90px;max-width:120px">
+      <div style="background:linear-gradient(145deg,#dbeafe,#bfdbfe);border:1.5px solid #93c5fd;border-radius:16px;padding:16px 8px;text-align:center;width:100%">
+        <div style="font-size:24px;margin-bottom:6px">⚙️</div>
+        <div style="font-size:13px;font-weight:700;color:#1e40af">CI/CD</div>
+        <div style="font-size:11px;color:#2563eb;margin-top:2px">Pipeline</div>
+      </div>
+    </div>
+    <div style="font-size:20px;color:#aaa;flex-shrink:0;margin-bottom:10px">→</div>
+
+    <!-- Step 5: Validate Pass -->
+    <div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:90px;max-width:120px">
+      <div style="background:linear-gradient(145deg,#d1fae5,#a7f3d0);border:1.5px solid #6ee7b7;border-radius:16px;padding:16px 8px;text-align:center;width:100%">
+        <div style="font-size:24px;margin-bottom:6px">✅</div>
+        <div style="font-size:13px;font-weight:700;color:#065f46">Validate</div>
+        <div style="font-size:11px;color:#059669;margin-top:2px">Pass</div>
+      </div>
+    </div>
+    <div style="font-size:20px;color:#aaa;flex-shrink:0;margin-bottom:10px">→</div>
+
+    <!-- Step 6: Log Report -->
+    <div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:90px;max-width:120px">
+      <div style="background:linear-gradient(145deg,#dbeafe,#bfdbfe);border:1.5px solid #93c5fd;border-radius:16px;padding:16px 8px;text-align:center;width:100%">
+        <div style="font-size:24px;margin-bottom:6px">📊</div>
+        <div style="font-size:13px;font-weight:700;color:#1e40af">Log</div>
+        <div style="font-size:11px;color:#2563eb;margin-top:2px">Report</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Sub-labels row -->
+  <div style="display:flex;justify-content:center;align-items:flex-start;gap:12px;margin-top:12px;flex-wrap:nowrap">
+    <div style="flex:1;min-width:90px;max-width:120px;text-align:center;font-size:10px;color:#888;line-height:1.4">QA Engineer writes automation script</div>
+    <div style="flex-shrink:0;width:20px"></div>
+    <div style="flex:1;min-width:90px;max-width:120px;text-align:center;font-size:10px;color:#888;line-height:1.4">Peer review &amp; code quality check</div>
+    <div style="flex-shrink:0;width:20px"></div>
+    <div style="flex:1;min-width:90px;max-width:120px;text-align:center;font-size:10px;color:#888;line-height:1.4">VM triggers daily execution</div>
+    <div style="flex-shrink:0;width:20px"></div>
+    <div style="flex:1;min-width:90px;max-width:120px;text-align:center;font-size:10px;color:#888;line-height:1.4">Auto-triggered via pipeline</div>
+    <div style="flex-shrink:0;width:20px"></div>
+    <div style="flex:1;min-width:90px;max-width:120px;text-align:center;font-size:10px;color:#888;line-height:1.4">Pass/fail results auto-logged</div>
+    <div style="flex-shrink:0;width:20px"></div>
+    <div style="flex:1;min-width:90px;max-width:120px;text-align:center;font-size:10px;color:#888;line-height:1.4">Reports sent to QMetry &amp; team</div>
+  </div>
+
+  <!-- Daily auto badge -->
+  <div style="text-align:center;margin-top:16px">
+    <span style="background:linear-gradient(135deg,#1a1a3e,#2d1b69);color:#fff;font-size:11px;padding:5px 18px;border-radius:20px;font-weight:500;letter-spacing:.03em">🔁 Runs automatically every day — zero manual intervention required</span>
+  </div>
+</div>
+
+<!-- DOWNLOAD PNG BUTTON -->
+<div style="text-align:center;margin-bottom:18px">
+  <button onclick="downloadPNG()" style="background:linear-gradient(135deg,#1a1a3e,#2d1b69);color:#fff;border:none;border-radius:10px;padding:12px 32px;font-size:14px;font-weight:600;cursor:pointer;letter-spacing:.03em">⬇ Download PNG</button>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <span><span class="f-dot"></span>Sprint 4 active · QA Automation Space · StorageDefender · QMetry Integrated</span>
+  <span class="f-badge">Generated April 2026</span>
+</div>
+
+</div>
+
+<script>
+const gc='rgba(0,0,0,0.06)',tc='#73726c';
+
+/* Pie — full solid green, no gap */
+new Chart(document.getElementById('pieAuto'),{
+  type:'doughnut',
+  data:{datasets:[{data:[504,1],backgroundColor:['#1d9e75','#1d9e75'],borderWidth:0}]},
+  options:{responsive:false,cutout:'60%',plugins:{legend:{display:false},tooltip:{enabled:false}}}
+});
+
+new Chart(document.getElementById('effortBar'),{
+  type:'bar',
+  data:{labels:['Manual effort','Auto/day VM'],datasets:[{data:[140,4.3],backgroundColor:['#e05c3a','#1d9e75'],borderRadius:8,borderSkipped:false}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataIndex===0?' 140 hrs manual':' 4.3 hrs/day auto'}}},scales:{y:{beginAtZero:true,grid:{color:gc},ticks:{color:tc,font:{size:10}}},x:{grid:{display:false},ticks:{color:tc,font:{size:11}}}}}
+});
+
+new Chart(document.getElementById('coverageDonut'),{
+  type:'doughnut',
+  data:{labels:['Done (504)','In Progress (245)','Not Started (527)','Non-Automatable (723)'],datasets:[{data:[504,245,527,723],backgroundColor:['#1d9e75','#378add','#f5a623','#d3d1c7'],borderWidth:2,borderColor:'#fff'}]},
+  options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.label}`}}}}
+});
+
+new Chart(document.getElementById('statusBar'),{
+  type:'bar',
+  data:{labels:['Done','In Progress','Not Yet Started'],datasets:[{data:[504,245,527],backgroundColor:['#1d9e75','#378add','#f5a623'],borderRadius:8,borderSkipped:false}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.raw} TCs`}}},scales:{y:{beginAtZero:true,grid:{color:gc},ticks:{color:tc,font:{size:10}}},x:{grid:{display:false},ticks:{color:tc,font:{size:11}}}}}
+});
+
+new Chart(document.getElementById('apiBar'),{
+  type:'bar',
+  data:{labels:['Done','In Progress','500+ not yet created'],datasets:[{data:[101,245,500],backgroundColor:['#1d9e75','#378add','#f5a623'],borderRadius:8,borderSkipped:false}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.raw}${c.dataIndex===2?'+':''} TCs`}}},scales:{y:{beginAtZero:true,grid:{color:gc},ticks:{color:tc,font:{size:10}}},x:{grid:{display:false},ticks:{color:tc,font:{size:9},maxRotation:15}}}}
+});
+
+new Chart(document.getElementById('projChart'),{
+  type:'bar',
+  data:{
+    labels:['Sprint 1','Sprint 2','Sprint 3','Sprint 4','Sprint 5\n(planned)','Sprint 6\n(planned)','Sprint 7\n(planned)'],
+    datasets:[
+      {
+        type:'bar',
+        label:'TCs automated',
+        data:[36,76,146,250,450,700,1000],
+        backgroundColor:[
+          'rgba(55,138,221,0.55)','rgba(55,138,221,0.62)','rgba(55,138,221,0.70)',
+          'rgba(55,138,221,0.80)','rgba(55,138,221,0.88)','rgba(55,138,221,0.94)','rgba(55,138,221,1)'
+        ],
+        borderRadius:5,
+        borderSkipped:false,
+        order:2
+      },
+      {
+        type:'line',
+        label:'Growth trend',
+        data:[36,76,146,250,450,700,1000],
+        borderColor:'#e05c3a',
+        borderWidth:2.5,
+        pointBackgroundColor:'#e05c3a',
+        pointRadius:4,
+        pointHoverRadius:6,
+        tension:0.35,
+        fill:false,
+        order:1
+      }
+    ]
+  },
+  options:{
+    responsive:true,
+    maintainAspectRatio:false,
+    plugins:{
+      legend:{display:false},
+      tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.raw} TCs`}}
+    },
+    scales:{
+      y:{
+        beginAtZero:true,
+        max:1100,
+        grid:{color:'rgba(21,101,192,0.1)'},
+        ticks:{color:'#1565c0',font:{size:9}},
+        title:{display:true,text:'TCs automated',color:'#1565c0',font:{size:9}}
+      },
+      x:{
+        grid:{display:false},
+        ticks:{color:'#1565c0',font:{size:8},maxRotation:0}
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>
