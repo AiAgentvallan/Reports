@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EEN Motion Detection & Notification Capture — Automation Workflow</title>
+<style>
+  :root {
+    --blue:    #2563eb;
+    --blue-lt: #dbeafe;
+    --green:   #16a34a;
+    --green-lt:#dcfce7;
+    --red:     #dc2626;
+    --red-lt:  #fee2e2;
+    --orange:  #d97706;
+    --orange-lt:#fef3c7;
+    --purple:  #7c3aed;
+    --purple-lt:#ede9fe;
+    --gray:    #4b5563;
+    --gray-lt: #f3f4f6;
+    --border:  #e5e7eb;
+    --text:    #111827;
+    --shadow:  0 2px 8px rgba(0,0,0,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f8fafc;
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ── Page Header ── */
+  .page-header {
+    background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+    color: white;
+    padding: 40px 60px;
+    border-bottom: 4px solid #1d4ed8;
+  }
+  .page-header h1 { font-size: 26px; font-weight: 700; margin-bottom: 6px; }
+  .page-header .subtitle { font-size: 14px; opacity: 0.85; margin-bottom: 16px; }
+  .meta-row { display: flex; gap: 24px; flex-wrap: wrap; }
+  .meta-pill {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  /* ── Layout ── */
+  .container { max-width: 1100px; margin: 0 auto; padding: 36px 40px; }
+
+  /* ── Section ── */
+  .section { margin-bottom: 44px; }
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e3a5f;
+    margin-bottom: 6px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--blue);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-desc { color: var(--gray); margin-bottom: 20px; font-size: 13px; }
+
+  /* ── Cards ── */
+  .card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    box-shadow: var(--shadow);
+  }
+
+  /* ── Summary boxes at top ── */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .summary-box {
+    background: white;
+    border-radius: 10px;
+    padding: 18px 20px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--blue);
+  }
+  .summary-box.green  { border-left-color: var(--green); }
+  .summary-box.orange { border-left-color: var(--orange); }
+  .summary-box.purple { border-left-color: var(--purple); }
+  .summary-box .label { font-size: 11px; font-weight: 600; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .summary-box .value { font-size: 20px; font-weight: 700; color: var(--text); }
+  .summary-box .note  { font-size: 11px; color: var(--gray); margin-top: 2px; }
+
+  /* ── Architecture Flow ── */
+  .arch-flow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .flow-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .flow-node {
+    border-radius: 8px;
+    padding: 12px 18px;
+    text-align: center;
+    min-width: 160px;
+    max-width: 200px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 2px solid transparent;
+    position: relative;
+  }
+  .fn-camera   { background: #eff6ff; border-color: #93c5fd; color: #1e40af; }
+  .fn-cloud    { background: #f0f9ff; border-color: #7dd3fc; color: #0369a1; }
+  .fn-rabbit   { background: #fef3c7; border-color: #fbbf24; color: #92400e; }
+  .fn-backend  { background: #f0fdf4; border-color: #86efac; color: #166534; }
+  .fn-incident { background: #dcfce7; border-color: #4ade80; color: #15803d; }
+  .fn-alert    { background: #faf5ff; border-color: #c4b5fd; color: #5b21b6; }
+  .fn-db       { background: #f8fafc; border-color: #94a3b8; color: #334155; }
+  .fn-test     { background: #fff7ed; border-color: #fb923c; color: #c2410c; }
+
+  .flow-node .fn-title { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+  .flow-node .fn-sub   { font-size: 10px; font-weight: 400; opacity: 0.8; }
+  .flow-node .fn-tag   {
+    display: inline-block;
+    background: rgba(0,0,0,0.08);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 10px;
+    margin-top: 4px;
+    font-family: monospace;
+  }
+
+  .flow-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4px 0;
+    color: var(--gray);
+    font-size: 10px;
+    text-align: center;
+    gap: 2px;
+  }
+  .flow-arrow .arrow { font-size: 20px; color: #94a3b8; line-height: 1; }
+  .flow-arrow .label { max-width: 120px; line-height: 1.3; }
+
+  /* ── Branching alerts row ── */
+  .branch-row {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    width: 100%;
+  }
+  .branch-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+  .branch-line {
+    width: 2px;
+    height: 20px;
+    background: #cbd5e1;
+  }
+
+  /* ── Automation Steps ── */
+  .steps-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .step-row {
+    display: flex;
+    gap: 0;
+    align-items: stretch;
+  }
+  .step-number-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 48px;
+    flex-shrink: 0;
+  }
+  .step-badge {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--blue);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+    z-index: 1;
+  }
+  .step-badge.green  { background: var(--green); }
+  .step-badge.orange { background: var(--orange); }
+  .step-badge.purple { background: var(--purple); }
+  .step-badge.red    { background: var(--red); }
+  .step-connector {
+    width: 2px;
+    background: #e5e7eb;
+    flex-grow: 1;
+    margin-top: 4px;
+  }
+  .step-content {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-left: 16px;
+    margin-bottom: 12px;
+    flex-grow: 1;
+    box-shadow: var(--shadow);
+  }
+  .step-content h3 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .step-content .step-file {
+    font-family: monospace;
+    font-size: 11px;
+    color: var(--blue);
+    background: var(--blue-lt);
+    padding: 2px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 8px;
+  }
+  .step-content p { font-size: 12px; color: var(--gray); }
+
+  /* ── Notification Validation Logic ── */
+  .notif-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .notif-card {
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .notif-header {
+    padding: 12px 16px;
+    font-weight: 700;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .notif-header.sms   { background: #eff6ff; color: #1e40af; border-bottom: 1px solid #bfdbfe; }
+  .notif-header.slack { background: #fdf4ff; color: #7e22ce; border-bottom: 1px solid #e9d5ff; }
+  .notif-header.email { background: #f0fdf4; color: #166534; border-bottom: 1px solid #bbf7d0; }
+  .notif-body { background: white; padding: 14px 16px; }
+  .rule-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 10px;
+    font-size: 12px;
+  }
+  .rule-row:last-child { margin-bottom: 0; }
+  .rule-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+  .rule-text { color: var(--gray); line-height: 1.4; }
+  .rule-result {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .pass   { background: var(--green-lt);  color: var(--green); }
+  .fail   { background: var(--red-lt);    color: var(--red); }
+  .skip   { background: var(--orange-lt); color: var(--orange); }
+
+  /* ── Current QA State ── */
+  .qa-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .qa-table th {
+    background: #1e3a5f;
+    color: white;
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .qa-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .qa-table tr:last-child td { border-bottom: none; }
+  .qa-table tr:nth-child(even) td { background: var(--gray-lt); }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .badge-green  { background: var(--green-lt);  color: var(--green); }
+  .badge-orange { background: var(--orange-lt); color: var(--orange); }
+  .badge-red    { background: var(--red-lt);    color: var(--red); }
+  .badge-blue   { background: var(--blue-lt);   color: var(--blue); }
+  code {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #0f172a;
+  }
+
+  /* ── Test Scenarios ── */
+  .scenario-list { display: flex; flex-direction: column; gap: 12px; }
+  .scenario-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    box-shadow: var(--shadow);
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  .scenario-tc {
+    font-family: monospace;
+    font-size: 11px;
+    color: white;
+    background: var(--blue);
+    padding: 4px 10px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    text-align: center;
+    line-height: 1.4;
+  }
+  .scenario-info h4 { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .scenario-info p  { font-size: 12px; color: var(--gray); }
+  .scenario-tag {
+    font-size: 10px;
+    font-family: monospace;
+    background: var(--blue-lt);
+    color: var(--blue);
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-right: 6px;
+  }
+
+  /* ── File Map ── */
+  .file-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+  .file-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+  }
+  .file-card .file-path {
+    font-family: monospace;
+    font-size: 11px;
+    color: var(--blue);
+    background: var(--blue-lt);
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    display: block;
+    word-break: break-all;
+  }
+  .file-card ul { list-style: none; padding: 0; }
+  .file-card ul li {
+    font-size: 12px;
+    color: var(--gray);
+    padding: 3px 0;
+    padding-left: 16px;
+    position: relative;
+  }
+  .file-card ul li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--blue);
+    font-size: 11px;
+  }
+
+  /* ── Footer ── */
+  .page-footer {
+    background: #1e3a5f;
+    color: rgba(255,255,255,0.7);
+    text-align: center;
+    padding: 20px;
+    font-size: 12px;
+    margin-top: 40px;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 700px) {
+    .container { padding: 20px; }
+    .notif-grid { grid-template-columns: 1fr; }
+    .page-header { padding: 24px; }
+    .branch-row { flex-direction: column; align-items: center; }
+  }
+
+  /* ── Print ── */
+  @media print {
+    body { background: white; }
+    .page-header { background: #1e3a5f !important; -webkit-print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════ PAGE HEADER ══ -->
+<div class="page-header">
+  <h1>EEN Motion Detection &amp; Notification Capture</h1>
+  <div class="subtitle">Automation Workflow — StorageDefender QA Test Suite</div>
+  <div class="meta-row">
+    <span class="meta-pill">📁 Project: QA_Automation</span>
+    <span class="meta-pill">🌿 Branch: test_ui</span>
+    <span class="meta-pill">🏢 Environment: QA (tod-multiverse.com)</span>
+    <span class="meta-pill">📅 May 2026</span>
+    <span class="meta-pill">🔧 Stack: Playwright · Cucumber · RabbitMQ · GraphQL</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ── Summary KPIs ──────────────────────────────────────── -->
+  <div class="summary-grid">
+    <div class="summary-box">
+      <div class="label">Test Scenarios</div>
+      <div class="value">3</div>
+      <div class="note">@EEN integration tag</div>
+    </div>
+    <div class="summary-box green">
+      <div class="label">Notification Channels</div>
+      <div class="value">3</div>
+      <div class="note">SMS · Slack · Email</div>
+    </div>
+    <div class="summary-box orange">
+      <div class="label">Max Poll Time</div>
+      <div class="value">50s</div>
+      <div class="note">10 attempts × 5s</div>
+    </div>
+    <div class="summary-box purple">
+      <div class="label">QA Active Channel</div>
+      <div class="value">Slack</div>
+      <div class="note">SMS/Email not configured</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ SECTION 1 ══ -->
+  <div class="section">
+    <div class="section-title">① System Architecture — End-to-End Signal Flow</div>
+    <div class="section-desc">
+      How an EEN camera event travels from the physical camera through to a notification delivered to the facility operator.
+    </div>
+    <div class="card">
+      <div class="arch-flow">
+
+        <!-- Row 1: Camera -->
+        <div class="flow-row">
+          <div class="flow-node fn-camera">
+            <div class="fn-title">📷 EEN Camera</div>
+            <div class="fn-sub">Eagle Eye Networks<br>Cloud Camera</div>
+            <div class="fn-tag">actor_id: 100a0aed</div>
+          </div>
+        </div>
+
+        <div class="flow-arrow">
+          <div class="arrow">↓</div>
+          <div class="label">Person / Motion detected<br><em>een.personDetectionEvent.v1</em></div>
+        </div>
+
+        <!-- Row 2: EEN Cloud -->
+        <div class="flow-row">
+          <div class="flow-node fn-cloud">
+            <div class="fn-title">☁️ EEN Cloud API</div>
+            <div class="fn-sub">webapp.eagleeyenetworks.com<br>Sends webhook to SD</div>
+            <div class="fn-tag">account_id: 00082574</div>
+          </div>
+        </div>
+
+        <div class="flow-arrow">
+          <div class="arrow">↓</div>
+          <div class="label">
+            POST /een-events<br>
+            <em style="color:#dc2626">⚠ In QA: nginx not proxying<br>→ Automation publishes directly</em>
+          </div>
+        </div>
+
+        <!-- Row 3: RabbitMQ -->
+        <div class="flow-row">
+          <div class="flow-node fn-rabbit">
+            <div class="fn-title">🐇 RabbitMQ</div>
+            <div class="fn-sub">Exchange: amq.topic<br>Host: 34.28.216.204</div>
+            <div class="fn-tag">sensor.een.camera.motion</div>
+          </div>
+        </div>
+
+        <div class="flow-arrow">
+          <div class="arrow">↓</div>
+          <div class="label">Message consumed by<br>Message Processor</div>
+        </div>
+
+        <!-- Row 4: Backend -->
+        <div class="flow-row">
+          <div class="flow-node fn-backend">
+            <div class="fn-title">⚙️ EENTriggerStrategy</div>
+            <div class="fn-sub">Elixir Message Processor<br>Routes motion events</div>
+            <div class="fn-tag">sensor.*.*.motion</div>
+          </div>
+        </div>
+
+        <div class="flow-arrow">
+          <div class="arrow">↓</div>
+          <div class="label">Calls IncidentInteractor<br><em>Zone type must be :zone</em></div>
+        </div>
+
+        <!-- Row 5: Incident -->
+        <div class="flow-row">
+          <div class="flow-node fn-incident">
+            <div class="fn-title">🚨 IncidentInteractor</div>
+            <div class="fn-sub">Creates Motion Incident<br>Zone: "Automation" (type: zone)</div>
+            <div class="fn-tag">type: motion | status: active</div>
+          </div>
+        </div>
+
+        <div class="flow-arrow">
+          <div class="arrow">↓</div>
+          <div class="label">Dispatches alerts to all<br>configured responders</div>
+        </div>
+
+        <!-- Row 6: Alert branches -->
+        <div class="branch-row">
+          <div class="branch-item">
+            <div class="branch-line"></div>
+            <div class="flow-node fn-alert" style="min-width:140px">
+              <div class="fn-title">📱 SMS Alert</div>
+              <div class="fn-sub">Twilio<br>Video URL in body</div>
+            </div>
+          </div>
+          <div class="branch-item">
+            <div class="branch-line"></div>
+            <div class="flow-node fn-alert" style="min-width:140px">
+              <div class="fn-title">💬 Slack Alert</div>
+              <div class="fn-sub">Slack Webhook<br>Video URL in body</div>
+            </div>
+          </div>
+          <div class="branch-item">
+            <div class="branch-line"></div>
+            <div class="flow-node fn-alert" style="min-width:140px">
+              <div class="fn-title">✉️ Email Alert</div>
+              <div class="fn-sub">SMTP<br>Video URL in body</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flow-arrow" style="margin-top:8px">
+          <div class="arrow">↓</div>
+          <div class="label">URL redirects to incident page<br><em>dfndr.tiny.us → sd-frontend</em></div>
+        </div>
+
+        <!-- Row 7: FO Incident Page -->
+        <div class="flow-row">
+          <div class="flow-node fn-db" style="min-width:260px">
+            <div class="fn-title">🖥️ Front Office — Incident Page</div>
+            <div class="fn-sub">sd-frontend.qa.tod-multiverse.com<br>/organizations/…/incidents/…</div>
+            <div class="fn-tag">"View Video" button visible</div>
+          </div>
+        </div>
+
+      </div><!-- /arch-flow -->
+    </div><!-- /card -->
+  </div>
+
+  <!-- ═══════════════════════════════════════════ SECTION 2 ══ -->
+  <div class="section">
+    <div class="section-title">② Automation Test Execution Flow</div>
+    <div class="section-desc">
+      Step-by-step breakdown of what the Cucumber test does from trigger to assertion, for both Person Detection and Motion Detection scenarios.
+    </div>
+
+    <div class="steps-container">
+
+      <!-- Step 1 -->
+      <div class="step-row">
+        <div class="step-number-col">
+          <div class="step-badge">1</div>
+          <div class="step-connector"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-file">api/eenWebhook.js</div>
+          <h3>Trigger EEN Webhook Event</h3>
+          <p>
+            Publishes a RabbitMQ message directly to the <code>amq.topic</code> exchange using routing key
+            <code>sensor.een.camera.motion</code>. The message mirrors the exact payload that
+            <code>eagle_eye_controller.ex</code> would have produced after validating an EEN webhook.
+            Stores the trigger timestamp (<code>_triggeredAt</code>) on the World context for cutoff
+            calculation in the polling step.
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step-row">
+        <div class="step-number-col">
+          <div class="step-badge green">2</div>
+          <div class="step-connector"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-file">EENPersonDetection.steps.js — Poll step</div>
+          <h3>Poll GraphQL for Active Incident</h3>
+          <p>
+            Authenticates via GraphQL <code>login</code> mutation, then polls
+            <code>activeIncidents(type: "motion", limit: 20)</code> every 5 seconds for up to 50 seconds
+            (10 attempts). For each attempt, all returned incidents are logged with their age, status, and
+            per-alert URL detection. The first incident with a <code>startedAt</code> timestamp ≥ the
+            trigger cutoff (trigger time − 5s) is captured. Alerts are grouped by type
+            (<code>sms</code> / <code>slack</code> / <code>email</code>) and stored on the context as
+            <code>_alertsByType</code>.
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 2b -->
+      <div class="step-row">
+        <div class="step-number-col">
+          <div class="step-badge orange">2b</div>
+          <div class="step-connector"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-file">EENPersonDetection.steps.js — Validate SMS / Slack / Email</div>
+          <h3>Validate Each Notification Channel Separately</h3>
+          <p>
+            Three independent steps run one after another — one for SMS, one for Slack, one for Email.
+            Each step checks whether alerts of that type were created and whether a video URL is present
+            in the alert body. The pass/fail/skip logic is identical for all three channels (see
+            Section ③). If a URL is found, it is promoted to <code>_videoURL</code> for use in Step 3.
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step-row">
+        <div class="step-number-col">
+          <div class="step-badge purple">3</div>
+          <div class="step-connector"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-file">EENPersonDetection.steps.js — Navigate step</div>
+          <h3>Navigate to Video URL</h3>
+          <p>
+            Opens <code>_videoURL</code> (the first URL extracted from any configured notification channel)
+            in the Playwright browser using <code>page.goto()</code> with <code>domcontentloaded</code>
+            wait, followed by a <code>networkidle</code> grace wait. Checks for 404 or error indicators
+            in the DOM. On success, stores the final landed URL as <code>_incidentPageURL</code>.
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="step-row">
+        <div class="step-number-col">
+          <div class="step-badge red">4</div>
+        </div>
+        <div class="step-content">
+          <div class="step-file">EENPersonDetection.steps.js — Button step</div>
+          <h3>Verify "View Video" Button Visible</h3>
+          <p>
+            Tries four Playwright selector strategies in order:
+            <code>button:has-text</code>, <code>a:has-text</code>, <code>[role="button"]:has-text</code>,
+            <code>text=</code>. If none match a visible element, a full-page screenshot is saved to
+            <code>test-results/</code> and the step fails. On success, prints the complete
+            journey summary box to the console showing all channel results and key values.
+          </p>
+        </div>
+      </div>
+
+    </div><!-- /steps-container -->
+  </div>
+
+  <!-- ═══════════════════════════════════════════ SECTION 3 ══ -->
+  <div class="section">
+    <div class="section-title">③ Notification Validation Logic — Per Channel Rules</div>
+    <div class="section-desc">
+      The same three-state decision applies independently to SMS, Slack, and Email. A channel being
+      unconfigured is not a failure — it is expected in environments where only one channel is set up.
+    </div>
+
+    <div class="notif-grid">
+
+      <!-- SMS -->
+      <div class="notif-card">
+        <div class="notif-header sms">📱 SMS Alert</div>
+        <div class="notif-body">
+          <div class="rule-row">
+            <div class="rule-icon">⚠️</div>
+            <div class="rule-text">
+              No SMS alerts found for the incident<br>
+              <span class="rule-result skip">PASS — SKIPPED</span><br>
+              <em>Logs: "SMS NOT CONFIGURED — no SMS responder set up"</em>
+            </div>
+          </div>
+          <div class="rule-row">
+            <div class="rule-icon">✅</div>
+            <div class="rule-text">
+              SMS alert exists <strong>and</strong> body contains a URL<br>
+              <span class="rule-result pass">PASS</span><br>
+              <em>Logs: Alert ID, To, From, Status, Body, Extracted URL</em>
+            </div>
+          </div>
+          <div class="rule-row">
+            <div class="rule-icon">❌</div>
+            <div class="rule-text">
+              SMS alert exists but body has <strong>no URL</strong><br>
+              <span class="rule-result fail">FAIL</span><br>
+              <em>Logs all SMS bodies. Check: Twilio / tiny.us URL builder</em>
+            </div>
+          </div>
+          <div style="margin-top:10px;padding-top:10px;border-top:1px solid #e5e7eb;font-size:11px;color:#6b7280">
+            <strong>Sender:</strong> Twilio<br>
+            <strong>QA Status:</strong> <span class="badge badge-orange">Not Configured</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slack -->
+      <div class="notif-card">
+        <div class="notif-header slack">💬 Slack Alert</div>
+        <div class="notif-body">
+          <div class="rule-row">
+            <div class="rule-icon">⚠️</div>
+            <div class="rule-text">
+              No Slack alerts found for the incident<br>
+              <span class="rule-result skip">PASS — SKIPPED</span><br>
+              <em>Logs: "Slack NOT CONFIGURED — no Slack responder set up"</em>
+            </div>
+          </div>
+          <div class="rule-row">
+            <div class="rule-icon">✅</div>
+            <div class="rule-text">
+              Slack alert exists <strong>and</strong> body contains a URL<br>
+              <span class="rule-result pass">PASS</span><br>
+              <em>Logs: Alert ID, Channel, Status, Body, Extracted URL</em>
+            </div>
+          </div>
+          <div class="rule-row">
+            <div class="rule-icon">❌</div>
+            <div class="rule-text">
+              Slack alert exists but body has <strong>no URL</strong><br>
+              <span class="rule-result fail">FAIL</span><br>
+              <em>Logs all Slack bodies. Check: Slack webhook / tiny.us URL builder</em>
+            </div>
+          </div>
+          <div style="margin-top:10px;padding-top:10px;border-top:1px solid #e5e7eb;font-size:11px;color:#6b7280">
+            <strong>Sender:</strong> Slack Webhook<br>
+            <strong>QA Status:</strong> <span class="badge badge-green">✅ Active in QA</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="notif-card">
+        <div class="notif-header email">✉️ Email Alert</div>
+        <div class="notif-body">
+          <div class="rule-row">
+            <div class="rule-icon">⚠️</div>
+            <div class="rule-text">
+              No Email alerts found for the incident<br>
+              <span class="rule-result skip">PASS — SKIPPED</span><br>
+              <em>Logs: "Email NOT CONFIGURED — no Email responder set up"</em>
+            </div>
+          </div>
+          <div class="rule-row">
+            <div class="rule-icon">✅</div>
+            <div class="rule-text">
+              Email alert exists <strong>and</strong> body contains a URL<br>
+              <span class="rule-result pass">PASS</span><br>
+              <em>Logs: Alert ID, To, From, Status, Body, Extracted URL</em>
+            </div>
+          </div>
+          <div class="rule-row">
+            <div class="rule-icon">❌</div>
+            <div class="rule-text">
+              Email alert exists but body has <strong>no URL</strong><br>
+              <span class="rule-result fail">FAIL</span><br>
+              <em>Logs all email bodies. Check: SMTP / tiny.us URL builder</em>
+            </div>
+          </div>
+          <div style="margin-top:10px;padding-top:10px;border-top:1px solid #e5e7eb;font-size:11px;color:#6b7280">
+            <strong>Sender:</strong> SMTP<br>
+            <strong>QA Status:</strong> <span class="badge badge-orange">Not Configured</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /notif-grid -->
+  </div>
+
+  <!-- ═══════════════════════════════════════════ SECTION 4 ══ -->
+  <div class="section">
+    <div class="section-title">④ Test Scenarios — Coverage Map</div>
+    <div class="section-desc">
+      Three Gherkin scenarios defined in <code>features/CustomerUi/EEN/EENPersonDetection.feature</code>.
+      All three use the shared Background step (FO login) and the same notification validation steps.
+    </div>
+
+    <div class="scenario-list">
+
+      <div class="scenario-card">
+        <div class="scenario-tc">SD-TC-509<br>SD-TC-517</div>
+        <div class="scenario-info">
+          <div>
+            <span class="scenario-tag">@EENPersonDetectionE2E</span>
+            <span class="scenario-tag">@regression</span>
+          </div>
+          <h4>Person detected by EEN camera creates incident with video URL in notification</h4>
+          <p>Triggers <code>een.personDetectionEvent.v1</code>. Polls for motion incident, validates SMS / Slack / Email URL delivery, navigates to incident page, confirms "View Video" button visible.</p>
+        </div>
+      </div>
+
+      <div class="scenario-card">
+        <div class="scenario-tc" style="background:#7c3aed">SD-TC-511</div>
+        <div class="scenario-info">
+          <div>
+            <span class="scenario-tag">@EENMotionDetectionE2E</span>
+            <span class="scenario-tag">@regression</span>
+          </div>
+          <h4>Motion detected by EEN camera creates incident with video URL in notification</h4>
+          <p>Triggers <code>een.motionDetectionEvent.v1</code>. Same validation flow as Person Detection — tests that generic motion events also create incidents and send notifications with video URLs.</p>
+        </div>
+      </div>
+
+      <div class="scenario-card">
+        <div class="scenario-tc" style="background:#16a34a">SD-TC-512</div>
+        <div class="scenario-info">
+          <div>
+            <span class="scenario-tag">@EENVideoURLVerification</span>
+            <span class="scenario-tag">@regression</span>
+          </div>
+          <h4>Verify notification alerts contain a valid video URL for EEN zone incident</h4>
+          <p>Triggers person detection, validates all three channel URLs, then verifies the extracted URL points to <code>*.tod-multiverse.com</code> or <code>*.storage-defender.*</code>. No browser navigation — focused on URL domain correctness.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ SECTION 5 ══ -->
+  <div class="section">
+    <div class="section-title">⑤ Current QA Environment — Notification Channel Status</div>
+    <div class="section-desc">
+      Status of each notification channel for the "Automation" zone under Test Fac DEMO 4 in the QA environment.
+      To activate SMS or Email, add the corresponding responder type in BackOffice → Responders.
+    </div>
+
+    <div class="card" style="padding:0;overflow:hidden">
+      <table class="qa-table">
+        <thead>
+          <tr>
+            <th>Channel</th>
+            <th>QA Status</th>
+            <th>Responder Required</th>
+            <th>URL in Body</th>
+            <th>Test Result</th>
+            <th>To Enable</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>📱 SMS</strong></td>
+            <td><span class="badge badge-orange">Not Configured</span></td>
+            <td>Phone / SMS responder</td>
+            <td>—</td>
+            <td><span class="badge badge-orange">⚠️ Skipped</span></td>
+            <td>Add SMS responder + valid phone number in BackOffice</td>
+          </tr>
+          <tr>
+            <td><strong>💬 Slack</strong></td>
+            <td><span class="badge badge-green">✅ Active</span></td>
+            <td>Slack responder</td>
+            <td><code>dfndr.tiny.us/…</code></td>
+            <td><span class="badge badge-green">✅ Passed</span></td>
+            <td>Already configured — working in QA</td>
+          </tr>
+          <tr>
+            <td><strong>✉️ Email</strong></td>
+            <td><span class="badge badge-orange">Not Configured</span></td>
+            <td>Email responder</td>
+            <td>—</td>
+            <td><span class="badge badge-orange">⚠️ Skipped</span></td>
+            <td>Add Email responder + valid address in BackOffice</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:14px;padding:14px 18px;background:#fef3c7;border:1px solid #fbbf24;border-radius:8px;font-size:12px;color:#92400e">
+      <strong>Why Slack in QA and not SMS?</strong> — SMS (Twilio) requires real phone numbers and incurs messaging costs.
+      In QA, Slack webhooks are used instead as a free, non-disruptive alternative. Both channels carry
+      the same video URL in the alert body. The automation treats them equally — only the <code>type</code>
+      field in the GraphQL alert response differs (<code>"slack"</code> vs <code>"sms"</code>).
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ SECTION 6 ══ -->
+  <div class="section">
+    <div class="section-title">⑥ Implementation File Map</div>
+    <div class="section-desc">Files created or modified to implement the EEN automation flow.</div>
+
+    <div class="file-grid">
+      <div class="file-card">
+        <span class="file-path">api/eenWebhook.js</span>
+        <ul>
+          <li>Connects to RabbitMQ via <code>amqplib</code></li>
+          <li>Builds RabbitMQ payload matching <code>eagle_eye_controller.ex</code> format</li>
+          <li>Publishes to <code>amq.topic</code> exchange, routing key <code>sensor.een.camera.motion</code></li>
+          <li>Exports <code>triggerPersonDetection()</code> and <code>triggerMotionDetection()</code></li>
+        </ul>
+      </div>
+
+      <div class="file-card">
+        <span class="file-path">features/CustomerUi/EEN/EENPersonDetection.feature</span>
+        <ul>
+          <li>3 Gherkin scenarios with <code>@EENIntegration</code> tag</li>
+          <li>Shared Background: FO login</li>
+          <li>Separate <code>And the SMS/Slack/Email alert should be validated</code> steps</li>
+          <li>Maps to test cases SD-TC-509, SD-TC-511, SD-TC-512, SD-TC-517</li>
+        </ul>
+      </div>
+
+      <div class="file-card">
+        <span class="file-path">features/step-definitions/EENPersonDetection.steps.js</span>
+        <ul>
+          <li>GraphQL auth + polling logic</li>
+          <li><code>groupAlertsByType()</code> — splits alerts into sms/slack/email buckets</li>
+          <li><code>validateAlertTypeForURL()</code> — shared 3-state logic for all channels</li>
+          <li>Navigation + button visibility assertions</li>
+          <li>Full console summary box on completion</li>
+        </ul>
+      </div>
+
+      <div class="file-card">
+        <span class="file-path">.env</span>
+        <ul>
+          <li><code>EEN_ACCOUNT_ID=00082574</code> — Test Fac DEMO 4</li>
+          <li><code>EEN_CAMERA_ID=100a0aed</code> — "Een #VC100a0aed" in "Automation" zone</li>
+          <li><code>RABBIT_HOST=34.28.216.204</code> — QA RabbitMQ</li>
+          <li><code>EXTERNAL_API_URL</code>, <code>FO_BASE_URL</code>, <code>GRAPHQL_URL</code></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ SECTION 7 ══ -->
+  <div class="section">
+    <div class="section-title">⑦ How to Run</div>
+
+    <div class="card" style="font-size:13px">
+      <table style="width:100%;border-collapse:collapse">
+        <tr>
+          <td style="padding:8px 12px;width:40%;border-bottom:1px solid #e5e7eb;font-weight:600">Run all EEN scenarios</td>
+          <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb"><code>npx cucumber-js --tags @EENIntegration</code></td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px;width:40%;border-bottom:1px solid #e5e7eb;font-weight:600">Run Person Detection only</td>
+          <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb"><code>npx cucumber-js --tags @EENPersonDetectionE2E</code></td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px;width:40%;border-bottom:1px solid #e5e7eb;font-weight:600">Run Motion Detection only</td>
+          <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb"><code>npx cucumber-js --tags @EENMotionDetectionE2E</code></td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px;width:40%;font-weight:600">Run URL Verification only</td>
+          <td style="padding:8px 12px"><code>npx cucumber-js --tags @EENVideoURLVerification</code></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<div class="page-footer">
+  StorageDefender QA Automation · EEN Integration Workflow · Generated May 2026 · Branch: test_ui
+</div>
+
+</body>
+</html>
