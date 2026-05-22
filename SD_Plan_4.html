@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SD Innovation — Idea #4: AI Non-Payment Automation Intelligence</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --purple: #a040e0;
+    --purple-light: #c060ff;
+    --navy: #0b1622;
+    --navy2: #0d1e30;
+    --white: #ffffff;
+    --text: #d0dcea;
+    --muted: rgba(255,255,255,0.45);
+    --border: rgba(255,255,255,0.08);
+  }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--navy); color: var(--text); }
+
+  .hero {
+    background: linear-gradient(135deg, #120a20 0%, #1a0e2e 40%, #120a20 100%);
+    border-bottom: 3px solid var(--purple);
+    padding: 50px 48px 44px; position: relative; overflow: hidden;
+  }
+  .hero::after {
+    content: ''; position: absolute; top: -100px; right: -100px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(160,64,224,0.12) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .hero-tag { display: inline-block; background: rgba(160,64,224,0.15); border: 1px solid rgba(160,64,224,0.45); color: var(--purple-light); font-size: 0.7rem; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; padding: 5px 16px; border-radius: 20px; margin-bottom: 16px; }
+  .hero h1 { font-size: 2.4rem; font-weight: 900; color: var(--white); line-height: 1.15; margin-bottom: 12px; }
+  .hero h1 span { color: var(--purple-light); }
+  .hero-sub { font-size: 1rem; color: rgba(255,255,255,0.55); max-width: 720px; line-height: 1.65; margin-bottom: 24px; }
+  .hero-pills { display: flex; flex-wrap: wrap; gap: 10px; }
+  .pill { display: flex; align-items: center; gap: 7px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; padding: 7px 14px; font-size: 0.78rem; color: rgba(255,255,255,0.65); font-weight: 500; }
+
+  .page { max-width: 1200px; margin: 0 auto; padding: 0 40px 60px; }
+
+  .plain-box { background: linear-gradient(135deg,#180a28,#100618); border: 1.5px solid rgba(160,64,224,0.35); border-radius: 16px; padding: 28px 32px; margin-bottom: 28px; }
+  .plain-box .pb-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .plain-box .pb-icon { font-size: 2rem; }
+  .plain-box .pb-title { font-size: 1.05rem; font-weight: 700; color: var(--white); }
+  .plain-box .pb-sub { font-size: 0.75rem; color: var(--muted); margin-top: 3px; }
+  .plain-box p { font-size: 0.9rem; line-height: 1.75; color: rgba(255,255,255,0.75); margin-bottom: 10px; }
+  .plain-box p:last-child { margin-bottom: 0; }
+
+  .section { padding: 44px 0 8px; }
+  .section-tag { display: inline-block; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--purple-light); background: rgba(160,64,224,0.1); border: 1px solid rgba(160,64,224,0.25); padding: 4px 12px; border-radius: 6px; margin-bottom: 12px; }
+  .section h2 { font-size: 1.7rem; font-weight: 800; color: var(--white); margin-bottom: 8px; }
+  .section h2 span { color: var(--purple-light); }
+  .section p.desc { font-size: 0.88rem; color: var(--muted); line-height: 1.6; margin-bottom: 28px; }
+  .divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 8px 0; }
+
+  /* ARCH */
+  .arch { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 28px; overflow-x: auto; }
+  .arch-title { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 22px; }
+  .arch-box { border: 1.5px solid; border-radius: 12px; padding: 14px 18px; flex-shrink: 0; min-width: 148px; text-align: center; }
+  .ab-icon { font-size: 1.6rem; margin-bottom: 6px; }
+  .ab-title { font-size: 0.82rem; font-weight: 700; color: var(--white); margin-bottom: 4px; }
+  .ab-sub { font-size: 0.65rem; color: var(--muted); line-height: 1.5; }
+  .ab-data    { background: rgba(40,100,200,0.12); border-color: rgba(40,100,200,0.35); }
+  .ab-engine  { background: rgba(160,64,224,0.10); border-color: rgba(160,64,224,0.35); }
+  .ab-ai      { background: rgba(140,60,200,0.14); border-color: rgba(140,60,200,0.50); }
+  .ab-loop    { background: rgba(220,160,20,0.10); border-color: rgba(220,160,20,0.35); }
+  .ab-deliver { background: rgba(20,160,180,0.12); border-color: rgba(20,160,180,0.35); }
+
+  /* STEPS */
+  .steps { display: flex; flex-direction: column; gap: 0; }
+  .step { display: flex; gap: 20px; }
+  .step-num-wrap { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 44px; }
+  .step-num { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 800; color: var(--white); flex-shrink: 0; }
+  .sn1{background:linear-gradient(135deg,#6010a0,#9030d0);}
+  .sn2{background:linear-gradient(135deg,#8020c0,#b040e0);}
+  .sn3{background:linear-gradient(135deg,#4010a0,#6030d0);}
+  .sn4{background:linear-gradient(135deg,#107060,#20b090);}
+  .sn5{background:linear-gradient(135deg,#a07010,#e0b020);}
+  .sn6{background:linear-gradient(135deg,#106080,#20a0c0);}
+  .sn7{background:linear-gradient(135deg,#901040,#e03060);}
+  .step-line { flex: 1; width: 2px; background: rgba(255,255,255,0.06); margin: 6px 0; min-height: 30px; }
+  .step-content { padding: 0 0 32px; flex: 1; }
+  .step-tag { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; margin-top: 10px; }
+  .step-title { font-size: 1rem; font-weight: 700; color: var(--white); margin-bottom: 10px; }
+  .step-body p { font-size: 0.87rem; line-height: 1.7; color: rgba(255,255,255,0.7); margin-bottom: 12px; }
+
+  /* CODE */
+  .code-block { background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 18px 20px; font-family: 'Cascadia Code','Fira Mono','Courier New',monospace; font-size: 0.76rem; line-height: 1.65; color: #c0b0ff; overflow-x: auto; white-space: pre; margin: 12px 0; }
+  .cm { color: rgba(120,160,120,0.85); }
+  .kw { color: #a080ff; }
+  .fn { color: #e0a060; }
+  .str { color: #80e080; }
+  .num { color: #e08060; }
+
+  /* CALLOUTS */
+  .callout { border-radius: 10px; padding: 14px 18px; margin: 12px 0; display: flex; gap: 12px; align-items: flex-start; font-size: 0.84rem; line-height: 1.65; }
+  .callout-success { background: rgba(40,160,80,0.10);  border: 1px solid rgba(40,160,80,0.25); }
+  .callout-warn    { background: rgba(220,160,20,0.10); border: 1px solid rgba(220,160,20,0.25); }
+  .callout-info    { background: rgba(40,120,220,0.10); border: 1px solid rgba(40,120,220,0.25); }
+  .callout-purple  { background: rgba(160,64,224,0.10); border: 1px solid rgba(160,64,224,0.30); }
+  .ci { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+
+  /* SIGNAL WEIGHTS */
+  .weights-table { width: 100%; border-collapse: collapse; }
+  .weights-table th { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); padding: 10px 14px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .weights-table td { font-size: 0.82rem; padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); color: rgba(255,255,255,0.7); }
+  .weights-table tr:last-child td { border-bottom: none; }
+  .w-bar-wrap { display: flex; align-items: center; gap: 8px; }
+  .w-bar-bg { flex: 1; height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; }
+  .w-bar-fill { height: 6px; border-radius: 3px; }
+
+  /* RISK CARDS */
+  .risk-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+  .risk-card { border-radius: 12px; padding: 18px; border: 1.5px solid; text-align: center; }
+  .rc-low      { background: rgba(40,180,80,0.08);  border-color: rgba(40,180,80,0.3); }
+  .rc-medium   { background: rgba(220,180,20,0.08); border-color: rgba(220,180,20,0.3); }
+  .rc-high     { background: rgba(220,100,20,0.10); border-color: rgba(220,100,20,0.3); }
+  .rc-critical { background: rgba(220,40,40,0.10);  border-color: rgba(220,40,40,0.3); }
+  .rc-score { font-size: 2rem; font-weight: 900; line-height: 1; margin-bottom: 4px; }
+  .rc-range { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .rc-label { font-size: 0.75rem; color: rgba(255,255,255,0.55); line-height: 1.4; }
+
+  /* TENANT ALERT PREVIEW */
+  .tenant-alert { background: rgba(255,255,255,0.02); border: 1px solid rgba(160,64,224,0.25); border-radius: 14px; padding: 20px; margin-bottom: 20px; }
+  .ta-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .ta-unit { font-size: 0.75rem; color: var(--muted); }
+  .ta-score-badge { background: rgba(220,80,20,0.2); border: 1px solid rgba(220,80,20,0.5); color: #ff8060; border-radius: 8px; padding: 4px 12px; font-size: 0.8rem; font-weight: 800; }
+  .ta-signals { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .ta-sig { background: rgba(255,255,255,0.03); border-radius: 8px; padding: 10px 12px; }
+  .ta-sig-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 4px; }
+  .ta-sig-val { font-size: 0.85rem; font-weight: 700; }
+
+  /* CS TABLE */
+  .cs-table { width: 100%; border-collapse: collapse; }
+  .cs-table th { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); padding: 10px 14px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .cs-table td { font-size: 0.8rem; padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); color: rgba(255,255,255,0.7); }
+  .cs-btn { background: rgba(160,64,224,0.15); border: 1px solid rgba(160,64,224,0.4); color: var(--purple-light); border-radius: 6px; padding: 4px 10px; font-size: 0.7rem; font-weight: 600; cursor: pointer; }
+  .badge-crit   { display:inline-block; background:rgba(220,40,40,0.2); color:#ff8080; border:1px solid rgba(220,40,40,0.4); border-radius:5px; padding:2px 8px; font-size:0.68rem; font-weight:700; }
+  .badge-high   { display:inline-block; background:rgba(220,100,20,0.2); color:#ffb060; border:1px solid rgba(220,100,20,0.4); border-radius:5px; padding:2px 8px; font-size:0.68rem; font-weight:700; }
+  .badge-medium { display:inline-block; background:rgba(220,180,20,0.2); color:#ffe060; border:1px solid rgba(220,180,20,0.4); border-radius:5px; padding:2px 8px; font-size:0.68rem; font-weight:700; }
+  .badge-low    { display:inline-block; background:rgba(40,180,80,0.2); color:#60e090; border:1px solid rgba(40,180,80,0.4); border-radius:5px; padding:2px 8px; font-size:0.68rem; font-weight:700; }
+
+  /* CLAUDE BOX */
+  .claude-box { background: linear-gradient(135deg,#140828,#0e0620); border: 1.5px solid rgba(140,60,200,0.45); border-radius: 16px; padding: 28px; }
+  .cb-head { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+  .cb-icon { font-size: 2.2rem; }
+  .cb-head h3 { font-size: 1.05rem; font-weight: 700; color: var(--white); }
+  .cb-sub { font-size: 0.72rem; color: rgba(160,80,255,0.7); margin-top: 3px; }
+  .cb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .cb-item { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 16px; }
+  .cb-item h5 { font-size: 0.78rem; font-weight: 700; color: rgba(160,80,255,0.85); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .cb-item ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .cb-item li { font-size: 0.8rem; color: rgba(255,255,255,0.65); padding-left: 14px; position: relative; line-height: 1.5; }
+  .cb-item li::before { content: '▸'; position: absolute; left: 0; color: rgba(140,60,200,0.7); font-size: 0.65rem; top: 2px; }
+
+  /* FEEDBACK LOOP */
+  .feedback-box { background: rgba(220,160,20,0.06); border: 1px solid rgba(220,160,20,0.25); border-radius: 12px; padding: 20px; }
+  .fb-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(220,180,60,0.7); margin-bottom: 10px; }
+  .fb-steps { display: flex; gap: 0; align-items: center; flex-wrap: wrap; }
+  .fb-step { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 8px 14px; font-size: 0.75rem; color: rgba(255,255,255,0.65); flex-shrink: 0; }
+  .fb-arr { color: rgba(220,180,60,0.6); margin: 0 6px; font-size: 0.9rem; }
+
+  /* ACCESS */
+  .access-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .access-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .access-card h4 { font-size: 0.82rem; font-weight: 700; color: var(--white); margin-bottom: 12px; }
+  .access-item { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .access-item:last-child { border-bottom: none; }
+  .ai-status { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
+  .have { background: rgba(40,180,80,0.2); color: #60e090; border: 1px solid rgba(40,180,80,0.4); }
+  .need { background: rgba(220,80,40,0.2); color: #ff8060; border: 1px solid rgba(220,80,40,0.4); }
+  .easy { background: rgba(40,120,220,0.2); color: #60b0ff; border: 1px solid rgba(40,120,220,0.4); }
+  .ai-name { font-size: 0.82rem; font-weight: 600; color: var(--white); margin-bottom: 3px; }
+  .ai-desc { font-size: 0.75rem; color: var(--muted); line-height: 1.5; }
+
+  /* TOOL GRID */
+  .tool-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .tool-card { border-radius: 12px; padding: 20px; border: 1.5px solid rgba(255,255,255,0.07); background: rgba(255,255,255,0.02); }
+  .tool-card.recommended { border-color: rgba(140,60,200,0.45); background: rgba(140,60,200,0.06); }
+  .rec-tag { font-size: 0.65rem; font-weight: 700; color: rgba(160,80,255,0.8); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .tool-card .tc-logo { font-size: 1.6rem; margin-bottom: 8px; }
+  .tool-card h4 { font-size: 0.92rem; font-weight: 700; color: var(--white); margin-bottom: 6px; }
+  .tool-card p { font-size: 0.78rem; color: var(--muted); margin-bottom: 10px; line-height: 1.5; }
+  .tool-card ul { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+  .tool-card li { font-size: 0.76rem; color: rgba(255,255,255,0.6); padding-left: 12px; position: relative; }
+  .tool-card li::before { content: '▸'; position: absolute; left: 0; color: var(--muted); font-size: 0.6rem; top: 2px; }
+
+  /* TIMELINE */
+  .timeline { display: flex; flex-direction: column; gap: 20px; }
+  .tl-week { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; overflow: hidden; }
+  .tl-week-label { background: rgba(160,64,224,0.08); border-bottom: 1px solid rgba(255,255,255,0.06); padding: 12px 20px; display: flex; align-items: center; gap: 12px; }
+  .wl-num { font-size: 0.85rem; font-weight: 800; color: var(--purple-light); }
+  .wl-days { font-size: 0.72rem; color: var(--muted); }
+  .tl-tasks { padding: 12px 20px; display: flex; flex-direction: column; gap: 8px; }
+  .tl-task { display: flex; align-items: flex-start; gap: 10px; font-size: 0.82rem; color: rgba(255,255,255,0.65); line-height: 1.5; }
+  .tt-who { display: inline-block; border-radius: 4px; padding: 2px 7px; font-size: 0.62rem; font-weight: 700; flex-shrink: 0; text-transform: uppercase; letter-spacing: 0.5px; }
+  .who-pm   { background: rgba(64,144,224,0.2); color: #80c0ff; border: 1px solid rgba(64,144,224,0.3); }
+  .who-eng  { background: rgba(40,180,80,0.2); color: #70e090; border: 1px solid rgba(40,180,80,0.3); }
+  .who-data { background: rgba(220,140,20,0.2); color: #e8b040; border: 1px solid rgba(220,140,20,0.3); }
+  .who-qa   { background: rgba(140,60,200,0.2); color: #c080ff; border: 1px solid rgba(140,60,200,0.3); }
+  .who-cs   { background: rgba(20,160,180,0.2); color: #40d0e0; border: 1px solid rgba(20,160,180,0.3); }
+
+  .footer { border-top: 1px solid rgba(255,255,255,0.06); padding: 22px 40px; font-size: 0.72rem; color: var(--muted); }
+
+  @media (max-width: 900px) {
+    .hero { padding: 32px 20px 28px; }
+    .page { padding: 0 16px 40px; }
+    .cb-grid, .access-grid, .tool-grid, .risk-grid { grid-template-columns: 1fr 1fr; }
+    .ta-signals { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ HERO ═══════════ -->
+<div class="hero">
+  <div class="page" style="padding-bottom:0;">
+    <div class="hero-tag">SD Innovation Tank &nbsp;·&nbsp; Month 1 &nbsp;·&nbsp; Idea #4 &nbsp;·&nbsp; ⭐ Best AI Innovation</div>
+    <h1>AI Non-Payment <span>Automation Intelligence</span></h1>
+    <p class="hero-sub">Turns SD's existing non-payment automation into a predictive engine — using PMS payment patterns and device telemetry together to flag which tenants are likely to default before they actually miss a payment. The highest AI innovation score of all 4 ideas (19/20).</p>
+    <div class="hero-pills">
+      <div class="pill">🤖 AI Innovation: 19/20</div>
+      <div class="pill">⭐ Score: 87 / 100</div>
+      <div class="pill">🏆 Best AI Innovation Award</div>
+      <div class="pill">⏱ Pilot: 45 days</div>
+      <div class="pill">🗃 Data: PMS sync + device telemetry</div>
+      <div class="pill">⚙️ Difficulty: ★★★★★ (hardest)</div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+<hr class="divider">
+
+<!-- ═══════════ SECTION 1: PLAIN ENGLISH ═══════════ -->
+<div class="section">
+  <div class="section-tag">Section 1</div>
+  <h2>What is this? <span>(Plain English)</span></h2>
+  <p class="desc">No jargon. Two audiences covered: non-technical (business) and technical (how it actually works).</p>
+
+  <div class="plain-box">
+    <div class="pb-head">
+      <div class="pb-icon">💳</div>
+      <div>
+        <div class="pb-title">Think of it like a credit score for your tenants — before they miss a payment, not after</div>
+        <div class="pb-sub">Non-technical explanation</div>
+      </div>
+    </div>
+    <p>When a tenant misses a payment, storage facilities usually find out only after it has happened — then they have to chase the tenant, issue warnings, and possibly escalate to a lien or auction process. It's slow, stressful, and costly.</p>
+    <p>SD already has <strong>non-payment automation</strong> — when PMS data shows a tenant is delinquent, SD can trigger workflows automatically. This idea adds a layer <em>before</em> that trigger: an AI that watches <strong>how tenants behave before they default</strong>. Two patterns predict default reliably: (1) <strong>payment delays creeping later each month</strong> — a tenant who pays on the 3rd, then the 9th, then the 16th is showing a clear trend toward non-payment; and (2) <strong>the tenant stops accessing their unit</strong> — device telemetry shows they haven't opened or been near their unit in 45+ days, often because they've quietly abandoned it.</p>
+    <p>The result: a facility manager gets an alert <em>before</em> the tenant misses a payment — <em>"Unit B-05 tenant is showing a high default risk. Payment trend is 12 days later than last month. Unit access has been zero for 6 weeks. Recommended action: call the tenant with a friendly reminder this week."</em> That one call could prevent a months-long delinquency process.</p>
+  </div>
+
+  <div class="plain-box" style="border-color:rgba(140,60,200,0.35);">
+    <div class="pb-head">
+      <div class="pb-icon">🔑</div>
+      <div>
+        <div class="pb-title">Why this is unique — SD has data no one else has</div>
+        <div class="pb-sub">The unfair competitive advantage</div>
+      </div>
+    </div>
+    <p>PMS systems (SiteLink, storEDGE) track payment history — but so do all competitors. What makes SD unique is <strong>device telemetry</strong>. SD sensors know when a tenant physically accesses their unit. No other self-storage software has this signal combined with payment data.</p>
+    <p>This is the idea with the <strong>highest AI Innovation score (19/20)</strong> precisely because it uses a data combination that is exclusive to SD — a genuine competitive moat. Facility managers who use this feature will not want to switch to a competitor who can't offer predictive default detection based on physical access patterns.</p>
+    <p>The value to SD: this feature makes the Smart Unit subscription <strong>stickier</strong> and becomes a key reason facility managers add more Smart Units — to get better tenant intelligence coverage. Every new device added at $12/month increases the prediction accuracy for that facility.</p>
+  </div>
+
+  <div class="plain-box" style="background:linear-gradient(135deg,#0e1a28,#0a1420);border-color:rgba(40,120,220,0.35);">
+    <div class="pb-head">
+      <div class="pb-icon">👔</div>
+      <div>
+        <div class="pb-title">How this grows SD revenue — the correct business case</div>
+        <div class="pb-sub">Important: tenant delinquency ≠ SD revenue. Here is the real link.</div>
+      </div>
+    </div>
+    <p>SD earns <strong>$12/device/month flat</strong>. Tenant non-payment is the facility manager's revenue problem — not SD's directly. The link to SD revenue works through two paths:</p>
+    <p><strong>Path 1 — Retention:</strong> Facilities that experience recurring delinquency issues blame the platform if they don't get proactive help. This feature makes SD the platform that <em>solves</em> the problem before it becomes a complaint. Happy facility managers stay on SD longer = retained $12/device/month revenue.</p>
+    <p><strong>Path 2 — Upsell:</strong> The quality of this prediction improves with more Smart Units per facility — because more units = more access pattern data = better predictions. Facility managers who see value in the predictive alerts are motivated to <strong>add more Smart Units at $12/device</strong> to get full facility coverage. This is a direct device expansion driver — same mechanism as Idea #2, but driven by tenant intelligence rather than security coverage.</p>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════ SECTION 2: ARCHITECTURE ═══════════ -->
+<div class="section">
+  <div class="section-tag">Section 2</div>
+  <h2>System <span>Architecture</span></h2>
+  <p class="desc">5 layers — plus a feedback loop that makes the model smarter over time. The feedback loop is what makes this idea unique vs the others.</p>
+
+  <div class="arch">
+    <div class="arch-title">ARCHITECTURE OVERVIEW — AI Non-Payment Prediction Pipeline</div>
+
+    <div style="display:flex;align-items:flex-start;gap:0;overflow-x:auto;padding-bottom:12px;min-width:950px;">
+
+      <!-- BOX 1 -->
+      <div style="display:flex;flex-direction:column;align-items:center;min-width:155px;">
+        <div class="arch-box ab-data" style="width:100%;">
+          <div class="ab-icon">🗄️</div>
+          <div class="ab-title">Data Sources</div>
+          <div class="ab-sub">PMS Sync<br>Device Telemetry<br>tod_backoffice</div>
+        </div>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;width:100%;">
+          <div style="background:rgba(40,100,200,0.1);border:1px solid rgba(40,100,200,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#80b0ff;">pms_charges (payment dates)</div>
+          <div style="background:rgba(40,100,200,0.1);border:1px solid rgba(40,100,200,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#80b0ff;">pms_tenants (delinquency)</div>
+          <div style="background:rgba(40,100,200,0.1);border:1px solid rgba(40,100,200,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#80b0ff;">incidents (unit access events)</div>
+          <div style="background:rgba(40,100,200,0.1);border:1px solid rgba(40,100,200,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#80b0ff;">devices (unit → sensor map)</div>
+          <div style="background:rgba(40,100,200,0.1);border:1px solid rgba(40,100,200,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#80b0ff;">units (zone, floor, layout)</div>
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 10px;padding-top:22px;flex-shrink:0;">
+        <div style="font-size:0.55rem;color:var(--purple-light);font-weight:700;margin-bottom:3px;white-space:nowrap;">daily SQL</div>
+        <div style="display:flex;align-items:center;">
+          <div style="width:30px;height:2px;background:rgba(160,64,224,0.5);"></div>
+          <div style="width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:8px solid rgba(160,64,224,0.8);"></div>
+        </div>
+      </div>
+
+      <!-- BOX 2 -->
+      <div style="display:flex;flex-direction:column;align-items:center;min-width:155px;">
+        <div class="arch-box ab-engine" style="width:100%;">
+          <div class="ab-icon">🧠</div>
+          <div class="ab-title">Prediction Engine</div>
+          <div class="ab-sub">Cloud Run<br>Daily at 3am UTC<br>Rule-based v1</div>
+        </div>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;width:100%;">
+          <div style="background:rgba(160,64,224,0.08);border:1px solid rgba(160,64,224,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#c080ff;">payment delay trend</div>
+          <div style="background:rgba(160,64,224,0.08);border:1px solid rgba(160,64,224,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#c080ff;">late payment count</div>
+          <div style="background:rgba(160,64,224,0.08);border:1px solid rgba(160,64,224,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#c080ff;">unit access drop flag</div>
+          <div style="background:rgba(160,64,224,0.08);border:1px solid rgba(160,64,224,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#c080ff;">risk_score 0–100</div>
+          <div style="background:rgba(160,64,224,0.08);border:1px solid rgba(160,64,224,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#c080ff;">alert threshold check</div>
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 10px;padding-top:22px;flex-shrink:0;">
+        <div style="font-size:0.55rem;color:var(--purple-light);font-weight:700;margin-bottom:3px;white-space:nowrap;">risk JSON</div>
+        <div style="display:flex;align-items:center;">
+          <div style="width:30px;height:2px;background:rgba(160,64,224,0.5);"></div>
+          <div style="width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:8px solid rgba(160,64,224,0.8);"></div>
+        </div>
+      </div>
+
+      <!-- BOX 3 -->
+      <div style="display:flex;flex-direction:column;align-items:center;min-width:155px;">
+        <div class="arch-box ab-ai" style="width:100%;">
+          <div class="ab-icon">🤖</div>
+          <div class="ab-title">Claude AI</div>
+          <div class="ab-sub">Anthropic API<br>claude-sonnet-4-6<br>On HIGH+ risk only</div>
+        </div>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;width:100%;">
+          <div style="background:rgba(140,60,200,0.1);border:1px solid rgba(140,60,200,0.25);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#c080ff;">explains risk signals</div>
+          <div style="background:rgba(140,60,200,0.1);border:1px solid rgba(140,60,200,0.25);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#c080ff;">writes intervention</div>
+          <div style="background:rgba(140,60,200,0.1);border:1px solid rgba(140,60,200,0.25);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#c080ff;">suggests right action</div>
+          <div style="background:rgba(140,60,200,0.1);border:1px solid rgba(140,60,200,0.25);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#c080ff;">drafts contact script</div>
+          <div style="background:rgba(140,60,200,0.1);border:1px solid rgba(140,60,200,0.25);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#c080ff;">cached system prompt</div>
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 10px;padding-top:22px;flex-shrink:0;">
+        <div style="font-size:0.55rem;color:var(--purple-light);font-weight:700;margin-bottom:3px;white-space:nowrap;">alert + script</div>
+        <div style="display:flex;align-items:center;">
+          <div style="width:30px;height:2px;background:rgba(160,64,224,0.5);"></div>
+          <div style="width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:8px solid rgba(160,64,224,0.8);"></div>
+        </div>
+      </div>
+
+      <!-- BOX 4 -->
+      <div style="display:flex;flex-direction:column;align-items:center;min-width:155px;">
+        <div class="arch-box ab-deliver" style="width:100%;">
+          <div class="ab-icon">📬</div>
+          <div class="ab-title">Delivery</div>
+          <div class="ab-sub">Customer UI<br>Email + Slack<br>CS Dashboard</div>
+        </div>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;width:100%;">
+          <div style="background:rgba(20,160,180,0.08);border:1px solid rgba(20,160,180,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#60d0e0;">Renters section flag</div>
+          <div style="background:rgba(20,160,180,0.08);border:1px solid rgba(20,160,180,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#60d0e0;">FM email alert</div>
+          <div style="background:rgba(20,160,180,0.08);border:1px solid rgba(20,160,180,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#60d0e0;">Slack (high risk)</div>
+          <div style="background:rgba(20,160,180,0.08);border:1px solid rgba(20,160,180,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#60d0e0;">CS Looker dashboard</div>
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 10px;padding-top:22px;flex-shrink:0;">
+        <div style="font-size:0.55rem;color:rgba(220,180,60,0.8);font-weight:700;margin-bottom:3px;white-space:nowrap;">outcome data</div>
+        <div style="display:flex;align-items:center;">
+          <div style="width:30px;height:2px;background:rgba(220,160,20,0.5);"></div>
+          <div style="width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:8px solid rgba(220,160,20,0.8);"></div>
+        </div>
+      </div>
+
+      <!-- BOX 5: Feedback Loop -->
+      <div style="display:flex;flex-direction:column;align-items:center;min-width:155px;">
+        <div class="arch-box ab-loop" style="width:100%;">
+          <div class="ab-icon">🔄</div>
+          <div class="ab-title">Feedback Loop</div>
+          <div class="ab-sub">BigQuery<br>Outcome tracking<br>Model improvement</div>
+        </div>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;width:100%;">
+          <div style="background:rgba(220,160,20,0.08);border:1px solid rgba(220,160,20,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#e0c060;">did tenant default?</div>
+          <div style="background:rgba(220,160,20,0.08);border:1px solid rgba(220,160,20,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#e0c060;">was alert acted on?</div>
+          <div style="background:rgba(220,160,20,0.08);border:1px solid rgba(220,160,20,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#e0c060;">precision / recall</div>
+          <div style="background:rgba(220,160,20,0.08);border:1px solid rgba(220,160,20,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#e0c060;">weight calibration</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="margin-top:28px;padding:14px 18px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;">
+      <div style="font-size:0.62rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;">☁️ Running on — Google Cloud Platform</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;">
+        <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:5px 12px;font-size:0.72rem;color:rgba(255,255,255,0.55);">Cloud Run (daily prediction job)</span>
+        <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:5px 12px;font-size:0.72rem;color:rgba(255,255,255,0.55);">Cloud Scheduler (3am UTC daily)</span>
+        <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:5px 12px;font-size:0.72rem;color:rgba(255,255,255,0.55);">BigQuery (read PMS/telemetry + write predictions + outcomes)</span>
+        <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:5px 12px;font-size:0.72rem;color:rgba(255,255,255,0.55);">Cloud SQL — tod_backoffice (read-only)</span>
+        <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:5px 12px;font-size:0.72rem;color:rgba(255,255,255,0.55);">Anthropic Claude API (HIGH+ risk only)</span>
+        <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:5px 12px;font-size:0.72rem;color:rgba(255,255,255,0.55);">BackOffice API (Renters section flag)</span>
+        <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:5px 12px;font-size:0.72rem;color:rgba(255,255,255,0.55);">Slack Webhook + SendGrid</span>
+        <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:5px 12px;font-size:0.72rem;color:rgba(255,255,255,0.55);">Looker Studio (CS + FM dashboards)</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════ SECTION 3: BUILD PLAN ═══════════ -->
+<div class="section">
+  <div class="section-tag">Section 3</div>
+  <h2>Step-by-Step <span>Build Plan</span></h2>
+  <p class="desc">7 steps. This is the most technically complex of the 4 ideas — the PMS + telemetry data join in Step 1 is the hardest part. Everything else is straightforward once the data pipeline is clean.</p>
+
+  <!-- Signal weights table -->
+  <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:20px;margin-bottom:32px;">
+    <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:14px;">🧮 Default Risk Score Formula — 4 Weighted Signals (total: 100 points)</div>
+    <table class="weights-table">
+      <thead>
+        <tr><th>Signal</th><th>Weight</th><th>Bar</th><th>What it measures</th><th>Data source</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong style="color:#fff;">Payment Delay Trend</strong></td>
+          <td style="color:#c080ff;font-weight:700;">35 pts</td>
+          <td><div class="w-bar-wrap"><div class="w-bar-bg"><div class="w-bar-fill" style="width:100%;background:rgba(160,64,224,0.7);"></div></div></div></td>
+          <td>How many days later each month is the tenant paying vs last month?</td>
+          <td style="color:var(--muted);">pms_charges</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#fff;">Late Payment Count</strong></td>
+          <td style="color:#ff8060;font-weight:700;">25 pts</td>
+          <td><div class="w-bar-wrap"><div class="w-bar-bg"><div class="w-bar-fill" style="width:71%;background:rgba(220,80,40,0.7);"></div></div></div></td>
+          <td>Number of late payments in last 6 months (past due date)</td>
+          <td style="color:var(--muted);">pms_charges</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#fff;">Unit Access Drop</strong></td>
+          <td style="color:#60b0ff;font-weight:700;">25 pts</td>
+          <td><div class="w-bar-wrap"><div class="w-bar-bg"><div class="w-bar-fill" style="width:71%;background:rgba(40,120,220,0.7);"></div></div></div></td>
+          <td>SD-exclusive: motion/door events in last 30 days vs previous 30 days (device telemetry)</td>
+          <td style="color:var(--muted);">incidents + devices</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#fff;">Currently Delinquent Flag</strong></td>
+          <td style="color:#ffe060;font-weight:700;">15 pts</td>
+          <td><div class="w-bar-wrap"><div class="w-bar-bg"><div class="w-bar-fill" style="width:43%;background:rgba(220,180,20,0.7);"></div></div></div></td>
+          <td>Is the tenant currently past due according to PMS sync?</td>
+          <td style="color:var(--muted);">pms_tenants</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="steps">
+
+    <!-- STEP 1 -->
+    <div class="step">
+      <div class="step-num-wrap"><div class="step-num sn1">1</div><div class="step-line"></div></div>
+      <div class="step-content">
+        <div class="step-tag" style="color:#9030d0;">Data Layer (Hardest Step)</div>
+        <div class="step-title">Join PMS payment data with device telemetry — one row per tenant per facility</div>
+        <div class="step-body">
+          <p>This is the most complex data step. The PMS sync tables hold payment history per tenant/unit. The incidents table holds device events per unit. The join key is <strong style="color:#fff;">unit_id</strong> — which links a tenant (via PMS) to a specific device (via tod_backoffice). Confirm the exact PMS table names with the backend team before building.</p>
+          <div class="code-block"><span class="cm">-- Step 1A: Payment delay trend per tenant (last 3 payments)</span>
+<span class="cm">-- How many days later is each payment vs the previous one?</span>
+<span class="kw">WITH</span> payment_history <span class="kw">AS</span> (
+  <span class="kw">SELECT</span>
+    c.unit_id,
+    c.tenant_id,
+    c.payment_date,
+    c.due_date,
+    <span class="fn">DATE_DIFF</span>(c.payment_date, c.due_date, DAY)     <span class="kw">AS</span> days_after_due,
+    <span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span> (<span class="kw">PARTITION BY</span> c.tenant_id
+                         <span class="kw">ORDER BY</span> c.payment_date <span class="kw">DESC</span>) <span class="kw">AS</span> payment_rank
+  <span class="kw">FROM</span> `tod_backoffice.pms_charges` c  <span class="cm">-- confirm actual table name</span>
+  <span class="kw">WHERE</span> c.charge_type = <span class="str">'rent'</span>
+    <span class="kw">AND</span> c.payment_date >= <span class="fn">DATE_SUB</span>(CURRENT_DATE(), <span class="kw">INTERVAL</span> <span class="num">6</span> MONTH)
+)
+<span class="kw">SELECT</span>
+  unit_id, tenant_id,
+  <span class="fn">MAX</span>(<span class="kw">CASE WHEN</span> payment_rank = <span class="num">1</span> <span class="kw">THEN</span> days_after_due <span class="kw">END</span>) <span class="kw">AS</span> latest_delay,
+  <span class="fn">MAX</span>(<span class="kw">CASE WHEN</span> payment_rank = <span class="num">2</span> <span class="kw">THEN</span> days_after_due <span class="kw">END</span>) <span class="kw">AS</span> prev_delay,
+  <span class="fn">MAX</span>(<span class="kw">CASE WHEN</span> payment_rank = <span class="num">1</span> <span class="kw">THEN</span> days_after_due <span class="kw">END</span>) -
+  <span class="fn">MAX</span>(<span class="kw">CASE WHEN</span> payment_rank = <span class="num">2</span> <span class="kw">THEN</span> days_after_due <span class="kw">END</span>)
+                                                              <span class="kw">AS</span> delay_trend_days,
+  <span class="fn">COUNTIF</span>(days_after_due > <span class="num">0</span>)                              <span class="kw">AS</span> late_payment_count_6mo
+<span class="kw">FROM</span> payment_history
+<span class="kw">GROUP BY</span> unit_id, tenant_id;
+
+<span class="cm">-- Step 1B: Unit access events from device telemetry (SD-exclusive signal)</span>
+<span class="kw">SELECT</span>
+  d.unit_id,
+  <span class="fn">COUNTIF</span>(i.created_at >= <span class="fn">DATE_SUB</span>(CURRENT_DATE(), <span class="kw">INTERVAL</span> <span class="num">30</span> DAY)) <span class="kw">AS</span> access_last_30d,
+  <span class="fn">COUNTIF</span>(i.created_at <span class="kw">BETWEEN</span> <span class="fn">DATE_SUB</span>(CURRENT_DATE(), <span class="kw">INTERVAL</span> <span class="num">60</span> DAY)
+                          <span class="kw">AND</span>     <span class="fn">DATE_SUB</span>(CURRENT_DATE(), <span class="kw">INTERVAL</span> <span class="num">30</span> DAY)) <span class="kw">AS</span> access_prev_30d
+<span class="kw">FROM</span> `tod_backoffice.devices` d
+<span class="kw">LEFT JOIN</span> `tod_backoffice.incidents` i
+  <span class="kw">ON</span> i.device_id = d.id
+ <span class="kw">AND</span> i.sensor_type <span class="kw">IN</span> (<span class="str">'motion'</span>, <span class="str">'door'</span>)
+<span class="kw">GROUP BY</span> d.unit_id;</div>
+          <div class="callout callout-warn">
+            <div class="ci">⚠️</div>
+            <p><strong>Confirm before building:</strong> Verify the exact PMS charge table name in tod_backoffice with the backend team. Different PMS systems (storEDGE, SiteLink, SSM) may sync into different table schemas. This confirmation is the most critical blocker for this idea.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step">
+      <div class="step-num-wrap"><div class="step-num sn2">2</div><div class="step-line"></div></div>
+      <div class="step-content">
+        <div class="step-tag" style="color:#b040e0;">Scoring Engine</div>
+        <div class="step-title">Build the Default Risk Scoring Engine — rule-based for v1 pilot</div>
+        <div class="step-body">
+          <p>For the 45-day pilot, use a <strong style="color:#fff;">rule-based weighted formula</strong> (same approach as Idea #2). This is explainable, fast to build, and easy to validate with the CS team. A true ML model (logistic regression or XGBoost) is a v2 upgrade once outcome data accumulates.</p>
+          <div class="code-block"><span class="cm">// risk-scorer.js</span>
+<span class="kw">function</span> <span class="fn">calculateDefaultRisk</span>(signals) {
+  <span class="kw">let</span> score = <span class="num">0</span>;
+
+  <span class="cm">// Signal 1: Payment delay trend — 0 to 35 points</span>
+  <span class="cm">// delay_trend_days = latest payment days late MINUS previous payment days late</span>
+  <span class="cm">// Positive = paying later each month = high risk</span>
+  score += <span class="fn">Math.min</span>(<span class="num">35</span>, <span class="fn">Math.max</span>(<span class="num">0</span>, (signals.delay_trend_days || <span class="num">0</span>) * <span class="num">2.5</span>));
+
+  <span class="cm">// Signal 2: Late payment count (last 6 months) — 0 to 25 points</span>
+  score += <span class="fn">Math.min</span>(<span class="num">25</span>, (signals.late_payment_count_6mo || <span class="num">0</span>) * <span class="num">8</span>);
+
+  <span class="cm">// Signal 3: Unit access drop (SD-exclusive) — 0 to 25 points</span>
+  <span class="cm">// If tenant stopped accessing unit when they previously did = abandonment risk</span>
+  <span class="kw">if</span> (signals.access_last_30d === <span class="num">0</span> && signals.access_prev_30d > <span class="num">0</span>) {
+    score += <span class="num">25</span>;  <span class="cm">// sudden abandonment</span>
+  } <span class="kw">else if</span> (signals.access_last_30d === <span class="num">0</span>) {
+    score += <span class="num">12</span>;  <span class="cm">// generally inactive</span>
+  } <span class="kw">else if</span> (signals.access_last_30d < signals.access_prev_30d * <span class="num">0.3</span>) {
+    score += <span class="num">8</span>;   <span class="cm">// access dropped >70%</span>
+  }
+
+  <span class="cm">// Signal 4: Currently delinquent per PMS — 0 or 15 points</span>
+  <span class="kw">if</span> (signals.is_currently_delinquent) score += <span class="num">15</span>;
+
+  <span class="kw">return</span> <span class="fn">Math.min</span>(<span class="num">100</span>, <span class="fn">Math.round</span>(score));
+}
+
+<span class="cm">// Threshold definitions</span>
+<span class="kw">const</span> RISK_BANDS = {
+  LOW:      { min: <span class="num">0</span>,  max: <span class="num">29</span>, action: <span class="str">'none'</span>             },
+  MEDIUM:   { min: <span class="num">30</span>, max: <span class="num">59</span>, action: <span class="str">'watchlist'</span>        },
+  HIGH:     { min: <span class="num">60</span>, max: <span class="num">79</span>, action: <span class="str">'alert_fm'</span>         },
+  CRITICAL: { min: <span class="num">80</span>, max: <span class="num">100</span>, action: <span class="str">'alert_fm_and_cs'</span> }
+};</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step">
+      <div class="step-num-wrap"><div class="step-num sn3">3</div><div class="step-line"></div></div>
+      <div class="step-content">
+        <div class="step-tag" style="color:#c080ff;">AI Layer — Claude</div>
+        <div class="step-title">Integrate Claude API — write specific intervention for HIGH and CRITICAL risk tenants</div>
+        <div class="step-body">
+          <p>Claude is called only for <strong style="color:#fff;">HIGH (60–79) and CRITICAL (80–100) risk tenants</strong>. It reads the signal breakdown and writes a specific, professional message for the facility manager explaining why this tenant is flagged and exactly what to do next.</p>
+          <div class="code-block"><span class="cm">// claude-default-advisor.js</span>
+<span class="kw">async function</span> <span class="fn">generateIntervention</span>(tenant, unit, facility, signals, riskScore) {
+  <span class="kw">const</span> payload = {
+    unit_number:           unit.unit_number,
+    zone:                  unit.zone_name,
+    risk_score:            riskScore,
+    payment_delay_trend:   signals.delay_trend_days,   <span class="cm">// e.g. +12 days later</span>
+    late_payments_6mo:     signals.late_payment_count_6mo,
+    access_last_30d:       signals.access_last_30d,    <span class="cm">// e.g. 0 events</span>
+    access_prev_30d:       signals.access_prev_30d,    <span class="cm">// e.g. 8 events</span>
+    is_delinquent:         signals.is_currently_delinquent,
+    pms_type:              facility.pms_type,
+    next_payment_due_days: signals.days_until_next_due  <span class="cm">// e.g. 6 days away</span>
+  };
+
+  <span class="kw">const</span> response = <span class="kw">await</span> client.messages.<span class="fn">create</span>({
+    model:      <span class="str">"claude-sonnet-4-6"</span>,
+    max_tokens: <span class="num">400</span>,
+    system: [{
+      type: <span class="str">"text"</span>,
+      text: <span class="str">`You are a customer success advisor at Storage Defender.
+A tenant at a self-storage facility is showing default risk signals.
+Write a short, specific alert for the facility manager explaining:
+1. Which signals are most concerning and why
+2. One clear recommended action to take THIS week (before next payment due)
+Tone: professional, factual, helpful — not alarmist. 2 short paragraphs.
+Never invent data. Only use what is provided.`</span>,
+      cache_control: { type: <span class="str">"ephemeral"</span> }
+    }],
+    messages: [{ role: <span class="str">"user"</span>, content: <span class="fn">JSON.stringify</span>(payload, <span class="kw">null</span>, <span class="num">2</span>) }]
+  });
+
+  <span class="kw">return</span> response.content[<span class="num">0</span>].text;
+}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="step">
+      <div class="step-num-wrap"><div class="step-num sn4">4</div><div class="step-line"></div></div>
+      <div class="step-content">
+        <div class="step-tag" style="color:#20b090;">Customer UI Integration</div>
+        <div class="step-title">Flag at-risk tenants in Customer UI Renters section via BackOffice API</div>
+        <div class="step-body">
+          <p>Add a risk badge to each at-risk tenant row in the <strong style="color:#fff;">Renters section</strong> of the Customer UI. The facility manager sees a coloured indicator next to the tenant's unit number: 🟡 MEDIUM / 🟠 HIGH / 🔴 CRITICAL. Clicking it opens Claude's recommendation.</p>
+          <div class="code-block"><span class="cm">// BackOffice API — new endpoint serving Renters section</span>
+<span class="cm">// GET /api/facilities/:facilityId/tenant-risk</span>
+router.<span class="fn">get</span>(<span class="str">'/facilities/:id/tenant-risk'</span>, <span class="kw">async</span> (req, res) => {
+  <span class="kw">const</span> risks = <span class="kw">await</span> bigquery.<span class="fn">query</span>(<span class="str">`
+    SELECT unit_id, risk_score, risk_band,
+           delay_trend_days, access_last_30d,
+           claude_recommendation, scored_at
+    FROM   tod_backoffice.tenant_risk_scores
+    WHERE  facility_id = @facilityId
+      AND  DATE(scored_at) = CURRENT_DATE()
+      AND  risk_band IN ('MEDIUM','HIGH','CRITICAL')
+    ORDER BY risk_score DESC
+  `</span>, { params: { facilityId: req.params.id } });
+
+  res.<span class="fn">json</span>({ at_risk_tenants: risks });
+});</div>
+          <div class="callout callout-success">
+            <div class="ci">⚡</div>
+            <p><strong>Pilot shortcut:</strong> Skip the Customer UI integration for the first 45 days — deliver alerts via email only. The Renters section badge is a v2 feature. This keeps the pilot to backend-only work and avoids frontend deployment complexity.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="step">
+      <div class="step-num-wrap"><div class="step-num sn5">5</div><div class="step-line"></div></div>
+      <div class="step-content">
+        <div class="step-tag" style="color:#e0b020;">Delivery — Email + Slack</div>
+        <div class="step-title">Send daily alert email to facility manager + Slack for CRITICAL risk tenants</div>
+        <div class="step-body">
+          <div class="code-block"><span class="cm">// delivery.js</span>
+<span class="kw">for</span> (<span class="kw">const</span> facility <span class="kw">of</span> facilitiesWithHighRisk) {
+  <span class="kw">const</span> highRiskTenants = <span class="kw">await</span> <span class="fn">getHighRiskTenants</span>(facility.id);
+
+  <span class="cm">// Email to facility manager — daily digest of HIGH+ risk tenants</span>
+  <span class="kw">await</span> sendgrid.<span class="fn">send</span>({
+    to:      facility.manager_email,
+    subject: <span class="str">`${highRiskTenants.length} tenants flagged for default risk — ${facility.name}`</span>,
+    html:    <span class="fn">riskEmailTemplate</span>({ facility, highRiskTenants })
+  });
+
+  <span class="cm">// Slack alert only for CRITICAL risk (score ≥ 80)</span>
+  <span class="kw">const</span> criticalTenants = highRiskTenants.<span class="fn">filter</span>(t => t.risk_score >= <span class="num">80</span>);
+  <span class="kw">if</span> (criticalTenants.length > <span class="num">0</span>) {
+    <span class="kw">await</span> slack.<span class="fn">post</span>({
+      text: <span class="str">`🔴 CRITICAL default risk: ${criticalTenants.length} tenant(s) at ${facility.name}`</span>,
+      blocks: criticalTenants.<span class="fn">map</span>(t => ({
+        unit:       t.unit_number,
+        score:      t.risk_score,
+        top_signal: t.delay_trend_days > <span class="num">7</span> ? <span class="str">'Payment delay trend'</span> : <span class="str">'Unit access drop'</span>,
+        advice:     t.claude_recommendation
+      }))
+    });
+  }
+}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 6 -->
+    <div class="step">
+      <div class="step-num-wrap"><div class="step-num sn6">6</div><div class="step-line"></div></div>
+      <div class="step-content">
+        <div class="step-tag" style="color:#20a0c0;">Feedback Loop</div>
+        <div class="step-title">Build outcome tracking — did the flagged tenant actually default?</div>
+        <div class="step-body">
+          <p>The feedback loop is what separates this idea from a simple rule engine. After each alert, track the outcome in BigQuery: did the tenant actually default? Was the alert acted on? This data is used to measure <strong style="color:#fff;">precision</strong> (how many alerts were correct) and <strong style="color:#fff;">recall</strong> (how many defaults were caught). Over time, it powers a true ML model (v2).</p>
+          <div class="feedback-box">
+            <div class="fb-title">📊 Feedback Loop Flow</div>
+            <div class="fb-steps">
+              <div class="fb-step">Alert fired (HIGH/CRITICAL)</div>
+              <div class="fb-arr">→</div>
+              <div class="fb-step">FM acts (or ignores)</div>
+              <div class="fb-arr">→</div>
+              <div class="fb-step">PMS sync: did tenant default?</div>
+              <div class="fb-arr">→</div>
+              <div class="fb-step">Write outcome to BigQuery</div>
+              <div class="fb-arr">→</div>
+              <div class="fb-step">Calculate precision/recall</div>
+              <div class="fb-arr">→</div>
+              <div class="fb-step">Tune signal weights</div>
+            </div>
+          </div>
+          <div class="callout callout-purple" style="margin-top:14px;">
+            <div class="ci">🤖</div>
+            <p><strong>v2 upgrade path:</strong> Once 3+ months of outcome data accumulates, replace the rule-based scoring with a <strong>logistic regression model</strong> trained on historical defaults. With enough data, the model learns that "payment delay trend + unit access drop together = 3× stronger predictor than either signal alone." This is when the 19/20 AI Innovation score is truly earned.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 7 -->
+    <div class="step">
+      <div class="step-num-wrap"><div class="step-num sn7">7</div></div>
+      <div class="step-content">
+        <div class="step-tag" style="color:#e03060;">Testing & Validation</div>
+        <div class="step-title">Backtest against historical defaults, validate with CS team, pilot with 5 facilities</div>
+        <div class="step-body">
+          <p>Before going live, <strong style="color:#fff;">backtest the scoring formula</strong> against known historical defaults — run the algorithm on data from 6 months ago and check how many real defaults it would have caught. This validates the signal weights before any facility manager sees a false positive.</p>
+          <div class="callout callout-warn">
+            <div class="ci">⚠️</div>
+            <p><strong>False positive risk:</strong> This idea has the highest false positive risk of all 4 — a wrong alert tells a facility manager to call a tenant who has done nothing wrong. Agree on an acceptable false positive rate with the CS team before launch (suggested: no more than 1 false alert per facility per week). Adjust the HIGH threshold (currently 60) upward if false positive rate is too high during backtest.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════ SECTION 4: CLAUDE DEEP DIVE ═══════════ -->
+<div class="section">
+  <div class="section-tag">Section 4</div>
+  <h2>Claude AI — <span>Deep Dive</span></h2>
+  <p class="desc">Claude generates the intervention message per at-risk tenant. Called only for HIGH and CRITICAL risk — not for every tenant daily.</p>
+
+  <div class="claude-box">
+    <div class="cb-head">
+      <div class="cb-icon">🤖</div>
+      <div>
+        <h3>Claude Sonnet 4.6 — Anthropic API</h3>
+        <div class="cb-sub">Model ID: claude-sonnet-4-6 &nbsp;|&nbsp; SDK: @anthropic-ai/sdk &nbsp;|&nbsp; Triggered for HIGH (60+) and CRITICAL (80+) risk tenants only</div>
+      </div>
+    </div>
+
+    <div class="cb-grid">
+      <div class="cb-item">
+        <h5>What Claude Does Here</h5>
+        <ul>
+          <li>Reads the 4 signal values for the specific tenant</li>
+          <li>Identifies which signal is most alarming and why</li>
+          <li>Writes 2 paragraphs: risk explanation + specific action for this week</li>
+          <li>Times the action to the next payment due date</li>
+          <li>Keeps tone factual and non-alarmist — facility managers don't like panic alerts</li>
+        </ul>
+      </div>
+      <div class="cb-item">
+        <h5>Why the Access Drop Signal is Unique</h5>
+        <ul>
+          <li>PMS payment data is available to any competitor</li>
+          <li>SD device telemetry is not — no other platform can detect that a tenant stopped entering their unit</li>
+          <li>Claude can explain this to the FM in plain language: "Unit B-05 had 8 motion events last month. This month: 0. Combined with the payment delay, this suggests the tenant may have stopped using the unit."</li>
+          <li>This explanation is something only SD can give</li>
+        </ul>
+      </div>
+      <div class="cb-item">
+        <h5>Cost Estimate (per month)</h5>
+        <ul>
+          <li>~5% of tenants reach HIGH+ risk on any given day</li>
+          <li>200 facilities × avg 50 tenants × 5% = ~500 API calls/day</li>
+          <li>~400 output tokens per intervention</li>
+          <li>System prompt cached per batch run</li>
+          <li>Estimated: <strong>~$8–12 USD/month</strong> for full fleet</li>
+        </ul>
+      </div>
+      <div class="cb-item">
+        <h5>What Claude Must NOT Do</h5>
+        <ul>
+          <li>Must NOT use tenant PII (name, contact details) in the output — use unit number only</li>
+          <li>Must NOT predict probability of default as a % (not enough data in v1)</li>
+          <li>Must NOT suggest legal actions (liens, auctions) — only soft interventions</li>
+          <li>Must NOT invent payment amounts or rental rates — those belong to the PMS</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:16px;">
+      <div style="font-size:0.65rem;font-weight:700;color:rgba(160,80,255,0.7);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;">📝 Sample Claude Output — what the facility manager reads in their alert email</div>
+      <p style="font-size:0.84rem;color:rgba(255,255,255,0.75);line-height:1.7;font-style:italic;">"Unit <strong style="color:#fff;">B-05</strong> is showing two concerning patterns together. Their last payment arrived <strong style="color:#fff;">12 days later than the previous month</strong>, continuing a trend that has been moving later for three consecutive months. Additionally, <strong style="color:#fff;">unit access events have dropped to zero in the last 30 days</strong> — down from 8 events the previous month. Together, these signals suggest the tenant may be disengaging from the unit.</p>
+      <p style="font-size:0.84rem;color:rgba(255,255,255,0.75);line-height:1.7;font-style:italic;margin-top:8px;">Recommended action: The next payment for this unit is due in <strong style="color:#fff;">6 days</strong>. A brief, friendly call this week to check in — not about payment — often resolves disengagement early and prevents a missed payment entirely. If the tenant has moved out informally, this is also the right time to confirm unit status."</p>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════ SECTION 5: SAMPLE OUTPUT ═══════════ -->
+<div class="section">
+  <div class="section-tag">Section 5</div>
+  <h2>Sample Output <span>Preview</span></h2>
+  <p class="desc">Four risk bands, a tenant alert card, and the CS dashboard showing facility-level default risk.</p>
+
+  <!-- Risk Bands -->
+  <div style="margin-bottom:10px;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--muted);">📊 Risk Score Bands — 4 levels, 4 different responses</div>
+  <div class="risk-grid" style="margin-bottom:28px;">
+    <div class="risk-card rc-low">
+      <div class="rc-score" style="color:#60e090;">0–29</div>
+      <div class="rc-range" style="color:#40c060;">Low Risk</div>
+      <div class="rc-label">No action needed. Standard monitoring. Not included in alerts.</div>
+    </div>
+    <div class="risk-card rc-medium">
+      <div class="rc-score" style="color:#ffe060;">30–59</div>
+      <div class="rc-range" style="color:#c0b020;">Medium Risk</div>
+      <div class="rc-label">Added to facility manager's watch list. Weekly digest only. No Claude call yet.</div>
+    </div>
+    <div class="risk-card rc-high">
+      <div class="rc-score" style="color:#ffb060;">60–79</div>
+      <div class="rc-range" style="color:#c07020;">High Risk</div>
+      <div class="rc-label">Claude generates intervention. Email alert to facility manager. CS watchlist.</div>
+    </div>
+    <div class="risk-card rc-critical">
+      <div class="rc-score" style="color:#ff6060;">80–100</div>
+      <div class="rc-range" style="color:#c03030;">Critical</div>
+      <div class="rc-label">Immediate Slack alert to CS team. Email to FM with Claude recommendation. Action required today.</div>
+    </div>
+  </div>
+
+  <!-- Sample tenant alert card -->
+  <div style="margin-bottom:10px;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--muted);">🏷️ Sample Tenant Alert Card — appears in Renters section of Customer UI</div>
+  <div class="tenant-alert" style="margin-bottom:28px;">
+    <div class="ta-header">
+      <div>
+        <div style="font-size:1rem;font-weight:800;color:var(--white);">Unit B-05</div>
+        <div class="ta-unit">Zone B &nbsp;·&nbsp; Riverside Storage &nbsp;·&nbsp; Flagged today</div>
+      </div>
+      <div class="ta-score-badge">⚠ Risk Score: 78 — HIGH</div>
+    </div>
+    <div class="ta-signals">
+      <div class="ta-sig">
+        <div class="ta-sig-label">Payment Delay Trend</div>
+        <div class="ta-sig-val" style="color:#ff8060;">+12 days later than last month</div>
+      </div>
+      <div class="ta-sig">
+        <div class="ta-sig-label">Late Payments (6 mo)</div>
+        <div class="ta-sig-val" style="color:#ffb060;">2 times past due date</div>
+      </div>
+      <div class="ta-sig">
+        <div class="ta-sig-label">Unit Access — Last 30 days</div>
+        <div class="ta-sig-val" style="color:#ff6060;">0 events (was 8 prev month)</div>
+      </div>
+      <div class="ta-sig">
+        <div class="ta-sig-label">Currently Delinquent</div>
+        <div class="ta-sig-val" style="color:#60e090;">No (next due in 6 days)</div>
+      </div>
+    </div>
+    <div style="background:rgba(160,64,224,0.08);border:1px solid rgba(160,64,224,0.2);border-radius:8px;padding:14px;">
+      <div style="font-size:0.65rem;font-weight:700;color:rgba(160,80,255,0.7);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">🤖 AI Recommendation</div>
+      <p style="font-size:0.82rem;color:rgba(255,255,255,0.7);line-height:1.65;font-style:italic;">"Unit B-05 is showing two concerning patterns together. Their last payment arrived 12 days later than the previous month, continuing a trend for three consecutive months. Unit access has dropped to zero — down from 8 events last month. <strong style="color:#fff;">Recommended: a brief friendly check-in call this week before the next payment date.</strong>"</p>
+    </div>
+  </div>
+
+  <!-- CS Dashboard -->
+  <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:24px;">
+    <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:4px;">CS Dashboard — Facility-Level Default Risk (Looker Studio)</div>
+    <div style="font-size:0.72rem;color:rgba(255,255,255,0.3);margin-bottom:16px;">Ranked by critical tenant count descending · Updated daily at 3am UTC</div>
+    <table class="cs-table">
+      <thead>
+        <tr><th>Facility</th><th>Smart Units</th><th>SD Sub</th><th>Critical Tenants</th><th>High Risk</th><th>Medium</th><th>Risk Level</th><th>Action</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong style="color:#fff;">Riverside Storage</strong></td>
+          <td>60</td>
+          <td style="color:#60e090;">$720/mo</td>
+          <td style="color:#ff6060;font-weight:700;">3</td>
+          <td style="color:#ffb060;">7</td>
+          <td style="color:#ffe060;">12</td>
+          <td><span class="badge-crit">CRITICAL</span></td>
+          <td><button class="cs-btn">View ↗</button></td>
+        </tr>
+        <tr>
+          <td><strong style="color:#fff;">Northgate Self Store</strong></td>
+          <td>30</td>
+          <td style="color:#60e090;">$360/mo</td>
+          <td style="color:#ff6060;font-weight:700;">1</td>
+          <td style="color:#ffb060;">4</td>
+          <td style="color:#ffe060;">8</td>
+          <td><span class="badge-high">HIGH</span></td>
+          <td><button class="cs-btn">View ↗</button></td>
+        </tr>
+        <tr>
+          <td><strong style="color:#fff;">Downtown Mini Storage</strong></td>
+          <td>80</td>
+          <td style="color:#60e090;">$960/mo</td>
+          <td style="color:rgba(255,255,255,0.3);">0</td>
+          <td style="color:#ffb060;">2</td>
+          <td style="color:#ffe060;">6</td>
+          <td><span class="badge-medium">MEDIUM</span></td>
+          <td><button class="cs-btn">View ↗</button></td>
+        </tr>
+        <tr>
+          <td><strong style="color:#fff;">Oakwood Vaults</strong></td>
+          <td>95</td>
+          <td style="color:#60e090;">$1,140/mo</td>
+          <td style="color:rgba(255,255,255,0.3);">0</td>
+          <td style="color:rgba(255,255,255,0.3);">0</td>
+          <td style="color:#ffe060;">2</td>
+          <td><span class="badge-low">LOW</span></td>
+          <td><button class="cs-btn" style="opacity:0.4;">No action</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════ SECTION 6: ACCESS ═══════════ -->
+<div class="section">
+  <div class="section-tag">Section 6</div>
+  <h2>Access &amp; <span>Permissions Needed</span></h2>
+  <p class="desc">The PMS charge table confirmation is the single most critical blocker. Everything else is standard.</p>
+
+  <div class="access-grid">
+    <div class="access-card">
+      <h4>✅ Already Have</h4>
+      <div class="access-item">
+        <div class="ai-status have">✓</div>
+        <div class="ai-text">
+          <div class="ai-name">PMS sync data (tod_backoffice)</div>
+          <div class="ai-desc">storEDGE, SiteLink, SSM, Monument data already synced into tod_backoffice via PMS integration services. Tenant and charge data exists.</div>
+        </div>
+      </div>
+      <div class="access-item">
+        <div class="ai-status have">✓</div>
+        <div class="ai-text">
+          <div class="ai-name">Device telemetry (incidents table)</div>
+          <div class="ai-desc">Motion and door events per device already stored in tod_backoffice. The incidents + devices join by unit_id is the SD-exclusive signal.</div>
+        </div>
+      </div>
+      <div class="access-item">
+        <div class="ai-status have">✓</div>
+        <div class="ai-text">
+          <div class="ai-name">BigQuery (via Hevo pipeline)</div>
+          <div class="ai-desc">Both PMS data and telemetry data flow into BigQuery. Read-only service account exists for queries.</div>
+        </div>
+      </div>
+      <div class="access-item">
+        <div class="ai-status have">✓</div>
+        <div class="ai-text">
+          <div class="ai-name">Slack webhook (SD CS channel)</div>
+          <div class="ai-desc">SD already uses Slack integration in the product. CS channel webhook URL available from Idea #3 setup.</div>
+        </div>
+      </div>
+      <div class="access-item">
+        <div class="ai-status have">✓</div>
+        <div class="ai-text">
+          <div class="ai-name">Anthropic account (Claude Code CLI)</div>
+          <div class="ai-desc">Same account used in Ideas #1, #2, #3. API key can be shared or a new one created for this service.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="access-card">
+      <h4>🔑 Need to Get / Confirm</h4>
+      <div class="access-item">
+        <div class="ai-status need">!</div>
+        <div class="ai-text">
+          <div class="ai-name">PMS charge table schema (critical blocker)</div>
+          <div class="ai-desc">Confirm exact table name and schema for payment/charge history in tod_backoffice with the backend team. Different PMS systems may have different column names. This must be resolved in Week 1 before any other work starts.</div>
+        </div>
+      </div>
+      <div class="access-item">
+        <div class="ai-status need">!</div>
+        <div class="ai-text">
+          <div class="ai-name">BigQuery write permission (predictions table)</div>
+          <div class="ai-desc">Scoring engine needs to write risk scores + outcome data to two new BigQuery tables. Service account needs bigquery.dataEditor.</div>
+        </div>
+      </div>
+      <div class="access-item">
+        <div class="ai-status need">!</div>
+        <div class="ai-text">
+          <div class="ai-name">Legal / compliance sign-off on tenant risk scoring</div>
+          <div class="ai-desc">Using payment + behavioural data to generate a "risk score" per tenant may need a legal review — especially for GDPR/PCI compliance. Confirm with Product/Legal team before building. Using unit number (not tenant name) in Claude output mitigates PII exposure.</div>
+        </div>
+      </div>
+      <div class="access-item">
+        <div class="ai-status easy">~</div>
+        <div class="ai-text">
+          <div class="ai-name">Anthropic API Key</div>
+          <div class="ai-desc">New key or reuse from Ideas #1–3. Store in GCP Secret Manager. ~$8–12/month estimated.</div>
+        </div>
+      </div>
+      <div class="access-item">
+        <div class="ai-status easy">~</div>
+        <div class="ai-text">
+          <div class="ai-name">CS team agreement on alert thresholds and false positive tolerance</div>
+          <div class="ai-desc">Agree before launch: HIGH threshold (currently 60), max false positive rate per facility per week, and escalation path for CRITICAL alerts.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════ SECTION 7: AI TOOL OPTIONS ═══════════ -->
+<div class="section">
+  <div class="section-tag">Section 7</div>
+  <h2>AI Tool <span>Options</span></h2>
+  <p class="desc">The scoring itself is rule-based in v1. Claude generates the intervention narrative. The v2 ML model is optional and longer-term.</p>
+
+  <div class="tool-grid">
+    <div class="tool-card recommended">
+      <div class="rec-tag">⭐ Recommended (v1)</div>
+      <div class="tc-logo">🤖</div>
+      <h4>Claude Sonnet 4.6</h4>
+      <p>Best for generating nuanced, context-aware interventions that combine payment and access signals.</p>
+      <ul>
+        <li>Can explain the access drop + payment combo in plain language</li>
+        <li>Triggered-only = ~$8–12/month for full fleet</li>
+        <li>Prompt caching on system prompt</li>
+        <li>SD already has Anthropic account</li>
+        <li>Easy to adjust tone via system prompt</li>
+      </ul>
+    </div>
+    <div class="tool-card alt">
+      <div class="tc-logo">📊</div>
+      <h4>Google BigQuery ML</h4>
+      <p>v2 upgrade: train a logistic regression model directly in BigQuery using outcome data.</p>
+      <ul>
+        <li>Native GCP — no external vendor</li>
+        <li>Uses actual default outcomes to train</li>
+        <li>Requires 3+ months of labelled data</li>
+        <li>Replaces rule-based scoring with learned weights</li>
+        <li>Best long-term AI approach for this use case</li>
+      </ul>
+    </div>
+    <div class="tool-card alt">
+      <div class="tc-logo">📋</div>
+      <h4>Rules Only (No AI)</h4>
+      <p>Skip Claude entirely — use templated alert messages based on which signal triggered.</p>
+      <ul>
+        <li>Zero AI cost</li>
+        <li>Fastest pilot build</li>
+        <li>Less contextual — misses combined signal nuance</li>
+        <li>Good fallback for first 2 weeks of pilot</li>
+        <li>Add Claude in v1.1 once data pipeline is stable</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════ SECTION 8: 45-DAY TIMELINE ═══════════ -->
+<div class="section">
+  <div class="section-tag">Section 8</div>
+  <h2>45-Day <span>Execution Timeline</span></h2>
+  <p class="desc">45 days — same as Idea #2. Week 1 is entirely blocked on confirming the PMS charge table schema. Do not start building Week 2 until that is confirmed.</p>
+
+  <div class="timeline">
+    <div class="tl-week">
+      <div class="tl-week-label">
+        <div class="wl-num">Week 1</div>
+        <div class="wl-days">Days 1–7 — Critical: Data Confirmation</div>
+      </div>
+      <div class="tl-tasks">
+        <div class="tl-task"><span class="tt-who who-data">Data</span><span class="tt-text">Confirm PMS charge table name and schema in tod_backoffice with backend team — this is the #1 blocker. Do not proceed to Step 2 until confirmed.</span></div>
+        <div class="tl-task"><span class="tt-who who-pm">PM</span><span class="tt-text">Get legal/compliance sign-off on tenant risk scoring — confirm using unit numbers (not tenant PII) in Claude output satisfies GDPR requirements</span></div>
+        <div class="tl-task"><span class="tt-who who-pm">PM</span><span class="tt-text">Define alert thresholds with CS team — HIGH threshold (60?), CRITICAL threshold (80?), max false positive rate per facility</span></div>
+        <div class="tl-task"><span class="tt-who who-eng">Eng</span><span class="tt-text">Create Cloud Run scaffold + Cloud Scheduler (daily 3am UTC) + two BigQuery tables (tenant_risk_scores, prediction_outcomes)</span></div>
+      </div>
+    </div>
+
+    <div class="tl-week">
+      <div class="tl-week-label">
+        <div class="wl-num">Week 2</div>
+        <div class="wl-days">Days 8–14</div>
+      </div>
+      <div class="tl-tasks">
+        <div class="tl-task"><span class="tt-who who-data">Data</span><span class="tt-text">Write and validate 4 signal SQL queries — test against 6 months of real PMS + telemetry data in BigQuery</span></div>
+        <div class="tl-task"><span class="tt-who who-data">Data</span><span class="tt-text">Backtest scoring formula — run algorithm against known historical defaults and measure how many it would have caught at HIGH/CRITICAL threshold</span></div>
+        <div class="tl-task"><span class="tt-who who-eng">Eng</span><span class="tt-text">Get Anthropic API key — store in GCP Secret Manager alongside existing keys from Ideas #1–3</span></div>
+      </div>
+    </div>
+
+    <div class="tl-week">
+      <div class="tl-week-label">
+        <div class="wl-num">Week 3</div>
+        <div class="wl-days">Days 15–21</div>
+      </div>
+      <div class="tl-tasks">
+        <div class="tl-task"><span class="tt-who who-eng">Eng</span><span class="tt-text">Build prediction engine — calculateDefaultRisk(), daily scoring loop, BigQuery output write</span></div>
+        <div class="tl-task"><span class="tt-who who-eng">Eng</span><span class="tt-text">Integrate Claude API — generateIntervention() with prompt caching, HIGH/CRITICAL threshold trigger only</span></div>
+        <div class="tl-task"><span class="tt-who who-qa">QA</span><span class="tt-text">Unit tests for risk scoring — validate signal weights, RISK_BAND boundary conditions, Claude trigger logic</span></div>
+      </div>
+    </div>
+
+    <div class="tl-week">
+      <div class="tl-week-label">
+        <div class="wl-num">Week 4</div>
+        <div class="wl-days">Days 22–28</div>
+      </div>
+      <div class="tl-tasks">
+        <div class="tl-task"><span class="tt-who who-eng">Eng</span><span class="tt-text">Build email delivery (SendGrid) + Slack CRITICAL alerts + Looker Studio CS dashboard</span></div>
+        <div class="tl-task"><span class="tt-who who-eng">Eng</span><span class="tt-text">Build outcome tracking — write prediction_outcomes records, connect PMS delinquency flag as ground truth</span></div>
+        <div class="tl-task"><span class="tt-who who-cs">CS</span><span class="tt-text">Review 10 sample alerts from backtest — are the HIGH-risk tenants ones the CS team would actually act on? Calibrate threshold if needed</span></div>
+      </div>
+    </div>
+
+    <div class="tl-week">
+      <div class="tl-week-label">
+        <div class="wl-num">Week 5–7</div>
+        <div class="wl-days">Days 29–45</div>
+      </div>
+      <div class="tl-tasks">
+        <div class="tl-task"><span class="tt-who who-eng">Eng</span><span class="tt-text">Deploy to production — enable for pilot cohort of 10 facilities. Monitor false positive rate daily for first 2 weeks.</span></div>
+        <div class="tl-task"><span class="tt-who who-cs">CS</span><span class="tt-text">CS team and facility managers act on first live alerts — log outcome: did the intervention prevent a missed payment?</span></div>
+        <div class="tl-task"><span class="tt-who who-qa">QA</span><span class="tt-text">Monitor pipeline — Cloud Logging alerts for scoring job failures, BigQuery write errors, Claude API errors</span></div>
+        <div class="tl-task"><span class="tt-who who-pm">PM</span><span class="tt-text">After 45 days: calculate precision (% of HIGH+ alerts that were correct) and recall (% of actual defaults that were caught). Report to leadership and plan v2 ML model if data volume justifies it.</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════ FINAL CALLOUT ═══════════ -->
+<div class="section" style="padding-bottom:20px;">
+  <div style="background:linear-gradient(135deg,#180a28,#100618);border:1.5px solid rgba(160,64,224,0.45);border-radius:16px;padding:28px 32px;display:flex;gap:20px;align-items:flex-start;">
+    <div style="font-size:2.5rem;flex-shrink:0;">🏆</div>
+    <div>
+      <div style="font-size:1.1rem;font-weight:800;color:#fff;margin-bottom:8px;">Summary — Why Idea #4 wins the Best AI Innovation Award</div>
+      <div style="font-size:0.86rem;color:rgba(255,255,255,0.65);line-height:1.65;">
+        This is the only idea that combines two data sources no competitor can replicate together: <strong style="color:#fff;">PMS payment patterns + physical unit access from device telemetry</strong>. The payment delay trend alone is not novel. The unit access drop alone is not novel. Combined, they create a predictive signal that is uniquely available to SD. That combination earns the <strong style="color:#a040e0;">19/20 AI Innovation score</strong> — the highest of all 4 ideas. The rule-based v1 is buildable in 45 days. The feedback loop built into the architecture means the model gets smarter every month as outcome data accumulates. The v2 BigQuery ML upgrade turns it into a genuine machine learning product — a feature competitors cannot copy without first deploying the same IoT infrastructure SD has spent years building. This is SD's <strong style="color:#c060ff;">deepest technical moat</strong>, packaged as a customer-facing feature.
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div class="footer">
+  SD Innovation Tank — Idea #4 Technical Execution Plan &nbsp;|&nbsp; Storage Defender &nbsp;|&nbsp; teamofdefenders.atlassian.net &nbsp;|&nbsp; May 2026
+</div>
+
+</body>
+</html>
