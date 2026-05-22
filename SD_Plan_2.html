@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SD Innovation — Idea #2: AI Smart Unit Gap Detector</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --blue: #4090e0;
+    --blue-light: #60b0ff;
+    --navy: #0b1622;
+    --navy2: #0d1e30;
+    --navy3: #112238;
+    --white: #ffffff;
+    --text: #d0dcea;
+    --muted: rgba(255,255,255,0.45);
+    --border: rgba(255,255,255,0.08);
+  }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--navy); color: var(--text); }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, #0a1520 0%, #0e1e35 40%, #0a1520 100%);
+    border-bottom: 3px solid var(--blue);
+    padding: 50px 48px 44px;
+    position: relative; overflow: hidden;
+  }
+  .hero::after {
+    content: ''; position: absolute; top: -100px; right: -100px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(64,144,224,0.10) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .hero-tag {
+    display: inline-block;
+    background: rgba(64,144,224,0.15); border: 1px solid rgba(64,144,224,0.45);
+    color: var(--blue); font-size: 0.7rem; font-weight: 700;
+    letter-spacing: 2.5px; text-transform: uppercase;
+    padding: 5px 16px; border-radius: 20px; margin-bottom: 16px;
+  }
+  .hero h1 { font-size: 2.4rem; font-weight: 900; color: var(--white); line-height: 1.15; margin-bottom: 12px; }
+  .hero h1 span { color: var(--blue); }
+  .hero-sub { font-size: 1rem; color: rgba(255,255,255,0.55); max-width: 680px; line-height: 1.65; margin-bottom: 24px; }
+  .hero-pills { display: flex; flex-wrap: wrap; gap: 10px; }
+  .pill {
+    display: flex; align-items: center; gap: 7px;
+    background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+    border-radius: 8px; padding: 7px 14px;
+    font-size: 0.78rem; color: rgba(255,255,255,0.65); font-weight: 500;
+  }
+  .pill .pi { font-size: 1rem; }
+
+  /* ── PAGE ── */
+  .page { max-width: 1200px; margin: 0 auto; padding: 0 40px 60px; }
+
+  /* ── PLAIN BOX ── */
+  .plain-box {
+    background: linear-gradient(135deg, #0a1e32, #081828);
+    border: 1.5px solid rgba(64,144,224,0.35);
+    border-radius: 16px; padding: 28px 32px; margin-bottom: 28px;
+  }
+  .plain-box .pb-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .plain-box .pb-icon { font-size: 2rem; }
+  .plain-box .pb-title { font-size: 1.05rem; font-weight: 700; color: var(--white); }
+  .plain-box .pb-sub { font-size: 0.75rem; color: var(--muted); margin-top: 3px; }
+  .plain-box p { font-size: 0.9rem; line-height: 1.75; color: rgba(255,255,255,0.75); margin-bottom: 10px; }
+  .plain-box p:last-child { margin-bottom: 0; }
+
+  /* ── SECTION ── */
+  .section { padding: 44px 0 8px; }
+  .section-tag {
+    display: inline-block;
+    font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 2px; color: var(--blue);
+    background: rgba(64,144,224,0.1); border: 1px solid rgba(64,144,224,0.25);
+    padding: 4px 12px; border-radius: 6px; margin-bottom: 12px;
+  }
+  .section h2 { font-size: 1.7rem; font-weight: 800; color: var(--white); margin-bottom: 8px; }
+  .section h2 span { color: var(--blue); }
+  .section p.desc { font-size: 0.88rem; color: var(--muted); line-height: 1.6; margin-bottom: 28px; }
+  .divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 8px 0; }
+
+  /* ── ARCHITECTURE ── */
+  .arch {
+    background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 16px; padding: 28px; overflow-x: auto;
+  }
+  .arch-title { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 22px; }
+  .arch-box {
+    border: 1.5px solid; border-radius: 12px; padding: 14px 18px; flex-shrink: 0;
+    min-width: 148px; text-align: center;
+  }
+  .ab-icon { font-size: 1.6rem; margin-bottom: 6px; }
+  .ab-title { font-size: 0.82rem; font-weight: 700; color: var(--white); margin-bottom: 4px; }
+  .ab-sub { font-size: 0.65rem; color: var(--muted); line-height: 1.5; }
+  .ab-data    { background: rgba(40,100,200,0.12); border-color: rgba(40,100,200,0.35); }
+  .ab-engine  { background: rgba(64,144,224,0.12);  border-color: rgba(64,144,224,0.40); }
+  .ab-score   { background: rgba(224,160,26,0.12);  border-color: rgba(224,160,26,0.40); }
+  .ab-ai      { background: rgba(140,60,200,0.12); border-color: rgba(140,60,200,0.40); }
+  .ab-deliver { background: rgba(20,160,180,0.12); border-color: rgba(20,160,180,0.35); }
+
+  /* ── STEPS ── */
+  .steps { display: flex; flex-direction: column; gap: 0; }
+  .step { display: flex; gap: 20px; }
+  .step-num-wrap { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 44px; }
+  .step-num {
+    width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; font-weight: 800; color: var(--white); flex-shrink: 0;
+  }
+  .sn1{background:linear-gradient(135deg,#1060c0,#2090e0);}
+  .sn2{background:linear-gradient(135deg,#4090e0,#60b0ff);}
+  .sn3{background:linear-gradient(135deg,#7a10c0,#b040e0);}
+  .sn4{background:linear-gradient(135deg,#108040,#20c060);}
+  .sn5{background:linear-gradient(135deg,#a07010,#e0b020);}
+  .sn6{background:linear-gradient(135deg,#106080,#20a0c0);}
+  .sn7{background:linear-gradient(135deg,#901040,#e03060);}
+  .step-line { flex: 1; width: 2px; background: rgba(255,255,255,0.06); margin: 6px 0; min-height: 30px; }
+  .step-content { padding: 0 0 32px; flex: 1; }
+  .step-tag { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; margin-top: 10px; }
+  .step-title { font-size: 1rem; font-weight: 700; color: var(--white); margin-bottom: 10px; }
+  .step-body p { font-size: 0.87rem; line-height: 1.7; color: rgba(255,255,255,0.7); margin-bottom: 12px; }
+
+  /* ── CODE BLOCK ── */
+  .code-block {
+    background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px; padding: 18px 20px;
+    font-family: 'Cascadia Code','Fira Mono','Courier New',monospace;
+    font-size: 0.76rem; line-height: 1.65; color: #b0d0ff;
+    overflow-x: auto; white-space: pre; margin: 12px 0;
+  }
+  .cm { color: rgba(120,160,120,0.85); }
+  .kw { color: #60b0ff; }
+  .fn { color: #e0a060; }
+  .str { color: #80e080; }
+  .num { color: #e08060; }
+
+  /* ── CALLOUTS ── */
+  .callout {
+    border-radius: 10px; padding: 14px 18px; margin: 12px 0;
+    display: flex; gap: 12px; align-items: flex-start;
+    font-size: 0.84rem; line-height: 1.65;
+  }
+  .callout-success { background: rgba(40,160,80,0.10);  border: 1px solid rgba(40,160,80,0.25); }
+  .callout-warn    { background: rgba(220,160,20,0.10); border: 1px solid rgba(220,160,20,0.25); }
+  .callout-info    { background: rgba(40,120,220,0.10); border: 1px solid rgba(40,120,220,0.25); }
+  .ci { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+
+  /* ── CLAUDE BOX ── */
+  .claude-box {
+    background: linear-gradient(135deg,#140828,#0e0620);
+    border: 1.5px solid rgba(140,60,200,0.40);
+    border-radius: 16px; padding: 28px;
+  }
+  .cb-head { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+  .cb-icon { font-size: 2.2rem; }
+  .cb-head h3 { font-size: 1.05rem; font-weight: 700; color: var(--white); }
+  .cb-sub { font-size: 0.72rem; color: rgba(160,80,255,0.7); margin-top: 3px; }
+  .cb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .cb-item { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 16px; }
+  .cb-item h5 { font-size: 0.78rem; font-weight: 700; color: rgba(160,80,255,0.85); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .cb-item ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .cb-item li { font-size: 0.8rem; color: rgba(255,255,255,0.65); padding-left: 14px; position: relative; line-height: 1.5; }
+  .cb-item li::before { content: '▸'; position: absolute; left: 0; color: rgba(140,60,200,0.7); font-size: 0.65rem; top: 2px; }
+
+  /* ── HEATMAP ── */
+  .heatmap-wrap {
+    background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 16px; padding: 28px; margin-bottom: 0;
+  }
+  .hm-title { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 18px; }
+  .hm-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; margin-bottom: 18px; }
+  .hm-cell {
+    aspect-ratio: 1; border-radius: 5px; display: flex; align-items: center;
+    justify-content: center; font-size: 0.52rem; font-weight: 700;
+    cursor: default; border: 1px solid rgba(0,0,0,0.2);
+    transition: transform 0.1s;
+  }
+  .hm-cell:hover { transform: scale(1.15); z-index: 2; position: relative; }
+  .hm-monitored  { background: rgba(40,180,80,0.25); border-color: rgba(40,180,80,0.5); color: #60e090; }
+  .hm-high       { background: rgba(220,50,50,0.35); border-color: rgba(220,50,50,0.7); color: #ff8080; }
+  .hm-medium     { background: rgba(220,140,20,0.30); border-color: rgba(220,140,20,0.6); color: #ffb040; }
+  .hm-low        { background: rgba(80,80,100,0.25); border-color: rgba(80,80,100,0.4); color: rgba(255,255,255,0.3); }
+  .hm-legend { display: flex; gap: 16px; flex-wrap: wrap; }
+  .hm-leg-item { display: flex; align-items: center; gap: 7px; font-size: 0.72rem; color: rgba(255,255,255,0.55); }
+  .hm-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+
+  /* ── CS DASHBOARD PREVIEW ── */
+  .cs-table { width: 100%; border-collapse: collapse; margin-top: 18px; }
+  .cs-table th { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); padding: 10px 14px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .cs-table td { font-size: 0.8rem; padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); color: rgba(255,255,255,0.7); }
+  .cs-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .risk-high   { display: inline-block; background: rgba(220,50,50,0.2); color: #ff8080; border: 1px solid rgba(220,50,50,0.4); border-radius: 5px; padding: 2px 8px; font-size: 0.68rem; font-weight: 700; }
+  .risk-medium { display: inline-block; background: rgba(220,140,20,0.2); color: #ffb040; border: 1px solid rgba(220,140,20,0.4); border-radius: 5px; padding: 2px 8px; font-size: 0.68rem; font-weight: 700; }
+  .risk-low    { display: inline-block; background: rgba(64,144,224,0.15); color: #80b8ff; border: 1px solid rgba(64,144,224,0.3); border-radius: 5px; padding: 2px 8px; font-size: 0.68rem; font-weight: 700; }
+  .cs-btn { background: rgba(64,144,224,0.15); border: 1px solid rgba(64,144,224,0.4); color: var(--blue-light); border-radius: 6px; padding: 4px 10px; font-size: 0.7rem; font-weight: 600; cursor: pointer; }
+
+  /* ── ACCESS ── */
+  .access-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .access-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .access-card h4 { font-size: 0.82rem; font-weight: 700; color: var(--white); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .access-item { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .access-item:last-child { border-bottom: none; }
+  .ai-status { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
+  .have { background: rgba(40,180,80,0.2); color: #60e090; border: 1px solid rgba(40,180,80,0.4); }
+  .need { background: rgba(220,80,40,0.2); color: #ff8060; border: 1px solid rgba(220,80,40,0.4); }
+  .easy { background: rgba(40,120,220,0.2); color: #60b0ff; border: 1px solid rgba(40,120,220,0.4); }
+  .ai-name { font-size: 0.82rem; font-weight: 600; color: var(--white); margin-bottom: 3px; }
+  .ai-desc { font-size: 0.75rem; color: var(--muted); line-height: 1.5; }
+
+  /* ── TOOL GRID ── */
+  .tool-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .tool-card { border-radius: 12px; padding: 20px; border: 1.5px solid rgba(255,255,255,0.07); background: rgba(255,255,255,0.02); }
+  .tool-card.recommended { border-color: rgba(140,60,200,0.45); background: rgba(140,60,200,0.06); position: relative; }
+  .rec-tag { font-size: 0.65rem; font-weight: 700; color: rgba(160,80,255,0.8); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .tool-card .tc-logo { font-size: 1.6rem; margin-bottom: 8px; }
+  .tool-card h4 { font-size: 0.92rem; font-weight: 700; color: var(--white); margin-bottom: 6px; }
+  .tool-card p { font-size: 0.78rem; color: var(--muted); margin-bottom: 10px; line-height: 1.5; }
+  .tool-card ul { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+  .tool-card li { font-size: 0.76rem; color: rgba(255,255,255,0.6); padding-left: 12px; position: relative; }
+  .tool-card li::before { content: '▸'; position: absolute; left: 0; color: var(--muted); font-size: 0.6rem; top: 2px; }
+  .tool-card.alt { opacity: 0.8; }
+
+  /* ── TIMELINE ── */
+  .timeline { display: flex; flex-direction: column; gap: 20px; }
+  .tl-week { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; overflow: hidden; }
+  .tl-week-label { background: rgba(64,144,224,0.08); border-bottom: 1px solid rgba(255,255,255,0.06); padding: 12px 20px; display: flex; align-items: center; gap: 12px; }
+  .wl-num { font-size: 0.85rem; font-weight: 800; color: var(--blue); }
+  .wl-days { font-size: 0.72rem; color: var(--muted); }
+  .tl-tasks { padding: 12px 20px; display: flex; flex-direction: column; gap: 8px; }
+  .tl-task { display: flex; align-items: flex-start; gap: 10px; font-size: 0.82rem; color: rgba(255,255,255,0.65); line-height: 1.5; }
+  .tt-who { display: inline-block; border-radius: 4px; padding: 2px 7px; font-size: 0.62rem; font-weight: 700; flex-shrink: 0; text-transform: uppercase; letter-spacing: 0.5px; }
+  .who-pm   { background: rgba(64,144,224,0.2); color: #80c0ff; border: 1px solid rgba(64,144,224,0.3); }
+  .who-eng  { background: rgba(40,180,80,0.2); color: #70e090; border: 1px solid rgba(40,180,80,0.3); }
+  .who-data { background: rgba(220,140,20,0.2); color: #e8b040; border: 1px solid rgba(220,140,20,0.3); }
+  .who-qa   { background: rgba(140,60,200,0.2); color: #c080ff; border: 1px solid rgba(140,60,200,0.3); }
+  .who-cs   { background: rgba(20,160,180,0.2); color: #40d0e0; border: 1px solid rgba(20,160,180,0.3); }
+
+  /* ── SCORE BADGE ── */
+  .score-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(64,144,224,0.12); border: 1.5px solid rgba(64,144,224,0.35);
+    border-radius: 10px; padding: 6px 16px;
+    font-size: 0.78rem; color: var(--blue-light); font-weight: 600;
+  }
+
+  /* ── FOOTER ── */
+  .footer { border-top: 1px solid rgba(255,255,255,0.06); padding: 22px 40px; font-size: 0.72rem; color: var(--muted); }
+
+  @media (max-width: 900px) {
+    .hero { padding: 32px 20px 28px; }
+    .page { padding: 0 16px 40px; }
+    .cb-grid, .access-grid, .tool-grid { grid-template-columns: 1fr; }
+    .hm-grid { grid-template-columns: repeat(6, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ HERO ══════════════════ -->
+<div class="hero">
+  <div class="page" style="padding-bottom:0;">
+    <div class="hero-tag">SD Innovation Tank &nbsp;·&nbsp; Month 1 &nbsp;·&nbsp; Idea #2</div>
+    <h1>AI Smart Unit <span>Gap Detector</span></h1>
+    <p class="hero-sub">Finds every unmonitored high-risk unit at each facility and turns it into a data-backed upsell conversation — driving more Smart Unit subscriptions from customers you already have.</p>
+    <div class="hero-pills">
+      <div class="pill"><span class="pi">🎯</span> Category: Existing Customer Growth</div>
+      <div class="pill"><span class="pi">⭐</span> Score: 88 / 100</div>
+      <div class="pill"><span class="pi">💰</span> Revenue Impact: 29/30</div>
+      <div class="pill"><span class="pi">⏱</span> Pilot: 45 days</div>
+      <div class="pill"><span class="pi">🗃</span> Data: tod_backoffice + PMS sync</div>
+      <div class="pill"><span class="pi">🤖</span> AI: Risk scoring + Claude narrative</div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+<hr class="divider">
+
+<!-- ═══════════════ SECTION 1: PLAIN ENGLISH ═══════════════ -->
+<div class="section">
+  <div class="section-tag">Section 1</div>
+  <h2>What is this? <span>(Plain English)</span></h2>
+  <p class="desc">No jargon. Read this first regardless of your background.</p>
+
+  <div class="plain-box">
+    <div class="pb-head">
+      <div class="pb-icon">🔦</div>
+      <div>
+        <div class="pb-title">Think of it like a security torch revealing blind spots in a dark room</div>
+        <div class="pb-sub">Non-technical explanation</div>
+      </div>
+    </div>
+    <p>Imagine a self-storage facility with 100 units. 60 of those units have Smart Units (SD sensors) installed. The other 40 do not. Right now, no one knows <strong>which of those 40 unmonitored units are actually the highest risk</strong> — they're invisible from a security standpoint.</p>
+    <p>This idea changes that. Every week, an AI engine scans the facility's activity data and asks: <em>"Which unmonitored units are sitting right next to your busiest zones? Which ones have tenants who accessed outside facility hours? Which zones have the most incidents from the units that are monitored?"</em> It then gives each unmonitored unit a <strong>risk score</strong> and shows the facility manager a <strong>heatmap</strong>: <em>"These 12 units in Zone B are your biggest blind spots right now."</em></p>
+    <p>For the <strong>CS and Sales team</strong>, every facility gets a ranked list: "Riverside Storage has 40 unmonitored units. The top 12 have a high risk score. Upgrading those = $144/month in new subscriptions." That's a real, data-backed conversation — not a cold sales call.</p>
+  </div>
+
+  <div class="plain-box" style="background: linear-gradient(135deg,#0e1a28,#0a1420); border-color: rgba(40,120,220,0.35);">
+    <div class="pb-head">
+      <div class="pb-icon">👔</div>
+      <div>
+        <div class="pb-title">Why this grows revenue directly</div>
+        <div class="pb-sub">Business case — 60 seconds</div>
+      </div>
+    </div>
+    <p>SD charges <strong>$12/device/month</strong> flat. Every unmonitored unit that gets a Smart Unit installed = <strong>+$12/month in new subscription revenue</strong>. This idea's entire purpose is to find those units and give the CS team and facility managers a compelling, data-driven reason to add them.</p>
+    <p>The data to do this already exists in <strong>tod_backoffice</strong> — incidents, zones, device records, PMS tenant data. No new sensors, no new data collection needed. The AI layer just connects the dots and surfaces the right units at the right time.</p>
+    <p>A facility with 40 unmonitored gap units represents <strong>$480/month in potential new subscription revenue</strong> (40 × $12). Across 200 facilities, even a 25% conversion rate = <strong>$24,000+/month in expansion revenue</strong>.</p>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════ SECTION 2: ARCHITECTURE ═══════════════ -->
+<div class="section">
+  <div class="section-tag">Section 2</div>
+  <h2>System <span>Architecture</span></h2>
+  <p class="desc">5 layers. Data flows from left to right — from existing SD databases through the scoring engine to the facility manager's screen and the CS team's dashboard.</p>
+
+  <div class="arch">
+    <div class="arch-title">ARCHITECTURE OVERVIEW — AI Smart Unit Gap Detector Pipeline</div>
+
+    <div style="display:flex; align-items:flex-start; gap:0; overflow-x:auto; padding-bottom:12px; min-width:860px;">
+
+      <!-- BOX 1: Data Sources -->
+      <div style="display:flex;flex-direction:column;align-items:center;min-width:155px;">
+        <div class="arch-box ab-data" style="width:100%;">
+          <div class="ab-icon">🗄️</div>
+          <div class="ab-title">Data Sources</div>
+          <div class="ab-sub">BigQuery<br>tod_backoffice<br>PMS Sync</div>
+        </div>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;width:100%;">
+          <div style="background:rgba(40,100,200,0.1);border:1px solid rgba(40,100,200,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#80b0ff;">incidents by zone</div>
+          <div style="background:rgba(40,100,200,0.1);border:1px solid rgba(40,100,200,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#80b0ff;">devices (smart/unmonitored)</div>
+          <div style="background:rgba(40,100,200,0.1);border:1px solid rgba(40,100,200,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#80b0ff;">units + zone layout</div>
+          <div style="background:rgba(40,100,200,0.1);border:1px solid rgba(40,100,200,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#80b0ff;">PMS tenant data</div>
+          <div style="background:rgba(40,100,200,0.1);border:1px solid rgba(40,100,200,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#80b0ff;">access time patterns</div>
+        </div>
+      </div>
+
+      <!-- Arrow 1 -->
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 12px;padding-top:22px;flex-shrink:0;">
+        <div style="font-size:0.58rem;color:var(--blue);font-weight:700;margin-bottom:3px;white-space:nowrap;">SQL queries</div>
+        <div style="display:flex;align-items:center;gap:0;">
+          <div style="width:36px;height:2px;background:rgba(64,144,224,0.5);"></div>
+          <div style="width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:8px solid rgba(64,144,224,0.8);"></div>
+        </div>
+      </div>
+
+      <!-- BOX 2: Risk Scoring Engine -->
+      <div style="display:flex;flex-direction:column;align-items:center;min-width:155px;">
+        <div class="arch-box ab-engine" style="width:100%;">
+          <div class="ab-icon">⚙️</div>
+          <div class="ab-title">Risk Scoring Engine</div>
+          <div class="ab-sub">Cloud Run Job<br>(Node.js / Python)<br>Runs daily at midnight</div>
+        </div>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;width:100%;">
+          <div style="background:rgba(64,144,224,0.08);border:1px solid rgba(64,144,224,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#80b8ff;">zone incident freq.</div>
+          <div style="background:rgba(64,144,224,0.08);border:1px solid rgba(64,144,224,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#80b8ff;">after-hours activity</div>
+          <div style="background:rgba(64,144,224,0.08);border:1px solid rgba(64,144,224,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#80b8ff;">tenant tenure flag</div>
+          <div style="background:rgba(64,144,224,0.08);border:1px solid rgba(64,144,224,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#80b8ff;">risk_score 0–100</div>
+          <div style="background:rgba(64,144,224,0.08);border:1px solid rgba(64,144,224,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#80b8ff;">gap_units ranked list</div>
+        </div>
+      </div>
+
+      <!-- Arrow 2 -->
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 12px;padding-top:22px;flex-shrink:0;">
+        <div style="font-size:0.58rem;color:var(--blue);font-weight:700;margin-bottom:3px;white-space:nowrap;">JSON payload</div>
+        <div style="display:flex;align-items:center;gap:0;">
+          <div style="width:36px;height:2px;background:rgba(64,144,224,0.5);"></div>
+          <div style="width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:8px solid rgba(64,144,224,0.8);"></div>
+        </div>
+      </div>
+
+      <!-- BOX 3: Claude AI -->
+      <div style="display:flex;flex-direction:column;align-items:center;min-width:155px;">
+        <div class="arch-box ab-ai" style="width:100%;border-color:rgba(140,60,200,0.55);">
+          <div class="ab-icon">🤖</div>
+          <div class="ab-title">Claude AI</div>
+          <div class="ab-sub">Anthropic API<br>claude-sonnet-4-6<br>Prompt caching ON</div>
+        </div>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;width:100%;">
+          <div style="background:rgba(140,60,200,0.1);border:1px solid rgba(140,60,200,0.25);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#c080ff;">reads gap JSON</div>
+          <div style="background:rgba(140,60,200,0.1);border:1px solid rgba(140,60,200,0.25);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#c080ff;">writes recommendation</div>
+          <div style="background:rgba(140,60,200,0.1);border:1px solid rgba(140,60,200,0.25);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#c080ff;">drafts CS email</div>
+          <div style="background:rgba(140,60,200,0.1);border:1px solid rgba(140,60,200,0.25);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#c080ff;">cites exact $12/device</div>
+          <div style="background:rgba(140,60,200,0.1);border:1px solid rgba(140,60,200,0.25);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#c080ff;">cached system prompt</div>
+        </div>
+      </div>
+
+      <!-- Arrow 3 -->
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 12px;padding-top:22px;flex-shrink:0;">
+        <div style="font-size:0.58rem;color:var(--blue);font-weight:700;margin-bottom:3px;white-space:nowrap;">narrative + email</div>
+        <div style="display:flex;align-items:center;gap:0;">
+          <div style="width:36px;height:2px;background:rgba(64,144,224,0.5);"></div>
+          <div style="width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:8px solid rgba(64,144,224,0.8);"></div>
+        </div>
+      </div>
+
+      <!-- BOX 4: Delivery -->
+      <div style="display:flex;flex-direction:column;align-items:center;min-width:155px;">
+        <div class="arch-box ab-deliver" style="width:100%;">
+          <div class="ab-icon">📬</div>
+          <div class="ab-title">Delivery</div>
+          <div class="ab-sub">3 channels:<br>Customer UI heatmap<br>CS Dashboard + Email</div>
+        </div>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;width:100%;">
+          <div style="background:rgba(20,160,180,0.08);border:1px solid rgba(20,160,180,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#60d0e0;">heatmap in Customer UI</div>
+          <div style="background:rgba(20,160,180,0.08);border:1px solid rgba(20,160,180,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#60d0e0;">CS ranked dashboard</div>
+          <div style="background:rgba(20,160,180,0.08);border:1px solid rgba(20,160,180,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#60d0e0;">personalised email (FM)</div>
+          <div style="background:rgba(20,160,180,0.08);border:1px solid rgba(20,160,180,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#60d0e0;">BigQuery output table</div>
+          <div style="background:rgba(20,160,180,0.08);border:1px solid rgba(20,160,180,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#60d0e0;">Looker Studio (CS)</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Infra strip -->
+    <div style="margin-top:28px;padding:14px 18px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;">
+      <div style="font-size:0.62rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;">☁️ Running on — Google Cloud Platform</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;">
+        <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:5px 12px;font-size:0.72rem;color:rgba(255,255,255,0.55);">Cloud Run (daily job)</span>
+        <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:5px 12px;font-size:0.72rem;color:rgba(255,255,255,0.55);">Cloud Scheduler (cron: nightly)</span>
+        <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:5px 12px;font-size:0.72rem;color:rgba(255,255,255,0.55);">BigQuery (read + write output table)</span>
+        <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:5px 12px;font-size:0.72rem;color:rgba(255,255,255,0.55);">Cloud SQL — tod_backoffice (read-only)</span>
+        <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:5px 12px;font-size:0.72rem;color:rgba(255,255,255,0.55);">Anthropic Claude API</span>
+        <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:5px 12px;font-size:0.72rem;color:rgba(255,255,255,0.55);">SendGrid (email)</span>
+        <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:5px 12px;font-size:0.72rem;color:rgba(255,255,255,0.55);">Looker Studio (CS dashboard)</span>
+        <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:5px 12px;font-size:0.72rem;color:rgba(255,255,255,0.55);">BackOffice API (Customer UI integration)</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════ SECTION 3: BUILD PLAN ═══════════════ -->
+<div class="section">
+  <div class="section-tag">Section 3</div>
+  <h2>Step-by-Step <span>Build Plan</span></h2>
+  <p class="desc">7 concrete steps. Each one is a discrete unit of work that can be built, tested, and merged independently.</p>
+
+  <div class="steps">
+
+    <!-- STEP 1 -->
+    <div class="step">
+      <div class="step-num-wrap">
+        <div class="step-num sn1">1</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <div class="step-tag" style="color:#4090e0;">Data Layer</div>
+        <div class="step-title">Write BigQuery SQL — pull zone incident frequency, device coverage map, and PMS tenant data</div>
+        <div class="step-body">
+          <p>The risk score for each unmonitored unit is built from 3 data sources already in <strong style="color:#fff;">tod_backoffice</strong>. Write separate queries for each, then join them in the scoring engine.</p>
+          <div class="code-block"><span class="cm">-- Query 1: Zone incident frequency (rolling 90 days)</span>
+<span class="kw">SELECT</span>
+  z.zone_id,
+  z.facility_id,
+  z.zone_name,
+  <span class="fn">COUNT</span>(i.id)                                         <span class="kw">AS</span> zone_incidents_90d,
+  <span class="fn">COUNTIF</span>(i.status = <span class="str">'escalated'</span>)                    <span class="kw">AS</span> escalated_count,
+  <span class="fn">COUNTIF</span>(<span class="fn">EXTRACT</span>(HOUR <span class="kw">FROM</span> i.created_at) <span class="kw">NOT BETWEEN</span> <span class="num">6</span> <span class="kw">AND</span> <span class="num">22</span>) <span class="kw">AS</span> after_hours_incidents
+<span class="kw">FROM</span> `tod_backoffice.zones` z
+<span class="kw">LEFT JOIN</span> `tod_backoffice.incidents` i
+  <span class="kw">ON</span> i.zone_id = z.zone_id
+ <span class="kw">AND</span> i.created_at >= <span class="fn">DATE_SUB</span>(CURRENT_DATE(), <span class="kw">INTERVAL</span> <span class="num">90</span> DAY)
+<span class="kw">GROUP BY</span> z.zone_id, z.facility_id, z.zone_name;
+
+<span class="cm">-- Query 2: Device coverage map — which units have Smart Units installed</span>
+<span class="kw">SELECT</span>
+  u.unit_id,
+  u.unit_number,
+  u.zone_id,
+  u.facility_id,
+  <span class="fn">CASE WHEN</span> d.unit_id <span class="kw">IS NOT NULL</span> <span class="kw">THEN</span> <span class="str">'monitored'</span> <span class="kw">ELSE</span> <span class="str">'unmonitored'</span> <span class="fn">END</span> <span class="kw">AS</span> coverage_status
+<span class="kw">FROM</span> `tod_backoffice.units` u
+<span class="kw">LEFT JOIN</span> `tod_backoffice.devices` d
+  <span class="kw">ON</span> d.unit_id = u.unit_id <span class="kw">AND</span> d.status = <span class="str">'active'</span>;
+
+<span class="cm">-- Query 3: Tenant data from PMS sync — flag new tenants (< 90 days)</span>
+<span class="kw">SELECT</span>
+  t.unit_id,
+  t.move_in_date,
+  <span class="fn">DATE_DIFF</span>(CURRENT_DATE(), t.move_in_date, DAY) <span class="kw">AS</span> days_as_tenant,
+  <span class="fn">CASE WHEN</span> <span class="fn">DATE_DIFF</span>(CURRENT_DATE(), t.move_in_date, DAY) < <span class="num">90</span>
+       <span class="kw">THEN</span> <span class="num">1</span> <span class="kw">ELSE</span> <span class="num">0</span> <span class="fn">END</span>                               <span class="kw">AS</span> is_new_tenant
+<span class="kw">FROM</span> `tod_backoffice.tenants` t
+<span class="kw">WHERE</span> t.status = <span class="str">'active'</span>;
+
+<span class="cm">-- Revenue calculation is simple: gap_units × $12 (flat device subscription)</span>
+<span class="cm">-- expansion_opportunity_usd = COUNT(unmonitored units) × 12</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step">
+      <div class="step-num-wrap">
+        <div class="step-num sn2">2</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <div class="step-tag" style="color:#60b0ff;">Scoring Engine</div>
+        <div class="step-title">Build the Risk Scoring Engine — score each unmonitored unit 0–100</div>
+        <div class="step-body">
+          <p>A lightweight scoring function that takes the 3 data sources above and assigns a <strong style="color:#fff;">risk_score (0–100)</strong> to each unmonitored unit. No machine learning required for the MVP — a weighted formula is enough and is fully explainable to facility managers.</p>
+          <div class="code-block"><span class="cm">// risk-scorer.js</span>
+<span class="kw">function</span> <span class="fn">calculateRiskScore</span>(unit, zoneStats, tenantInfo) {
+  <span class="kw">let</span> score = <span class="num">0</span>;
+
+  <span class="cm">// Factor 1: Zone incident frequency — 0 to 50 points</span>
+  <span class="cm">// High-incident zone neighbours = higher risk for unmonitored units</span>
+  score += <span class="fn">Math.min</span>(<span class="num">50</span>, (zoneStats.zone_incidents_90d || <span class="num">0</span>) * <span class="num">2</span>);
+
+  <span class="cm">// Factor 2: After-hours activity in the same zone — 0 to 30 points</span>
+  score += <span class="fn">Math.min</span>(<span class="num">30</span>, (zoneStats.after_hours_incidents || <span class="num">0</span>) * <span class="num">3</span>);
+
+  <span class="cm">// Factor 3: New tenant flag (move-in < 90 days ago) — 0 or 20 points</span>
+  <span class="kw">if</span> (tenantInfo?.is_new_tenant) score += <span class="num">20</span>;
+
+  <span class="kw">return</span> <span class="fn">Math.min</span>(<span class="num">100</span>, <span class="fn">Math.round</span>(score));
+}
+
+<span class="cm">// Gap detection — find unmonitored units and rank by risk</span>
+<span class="kw">async function</span> <span class="fn">detectGaps</span>(facilityId) {
+  <span class="kw">const</span> unmonitored = <span class="kw">await</span> <span class="fn">getUnmonitoredUnits</span>(facilityId);
+  <span class="kw">const</span> zoneStats   = <span class="kw">await</span> <span class="fn">getZoneStats</span>(facilityId);
+  <span class="kw">const</span> tenants     = <span class="kw">await</span> <span class="fn">getTenantData</span>(facilityId);
+
+  <span class="kw">const</span> gaps = unmonitored.<span class="fn">map</span>(unit => ({
+    unit_id:           unit.unit_id,
+    unit_number:       unit.unit_number,
+    zone_id:           unit.zone_id,
+    zone_name:         unit.zone_name,
+    risk_score:        <span class="fn">calculateRiskScore</span>(unit, zoneStats[unit.zone_id], tenants[unit.unit_id]),
+    subscription_usd:  <span class="num">12</span>   <span class="cm">// flat $12/device/month — no exceptions</span>
+  }));
+
+  <span class="cm">// Sort highest risk first</span>
+  <span class="kw">return</span> gaps.<span class="fn">sort</span>((a, b) => b.risk_score - a.risk_score);
+}</div>
+          <div class="callout callout-info">
+            <div class="ci">💡</div>
+            <p><strong>Why not use ML?</strong> A rule-based weighted score is faster to build, easier to explain to a facility manager (<em>"Zone B had 25 incidents last 90 days — that's why this unit scores 78"</em>), and can be shipped in Week 2. ML scoring is a v2 enhancement once data volume grows.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step">
+      <div class="step-num-wrap">
+        <div class="step-num sn3">3</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <div class="step-tag" style="color:#c080ff;">AI Layer — Claude</div>
+        <div class="step-title">Integrate Claude API to write personalised expansion recommendations</div>
+        <div class="step-body">
+          <p>Once the gap list is scored, we hand the top gaps per facility to <strong style="color:#fff;">Claude Sonnet</strong>. Claude converts the JSON data into a clear, friendly recommendation that the facility manager can understand — and that the CS team can use as a ready-to-send email draft.</p>
+          <p>The key rule: <strong style="color:#fff;">Claude never invents numbers</strong>. All figures (gap count, zone names, $12/device) come from the JSON. Prompt caching means the system prompt is paid for once and reused across all facilities.</p>
+          <div class="code-block"><span class="cm">// claude-gap-advisor.js</span>
+<span class="kw">const</span> Anthropic = <span class="fn">require</span>(<span class="str">'@anthropic-ai/sdk'</span>);
+<span class="kw">const</span> client = <span class="kw">new</span> Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+<span class="kw">async function</span> <span class="fn">generateGapRecommendation</span>(facility, gaps) {
+  <span class="kw">const</span> topGaps = gaps.<span class="fn">slice</span>(<span class="num">0</span>, <span class="num">10</span>);  <span class="cm">// top 10 highest-risk gap units</span>
+
+  <span class="kw">const</span> payload = {
+    facility_name:          facility.name,
+    current_smart_units:    facility.smart_unit_count,
+    total_units:            facility.total_unit_count,
+    current_subscription:   facility.smart_unit_count * <span class="num">12</span>,  <span class="cm">// e.g. $720/mo</span>
+    total_gap_units:        gaps.length,
+    expansion_opp_usd:      gaps.length * <span class="num">12</span>,  <span class="cm">// e.g. 40 gaps × $12 = $480/mo</span>
+    top_gap_units:          topGaps,          <span class="cm">// ranked by risk_score</span>
+    highest_risk_zone:      topGaps[<span class="num">0</span>]?.zone_name
+  };
+
+  <span class="kw">const</span> response = <span class="kw">await</span> client.messages.<span class="fn">create</span>({
+    model: <span class="str">"claude-sonnet-4-6"</span>,
+    max_tokens: <span class="num">450</span>,
+    system: [{
+      type: <span class="str">"text"</span>,
+      text: <span class="str">`You are a security advisor at Storage Defender.
+Write a concise, friendly expansion recommendation for a facility manager.
+Identify which specific zones have the highest-risk unmonitored units.
+Always cite: current Smart Unit count, gap unit count, and the exact
+monthly subscription cost to close the gaps ($12 per Smart Unit device).
+Do not invent any numbers — use only what is provided in the data.
+Tone: helpful and specific, not pushy. 2–3 short paragraphs.`</span>,
+      cache_control: { type: <span class="str">"ephemeral"</span> }  <span class="cm">// cached across all facilities</span>
+    }],
+    messages: [{ role: <span class="str">"user"</span>, content: <span class="fn">JSON.stringify</span>(payload, <span class="kw">null</span>, <span class="num">2</span>) }]
+  });
+
+  <span class="kw">return</span> response.content[<span class="num">0</span>].text;
+}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="step">
+      <div class="step-num-wrap">
+        <div class="step-num sn4">4</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <div class="step-tag" style="color:#60e080;">Customer UI Layer</div>
+        <div class="step-title">Build the facility heatmap — show gap units visually inside Customer UI</div>
+        <div class="step-body">
+          <p>The most impactful deliverable for facility managers is a <strong style="color:#fff;">visual heatmap</strong> inside the Customer UI (Manage Facility / Smart Units section). Each unit in the facility is shown as a colour-coded cell: green = monitored, red = high-risk gap, orange = medium-risk gap, grey = low-risk unmonitored.</p>
+          <p>For the pilot, this can be a simple <strong style="color:#fff;">REST API endpoint</strong> that returns the scored gap data as JSON, rendered as an HTML/CSS grid in the existing Customer UI. No new UI framework needed — the BackOffice API already serves the Smart Units page.</p>
+          <div class="code-block"><span class="cm">// gap-api-endpoint.js — new BackOffice API endpoint</span>
+<span class="cm">// GET /api/facilities/:facilityId/gap-analysis</span>
+router.<span class="fn">get</span>(<span class="str">'/facilities/:facilityId/gap-analysis'</span>, <span class="kw">async</span> (req, res) => {
+  <span class="kw">const</span> { facilityId } = req.params;
+
+  <span class="cm">// Read latest scored gaps from BigQuery output table</span>
+  <span class="kw">const</span> gaps = <span class="kw">await</span> bigquery
+    .<span class="fn">query</span>(<span class="str">`SELECT * FROM tod_backoffice.gap_scores
+             WHERE facility_id = @facilityId
+               AND scored_at >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 24 HOUR)
+             ORDER BY risk_score DESC`</span>,
+      { params: { facilityId } });
+
+  res.<span class="fn">json</span>({
+    facility_id:        facilityId,
+    total_gap_units:    gaps.length,
+    expansion_opp_usd:  gaps.length * <span class="num">12</span>,  <span class="cm">// $12/device flat fee</span>
+    gap_units:          gaps,
+    generated_at:       <span class="kw">new</span> <span class="fn">Date</span>().<span class="fn">toISOString</span>()
+  });
+});</div>
+          <div class="callout callout-success">
+            <div class="ci">⚡</div>
+            <p><strong>Pilot shortcut:</strong> For the 45-day pilot, skip the Customer UI heatmap entirely and deliver the output via a <strong>Looker Studio dashboard + email only</strong>. The heatmap UI can be a v2 feature once the scoring engine is validated. This reduces engineering effort from ~3 weeks to ~4 days.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="step">
+      <div class="step-num-wrap">
+        <div class="step-num sn5">5</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <div class="step-tag" style="color:#e0b020;">Delivery — Email to Facility Manager</div>
+        <div class="step-title">Send personalised expansion email to each facility manager monthly</div>
+        <div class="step-body">
+          <p>On the 1st of each month, send a personalised email to each facility manager whose gap analysis shows <strong style="color:#fff;">5 or more high-risk gap units</strong> (risk_score > 70). Email includes Claude's written recommendation and a direct CTA to the Customer UI Smart Units page.</p>
+          <div class="code-block"><span class="cm">// delivery.js</span>
+<span class="kw">for</span> (<span class="kw">const</span> facility <span class="kw">of</span> facilitiesWithHighRiskGaps) {
+  <span class="kw">const</span> gaps          = <span class="kw">await</span> <span class="fn">detectGaps</span>(facility.id);
+  <span class="kw">const</span> narrative     = <span class="kw">await</span> <span class="fn">generateGapRecommendation</span>(facility, gaps);
+  <span class="kw">const</span> expansionUsd  = gaps.length * <span class="num">12</span>;  <span class="cm">// $12/device — flat subscription</span>
+
+  <span class="kw">await</span> sendgrid.<span class="fn">send</span>({
+    to:      facility.manager_email,
+    from:    <span class="str">'insights@storage-defender.com'</span>,
+    subject: <span class="str">`Coverage gap detected at ${facility.name} — ${gaps.length} unmonitored units`</span>,
+    html:    <span class="fn">gapEmailTemplate</span>({ facility, gaps, narrative, expansionUsd })
+  });
+
+  <span class="cm">// Also create in-app notification via BackOffice API</span>
+  <span class="kw">await</span> backofficeApi.<span class="fn">createNotification</span>({
+    facilityId: facility.id,
+    type:       <span class="str">'gap_analysis'</span>,
+    title:      <span class="str">`${gaps.length} unmonitored high-risk units detected`</span>,
+    body:       narrative
+  });
+}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 6 -->
+    <div class="step">
+      <div class="step-num-wrap">
+        <div class="step-num sn6">6</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <div class="step-tag" style="color:#20a0c0;">CS Dashboard</div>
+        <div class="step-title">Build CS upsell dashboard — ranked expansion opportunities across all accounts</div>
+        <div class="step-body">
+          <p>A <strong style="color:#fff;">Looker Studio dashboard</strong> connected to the BigQuery gap_scores output table. Shows every facility ranked by expansion opportunity: gap count, top risk zone, expansion revenue ($12 × gaps), and a button to trigger the Claude-drafted upsell email.</p>
+          <div class="callout callout-info">
+            <div class="ci">📊</div>
+            <p><strong>Fastest path to CS dashboard:</strong> BigQuery output table → Looker Studio. No new UI dev. Setup time: 3–4 hours once the scoring engine writes data to BigQuery. CS team can filter by region, risk level, or expansion opportunity size.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 7 -->
+    <div class="step">
+      <div class="step-num-wrap">
+        <div class="step-num sn7">7</div>
+      </div>
+      <div class="step-content">
+        <div class="step-tag" style="color:#e03060;">Testing & Monitoring</div>
+        <div class="step-title">Test, validate, and monitor the scoring pipeline end-to-end</div>
+        <div class="step-body">
+          <p>Before enabling for all facilities, run the scoring engine against <strong style="color:#fff;">5–10 pilot facilities</strong> and have the CS team manually verify the output. Check: Are the highest-scored units actually in the most active zones? Do the zone names match? Are the device counts accurate?</p>
+          <p>Set up <strong style="color:#fff;">Cloud Logging alerts</strong> for scoring failures and send a Slack alert to the engineering channel on any pipeline error.</p>
+          <div class="callout callout-warn">
+            <div class="ci">⚠️</div>
+            <p><strong>Key validation:</strong> Cross-check the <code style="background:rgba(255,255,255,0.08);padding:1px 5px;border-radius:3px;font-size:0.72rem;">devices</code> table against actual installed devices before the first run — stale or deprovisioned device records will make the coverage map inaccurate, which affects every risk score downstream.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════ SECTION 4: CLAUDE AI DETAIL ═══════════════ -->
+<div class="section">
+  <div class="section-tag">Section 4</div>
+  <h2>Claude AI — <span>Deep Dive</span></h2>
+  <p class="desc">Exactly how Claude is used in this feature, what it generates, and why it fits here.</p>
+
+  <div class="claude-box">
+    <div class="cb-head">
+      <div class="cb-icon">🤖</div>
+      <div>
+        <h3>Claude Sonnet 4.6 — Anthropic API</h3>
+        <div class="cb-sub">Model ID: claude-sonnet-4-6 &nbsp;|&nbsp; SDK: @anthropic-ai/sdk &nbsp;|&nbsp; Prompt caching enabled</div>
+      </div>
+    </div>
+
+    <div class="cb-grid">
+      <div class="cb-item">
+        <h5>What Claude Does Here</h5>
+        <ul>
+          <li>Takes the scored gap unit JSON as input</li>
+          <li>Identifies the highest-risk zones by name</li>
+          <li>Writes a 2–3 paragraph expansion recommendation</li>
+          <li>Cites exact $12/device cost — no invented figures</li>
+          <li>Also drafts a CS outreach email body ready to send</li>
+        </ul>
+      </div>
+      <div class="cb-item">
+        <h5>Why Not Just Show the Raw Data?</h5>
+        <ul>
+          <li>Facility managers are not data analysts — numbers alone don't drive action</li>
+          <li>A sentence like "Zone B has your 8 highest-risk blind spots at $96/month to cover" is more actionable than a score table</li>
+          <li>Claude adds context and a clear call to action that the raw JSON cannot</li>
+          <li>CS team gets a pre-written email — reduces their effort to 1 click</li>
+        </ul>
+      </div>
+      <div class="cb-item">
+        <h5>Cost Estimate (per month)</h5>
+        <ul>
+          <li>~200 facilities × 1 report/month = 200 API calls</li>
+          <li>~450 output tokens per facility</li>
+          <li>System prompt cached — paid once per batch run</li>
+          <li>Estimated: <strong>~$4–6 USD/month</strong> for entire fleet</li>
+          <li>Scales to 2,000 facilities ≈ $40–60/month</li>
+        </ul>
+      </div>
+      <div class="cb-item">
+        <h5>Prompt Caching Strategy</h5>
+        <ul>
+          <li>System prompt is identical for all facilities</li>
+          <li>Mark with <code style="background:rgba(255,255,255,0.08);padding:1px 5px;border-radius:3px;font-size:0.72rem;">cache_control: ephemeral</code></li>
+          <li>Process all facilities in a single batch job run</li>
+          <li>First call: full input cost. Subsequent: ~90% cheaper</li>
+          <li>Cache TTL: 5 min — keep entire job under 5 minutes</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:16px;">
+      <div style="font-size:0.65rem;font-weight:700;color:rgba(160,80,255,0.7);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;">📝 Sample Claude Output — what the facility manager reads in their email</div>
+      <p style="font-size:0.84rem;color:rgba(255,255,255,0.75);line-height:1.7;font-style:italic;">"Your facility currently has <strong style="color:#fff;">60 Smart Units covering 60% of Riverside Storage</strong>. Based on your facility's activity data over the last 90 days, we've identified <strong style="color:#fff;">12 unmonitored units in Zone B and Zone C</strong> as your highest-risk blind spots — these zones had the most motion and door activity in the facility.</p>
+      <p style="font-size:0.84rem;color:rgba(255,255,255,0.75);line-height:1.7;font-style:italic;margin-top:8px;">Adding Smart Units to just those 12 units would extend your coverage to 72% for an additional <strong style="color:#fff;">$144/month</strong> (12 units × $12/device). Full 100% coverage of all 100 units would be <strong style="color:#e05c1a;">$480/month</strong> (40 remaining units × $12). Your current subscription is <strong style="color:#fff;">$720/month</strong> for 60 devices.</p>
+      <p style="font-size:0.84rem;color:rgba(255,255,255,0.75);line-height:1.7;font-style:italic;margin-top:8px;">To upgrade coverage for Zone B and Zone C, reach out to your Storage Defender account manager or visit Smart Units in your portal."</p>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════ SECTION 5: SAMPLE OUTPUT PREVIEW ═══════════════ -->
+<div class="section">
+  <div class="section-tag">Section 5</div>
+  <h2>Sample Output <span>Preview</span></h2>
+  <p class="desc">Three outputs: the facility heatmap, the CS dashboard row, and the gap analysis summary panel.</p>
+
+  <!-- Heatmap -->
+  <div class="heatmap-wrap" style="margin-bottom:24px;">
+    <div class="hm-title">📍 Facility Heatmap — Riverside Storage (100 units across 4 zones)</div>
+    <div style="font-size:0.72rem;color:var(--muted);margin-bottom:14px;">Hover over any cell to see unit details &nbsp;·&nbsp; Zone A (top) → Zone D (bottom)</div>
+    <div class="hm-grid">
+      <!-- Zone A: mostly monitored -->
+      <div class="hm-cell hm-monitored" title="A01 - Monitored">A01</div>
+      <div class="hm-cell hm-monitored" title="A02 - Monitored">A02</div>
+      <div class="hm-cell hm-monitored" title="A03 - Monitored">A03</div>
+      <div class="hm-cell hm-low"       title="A04 - Low risk (unmonitored)">A04</div>
+      <div class="hm-cell hm-monitored" title="A05 - Monitored">A05</div>
+      <div class="hm-cell hm-monitored" title="A06 - Monitored">A06</div>
+      <div class="hm-cell hm-low"       title="A07 - Low risk (unmonitored)">A07</div>
+      <div class="hm-cell hm-monitored" title="A08 - Monitored">A08</div>
+      <div class="hm-cell hm-monitored" title="A09 - Monitored">A09</div>
+      <div class="hm-cell hm-monitored" title="A10 - Monitored">A10</div>
+      <!-- Zone B: high risk gaps -->
+      <div class="hm-cell hm-monitored" title="B01 - Monitored">B01</div>
+      <div class="hm-cell hm-high"      title="B02 - HIGH RISK gap (score 84)">B02</div>
+      <div class="hm-cell hm-high"      title="B03 - HIGH RISK gap (score 81)">B03</div>
+      <div class="hm-cell hm-monitored" title="B04 - Monitored">B04</div>
+      <div class="hm-cell hm-high"      title="B05 - HIGH RISK gap (score 79)">B05</div>
+      <div class="hm-cell hm-high"      title="B06 - HIGH RISK gap (score 77)">B06</div>
+      <div class="hm-cell hm-monitored" title="B07 - Monitored">B07</div>
+      <div class="hm-cell hm-high"      title="B08 - HIGH RISK gap (score 73)">B08</div>
+      <div class="hm-cell hm-medium"    title="B09 - Medium risk gap (score 62)">B09</div>
+      <div class="hm-cell hm-medium"    title="B10 - Medium risk gap (score 58)">B10</div>
+      <!-- Zone C: mixed -->
+      <div class="hm-cell hm-medium"    title="C01 - Medium risk gap (score 65)">C01</div>
+      <div class="hm-cell hm-monitored" title="C02 - Monitored">C02</div>
+      <div class="hm-cell hm-medium"    title="C03 - Medium risk gap (score 60)">C03</div>
+      <div class="hm-cell hm-monitored" title="C04 - Monitored">C04</div>
+      <div class="hm-cell hm-monitored" title="C05 - Monitored">C05</div>
+      <div class="hm-cell hm-low"       title="C06 - Low risk (unmonitored)">C06</div>
+      <div class="hm-cell hm-monitored" title="C07 - Monitored">C07</div>
+      <div class="hm-cell hm-low"       title="C08 - Low risk (unmonitored)">C08</div>
+      <div class="hm-cell hm-monitored" title="C09 - Monitored">C09</div>
+      <div class="hm-cell hm-monitored" title="C10 - Monitored">C10</div>
+      <!-- Zone D: mostly low risk -->
+      <div class="hm-cell hm-low"       title="D01 - Low risk (unmonitored)">D01</div>
+      <div class="hm-cell hm-low"       title="D02 - Low risk (unmonitored)">D02</div>
+      <div class="hm-cell hm-monitored" title="D03 - Monitored">D03</div>
+      <div class="hm-cell hm-low"       title="D04 - Low risk (unmonitored)">D04</div>
+      <div class="hm-cell hm-monitored" title="D05 - Monitored">D05</div>
+      <div class="hm-cell hm-low"       title="D06 - Low risk (unmonitored)">D06</div>
+      <div class="hm-cell hm-low"       title="D07 - Low risk (unmonitored)">D07</div>
+      <div class="hm-cell hm-monitored" title="D08 - Monitored">D08</div>
+      <div class="hm-cell hm-low"       title="D09 - Low risk (unmonitored)">D09</div>
+      <div class="hm-cell hm-low"       title="D10 - Low risk (unmonitored)">D10</div>
+    </div>
+    <div class="hm-legend">
+      <div class="hm-leg-item"><div class="hm-dot" style="background:rgba(40,180,80,0.5);border:1px solid rgba(40,180,80,0.7);"></div>Smart Unit installed (monitored)</div>
+      <div class="hm-leg-item"><div class="hm-dot" style="background:rgba(220,50,50,0.5);border:1px solid rgba(220,50,50,0.8);"></div>HIGH risk gap (score &gt;70)</div>
+      <div class="hm-leg-item"><div class="hm-dot" style="background:rgba(220,140,20,0.5);border:1px solid rgba(220,140,20,0.8);"></div>Medium risk gap (score 50–70)</div>
+      <div class="hm-leg-item"><div class="hm-dot" style="background:rgba(80,80,100,0.4);border:1px solid rgba(80,80,100,0.6);"></div>Low risk (unmonitored, score &lt;50)</div>
+    </div>
+    <div style="margin-top:16px;padding:12px 16px;background:rgba(64,144,224,0.08);border:1px solid rgba(64,144,224,0.2);border-radius:8px;font-size:0.8rem;color:rgba(255,255,255,0.65);">
+      <strong style="color:#fff;">Summary:</strong> 60 monitored · 5 HIGH risk gaps (Zone B) · 4 medium risk gaps · 11 low risk unmonitored &nbsp;·&nbsp;
+      <strong style="color:#60b0ff;">Total expansion opportunity: $240/month</strong> (20 gaps × $12) &nbsp;·&nbsp;
+      Immediate priority: Zone B (5 units at $60/month)
+    </div>
+  </div>
+
+  <!-- CS Dashboard preview -->
+  <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:24px;margin-bottom:24px;">
+    <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:4px;">CS Team Dashboard — Ranked Upsell Opportunities (Looker Studio)</div>
+    <div style="font-size:0.72rem;color:rgba(255,255,255,0.3);margin-bottom:16px;">Sorted by expansion opportunity descending</div>
+    <table class="cs-table">
+      <thead>
+        <tr>
+          <th>Facility</th>
+          <th>Current Devices</th>
+          <th>Monthly Sub</th>
+          <th>Gap Units</th>
+          <th>Expansion Opp.</th>
+          <th>Risk Level</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong style="color:#fff;">Riverside Storage</strong></td>
+          <td>60 devices</td>
+          <td style="color:#60e090;">$720/mo</td>
+          <td>40 units</td>
+          <td style="color:#60b0ff;font-weight:700;">+$480/mo</td>
+          <td><span class="risk-high">HIGH</span></td>
+          <td><button class="cs-btn">Send Email ↗</button></td>
+        </tr>
+        <tr>
+          <td><strong style="color:#fff;">Northgate Self Store</strong></td>
+          <td>30 devices</td>
+          <td style="color:#60e090;">$360/mo</td>
+          <td>55 units</td>
+          <td style="color:#60b0ff;font-weight:700;">+$660/mo</td>
+          <td><span class="risk-high">HIGH</span></td>
+          <td><button class="cs-btn">Send Email ↗</button></td>
+        </tr>
+        <tr>
+          <td><strong style="color:#fff;">Downtown Mini Storage</strong></td>
+          <td>80 devices</td>
+          <td style="color:#60e090;">$960/mo</td>
+          <td>18 units</td>
+          <td style="color:#ffb040;font-weight:700;">+$216/mo</td>
+          <td><span class="risk-medium">MEDIUM</span></td>
+          <td><button class="cs-btn">Send Email ↗</button></td>
+        </tr>
+        <tr>
+          <td><strong style="color:#fff;">Oakwood Vaults</strong></td>
+          <td>95 devices</td>
+          <td style="color:#60e090;">$1,140/mo</td>
+          <td>5 units</td>
+          <td style="color:#80b8ff;font-weight:700;">+$60/mo</td>
+          <td><span class="risk-low">LOW</span></td>
+          <td><button class="cs-btn">Send Email ↗</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════ SECTION 6: ACCESS & PERMISSIONS ═══════════════ -->
+<div class="section">
+  <div class="section-tag">Section 6</div>
+  <h2>Access &amp; <span>Permissions Needed</span></h2>
+  <p class="desc">What we already have vs what we need to request before starting.</p>
+
+  <div class="access-grid">
+    <div class="access-card">
+      <h4>✅ Already Have</h4>
+      <div class="access-item">
+        <div class="ai-status have">✓</div>
+        <div class="ai-text">
+          <div class="ai-name">BigQuery access (Hevo pipeline)</div>
+          <div class="ai-desc">Hevo already syncs tod_backoffice → BigQuery. incidents, devices, zones, units tables are all available.</div>
+        </div>
+      </div>
+      <div class="access-item">
+        <div class="ai-status have">✓</div>
+        <div class="ai-text">
+          <div class="ai-name">tod_backoffice (Cloud SQL)</div>
+          <div class="ai-desc">All device, zone, unit, tenant, and PMS sync data lives here. Read-only service account exists for BigQuery.</div>
+        </div>
+      </div>
+      <div class="access-item">
+        <div class="ai-status have">✓</div>
+        <div class="ai-text">
+          <div class="ai-name">Google Cloud Platform (GCP)</div>
+          <div class="ai-desc">Cloud Run, Cloud Scheduler, and Looker Studio all in same GCP project. No new cloud account needed.</div>
+        </div>
+      </div>
+      <div class="access-item">
+        <div class="ai-status have">✓</div>
+        <div class="ai-text">
+          <div class="ai-name">BackOffice API (createNotification)</div>
+          <div class="ai-desc">Existing endpoint already used in Idea #1. Can push gap alert notifications to Customer UI without new API work.</div>
+        </div>
+      </div>
+      <div class="access-item">
+        <div class="ai-status have">✓</div>
+        <div class="ai-text">
+          <div class="ai-name">Anthropic account (Claude Code CLI)</div>
+          <div class="ai-desc">SD already uses Claude Code — same Anthropic account can issue a production API key.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="access-card">
+      <h4>🔑 Need to Get / Set Up</h4>
+      <div class="access-item">
+        <div class="ai-status need">!</div>
+        <div class="ai-text">
+          <div class="ai-name">Anthropic API Key</div>
+          <div class="ai-desc">Create at console.anthropic.com. Store in GCP Secret Manager. ~$5–10/month for pilot fleet.</div>
+        </div>
+      </div>
+      <div class="access-item">
+        <div class="ai-status need">!</div>
+        <div class="ai-text">
+          <div class="ai-name">BigQuery write permission for output table</div>
+          <div class="ai-desc">Scoring engine needs to write gap_scores results to a new BigQuery table. Service account needs bigquery.dataEditor on that dataset.</div>
+        </div>
+      </div>
+      <div class="access-item">
+        <div class="ai-status easy">~</div>
+        <div class="ai-text">
+          <div class="ai-name">SendGrid / email API key</div>
+          <div class="ai-desc">For sending personalised gap emails to facility managers. Free tier covers pilot (100 emails/day).</div>
+        </div>
+      </div>
+      <div class="access-item">
+        <div class="ai-status easy">~</div>
+        <div class="ai-text">
+          <div class="ai-name">Cloud Run deploy permission</div>
+          <div class="ai-desc">DevOps/SRE team adds the new Cloud Run service and Cloud Scheduler nightly cron. Standard GCP task — 30 minutes.</div>
+        </div>
+      </div>
+      <div class="access-item">
+        <div class="ai-status easy">~</div>
+        <div class="ai-text">
+          <div class="ai-name">CS team sign-off on email tone</div>
+          <div class="ai-desc">CS team should review 3 sample Claude-generated emails before bulk sending — make sure tone matches their existing customer communication style.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════ SECTION 7: AI TOOL OPTIONS ═══════════════ -->
+<div class="section">
+  <div class="section-tag">Section 7</div>
+  <h2>AI Tool <span>Options</span></h2>
+  <p class="desc">The risk scoring itself is rule-based (no AI needed). Claude is used only for narrative generation. Here is how the options compare.</p>
+
+  <div class="tool-grid">
+    <div class="tool-card recommended">
+      <div class="rec-tag">⭐ Recommended</div>
+      <div class="tc-logo">🤖</div>
+      <h4>Claude Sonnet 4.6</h4>
+      <p>Best fit for converting structured JSON data into clear, natural language recommendations.</p>
+      <ul>
+        <li>Prompt caching = 70% cost saving across batch runs</li>
+        <li>Excellent instruction following — never invents numbers</li>
+        <li>SD already uses Claude Code — same vendor</li>
+        <li>~$0.02 per facility narrative</li>
+        <li>Easiest to tune via system prompt</li>
+      </ul>
+    </div>
+    <div class="tool-card alt">
+      <div class="tc-logo">🟢</div>
+      <h4>OpenAI GPT-4o</h4>
+      <p>Viable alternative if team is more familiar with OpenAI SDK.</p>
+      <ul>
+        <li>No prompt caching = higher cost at scale</li>
+        <li>~$0.05 per facility (2.5× more expensive)</li>
+        <li>New vendor account needed</li>
+        <li>Similar quality for this specific task</li>
+        <li>Not recommended given existing Anthropic usage</li>
+      </ul>
+    </div>
+    <div class="tool-card alt">
+      <div class="tc-logo">📊</div>
+      <h4>No AI (Rules Only)</h4>
+      <p>Skip Claude entirely — generate templated text from the scored data.</p>
+      <ul>
+        <li>Zero AI cost</li>
+        <li>Faster to build for pilot</li>
+        <li>Less natural language — reads like a template</li>
+        <li>Good fallback if Anthropic API key delayed</li>
+        <li>Can add Claude narrative in v2</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════ SECTION 8: 45-DAY TIMELINE ═══════════════ -->
+<div class="section">
+  <div class="section-tag">Section 8</div>
+  <h2>45-Day <span>Execution Timeline</span></h2>
+  <p class="desc">45 days from kick-off to first live gap analysis landing in facility managers' inboxes and CS team dashboards.</p>
+
+  <div class="timeline">
+    <div class="tl-week">
+      <div class="tl-week-label">
+        <div class="wl-num">Week 1</div>
+        <div class="wl-days">Days 1–7</div>
+      </div>
+      <div class="tl-tasks">
+        <div class="tl-task"><span class="tt-who who-pm">PM</span><span class="tt-text">Define scope — agree with CS team on: risk score thresholds (what counts as HIGH/MEDIUM/LOW), email trigger condition (e.g. ≥5 HIGH risk gaps), and which facilities are in pilot cohort</span></div>
+        <div class="tl-task"><span class="tt-who who-data">Data</span><span class="tt-text">Write and validate all BigQuery SQL queries (zone incident freq, device coverage map, PMS tenant data) — test against real facility data</span></div>
+        <div class="tl-task"><span class="tt-who who-eng">Eng</span><span class="tt-text">Get Anthropic API key + SendGrid key — store in GCP Secret Manager</span></div>
+        <div class="tl-task"><span class="tt-who who-eng">Eng</span><span class="tt-text">Create Cloud Run service scaffold + Cloud Scheduler nightly cron job (midnight UTC)</span></div>
+      </div>
+    </div>
+
+    <div class="tl-week">
+      <div class="tl-week-label">
+        <div class="wl-num">Week 2</div>
+        <div class="wl-days">Days 8–14</div>
+      </div>
+      <div class="tl-tasks">
+        <div class="tl-task"><span class="tt-who who-eng">Eng</span><span class="tt-text">Build Risk Scoring Engine — calculateRiskScore(), detectGaps(), output to BigQuery gap_scores table</span></div>
+        <div class="tl-task"><span class="tt-who who-eng">Eng</span><span class="tt-text">Integrate Claude API — implement generateGapRecommendation() with prompt caching</span></div>
+        <div class="tl-task"><span class="tt-who who-qa">QA</span><span class="tt-text">Write unit tests for scoring formula — validate risk_score boundaries, expansion_usd calculation ($12 × gaps), and gap ranking order</span></div>
+        <div class="tl-task"><span class="tt-who who-data">Data</span><span class="tt-text">Begin Looker Studio CS dashboard setup — connect to BigQuery gap_scores table</span></div>
+      </div>
+    </div>
+
+    <div class="tl-week">
+      <div class="tl-week-label">
+        <div class="wl-num">Week 3</div>
+        <div class="wl-days">Days 15–21</div>
+      </div>
+      <div class="tl-tasks">
+        <div class="tl-task"><span class="tt-who who-eng">Eng</span><span class="tt-text">Build email delivery (SendGrid) — personalised gap email template with Claude narrative and CTA button</span></div>
+        <div class="tl-task"><span class="tt-who who-eng">Eng</span><span class="tt-text">Push in-app notification via BackOffice API createNotification() for each facility with HIGH risk gaps</span></div>
+        <div class="tl-task"><span class="tt-who who-data">Data</span><span class="tt-text">Complete Looker Studio CS dashboard — ranked table, risk filter, expansion opportunity column, Send Email button</span></div>
+        <div class="tl-task"><span class="tt-who who-qa">QA</span><span class="tt-text">End-to-end test on 5 pilot facilities — verify device counts, gap rankings, email content, and notification delivery</span></div>
+      </div>
+    </div>
+
+    <div class="tl-week">
+      <div class="tl-week-label">
+        <div class="wl-num">Week 4–5</div>
+        <div class="wl-days">Days 22–35</div>
+      </div>
+      <div class="tl-tasks">
+        <div class="tl-task"><span class="tt-who who-cs">CS</span><span class="tt-text">CS team reviews 5 sample emails — approve Claude narrative tone, check data accuracy, confirm the gap units match what they know about each facility</span></div>
+        <div class="tl-task"><span class="tt-who who-pm">PM</span><span class="tt-text">CS team conducts first upsell conversations with 5 pilot facility managers using the dashboard data — log outcome</span></div>
+        <div class="tl-task"><span class="tt-who who-eng">Eng</span><span class="tt-text">Set up Cloud Logging alerts — Slack alert on scoring job failure, BigQuery write error, or email bounce</span></div>
+        <div class="tl-task"><span class="tt-who who-eng">Eng</span><span class="tt-text">Deploy to production — enable for pilot cohort of 15–20 facilities</span></div>
+      </div>
+    </div>
+
+    <div class="tl-week">
+      <div class="tl-week-label">
+        <div class="wl-num">Week 6–7</div>
+        <div class="wl-days">Days 36–45</div>
+      </div>
+      <div class="tl-tasks">
+        <div class="tl-task"><span class="tt-who who-qa">QA</span><span class="tt-text">Monitor first live run — verify all pilot facilities scored, emails delivered, CS dashboard populated correctly</span></div>
+        <div class="tl-task"><span class="tt-who who-cs">CS</span><span class="tt-text">Track upsell conversion rate from pilot — how many facility managers added Smart Units after receiving the gap email?</span></div>
+        <div class="tl-task"><span class="tt-who who-pm">PM</span><span class="tt-text">Collect facility manager feedback — did the heatmap/email help them understand their coverage gaps? Measure email open rate and click-through</span></div>
+        <div class="tl-task"><span class="tt-who who-eng">Eng</span><span class="tt-text">v2 planning — evaluate adding Customer UI heatmap widget and ML-based scoring if rule-based scores need refinement</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════ FINAL CALLOUT ═══════════════ -->
+<div class="section" style="padding-bottom:20px;">
+  <div style="background:linear-gradient(135deg,#0a1828,#061222);border:1.5px solid rgba(64,144,224,0.4);border-radius:16px;padding:28px 32px;display:flex;gap:20px;align-items:flex-start;">
+    <div style="font-size:2.5rem;flex-shrink:0;">🎯</div>
+    <div>
+      <div style="font-size:1.1rem;font-weight:800;color:#fff;margin-bottom:8px;">Summary — Why Idea #2 wins on Revenue Impact</div>
+      <div style="font-size:0.86rem;color:rgba(255,255,255,0.65);line-height:1.65;">
+        The data to build this already exists in <strong style="color:#fff;">tod_backoffice — no new sensors, no new data collection</strong>. Every unmonitored unit that converts = <strong style="color:#fff;">+$12/month pure subscription revenue</strong>. The CS team gets a ranked upsell list with data they can use in a conversation today — no guesswork. Claude generates the personalised email draft so CS effort is minimal. The risk scoring formula is explainable, auditable, and can be refined over time. This is the highest-revenue-impact idea in the Innovation Tank because it directly converts existing customer data into new subscriptions at <strong style="color:#4090e0;">$12/device/month</strong> — and it can be piloted in <strong style="color:#4090e0;">45 days with 2 engineers and 1 data analyst</strong>.
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end page -->
+
+<div class="footer">
+  SD Innovation Tank — Idea #2 Technical Execution Plan &nbsp;|&nbsp; Storage Defender &nbsp;|&nbsp; teamofdefenders.atlassian.net &nbsp;|&nbsp; May 2026
+</div>
+
+</body>
+</html>
