@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SD Idea 5: AI Gateway Connectivity Monitor & Security Alert System</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f4f4f6; color: #1a1a1a; line-height: 1.65; }
+
+    /* ── HEADER ── */
+    .hero { background: linear-gradient(135deg, #d63031 0%, #922b21 100%); color: white; padding: 52px 40px 44px; }
+    .hero-inner { max-width: 1120px; margin: 0 auto; }
+    .idea-badge { display: inline-block; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.35); color: white; font-size: 11px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; padding: 5px 14px; border-radius: 20px; margin-bottom: 18px; }
+    .hero h1 { font-size: 34px; font-weight: 800; margin-bottom: 6px; line-height: 1.2; }
+    .hero .tagline { font-size: 17px; opacity: 0.88; margin-bottom: 28px; }
+    .hero-chips { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .chip { background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.28); border-radius: 10px; padding: 10px 22px; text-align: center; min-width: 90px; }
+    .chip .n { font-size: 26px; font-weight: 800; line-height: 1; }
+    .chip .l { font-size: 10px; opacity: 0.78; text-transform: uppercase; letter-spacing: 1px; margin-top: 3px; }
+    .chip.award { background: rgba(255,215,0,0.22); border-color: rgba(255,215,0,0.5); }
+    .chip.award .n { font-size: 18px; }
+
+    /* ── LAYOUT ── */
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px 60px; }
+    .section { background: white; border-radius: 14px; padding: 36px; margin: 22px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+    .sec-hdr { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+    .sec-num { background: #d63031; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; flex-shrink: 0; }
+    .sec-hdr h2 { font-size: 21px; font-weight: 700; }
+
+    /* ── CALLOUTS ── */
+    .callout { border-left: 4px solid #d63031; background: #fff5f5; border-radius: 0 8px 8px 0; padding: 14px 18px; margin: 14px 0; font-size: 14px; }
+    .callout.green { border-color: #27ae60; background: #f0fff4; }
+    .callout.blue { border-color: #2980b9; background: #f0f6ff; }
+    .callout.orange { border-color: #e67e22; background: #fff8f0; }
+    .callout.yellow { border-color: #f39c12; background: #fffbe0; }
+    .callout strong { color: #922b21; }
+    .callout.green strong { color: #1a7a40; }
+    .callout.blue strong { color: #1a5a8a; }
+    .callout.orange strong { color: #a05010; }
+    .callout.yellow strong { color: #8a6000; }
+
+    /* ── GRID ── */
+    .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 16px 0; }
+    .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin: 16px 0; }
+    .g4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 16px 0; }
+    @media (max-width: 750px) { .g2,.g3,.g4 { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 480px) { .g2,.g3,.g4 { grid-template-columns: 1fr; } }
+
+    /* ── CARDS ── */
+    .card { background: #f7f7f9; border: 1px solid #e4e4ea; border-radius: 10px; padding: 18px; }
+    .card h4 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: #922b21; margin-bottom: 8px; }
+    .card.blue h4 { color: #1a5a8a; }
+    .card.green h4 { color: #1a7a40; }
+    .card.orange h4 { color: #a05010; }
+    .card.yellow h4 { color: #8a6000; }
+    .card p, .card li { font-size: 13px; color: #444; line-height: 1.55; }
+    .card ul { list-style: none; padding: 0; }
+    .card ul li { padding: 3px 0 3px 16px; position: relative; }
+    .card ul li::before { content: '→'; position: absolute; left: 0; color: #d63031; font-size: 11px; top: 4px; }
+    .card.green ul li::before { color: #27ae60; }
+    .card.blue ul li::before { color: #2980b9; }
+
+    /* ── CODE ── */
+    .code { background: #0f1117; color: #e2e8f0; border-radius: 10px; padding: 20px; font-family: 'Cascadia Code', 'Courier New', Consolas, monospace; font-size: 12.5px; line-height: 1.7; overflow-x: auto; margin: 16px 0; }
+    .code .c { color: #5a7a5a; }
+    .code .k { color: #7ecad4; }
+    .code .s { color: #b8e0a0; }
+    .code .n { color: #f0c060; }
+    .code .f { color: #c8a0f0; }
+    .code .t { color: #f08060; }
+
+    /* ── ARCHITECTURE LAYERS ── */
+    .arch { margin: 20px 0; }
+    .arch-layer { display: flex; margin-bottom: 5px; border-radius: 10px; overflow: hidden; border: 1px solid #e0d0d0; }
+    .arch-icon { width: 52px; min-width: 52px; background: #d63031; color: white; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+    .arch-body { flex: 1; background: #fff8f8; padding: 12px 16px; }
+    .arch-body strong { color: #922b21; font-size: 14px; }
+    .arch-body p { font-size: 13px; color: #555; margin-top: 3px; }
+    .arch-arrow { text-align: center; font-size: 20px; color: #d63031; line-height: 1; margin: 2px 0; }
+
+    /* ── TABLES ── */
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+    th { background: #d63031; color: white; padding: 10px 14px; text-align: left; font-weight: 600; }
+    td { padding: 10px 14px; border-bottom: 1px solid #eee; color: #333; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fff5f5; }
+
+    /* ── RISK BANDS ── */
+    .risk-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 18px 0; }
+    @media (max-width: 700px) { .risk-grid { grid-template-columns: 1fr 1fr; } }
+    .rband { border-radius: 10px; padding: 18px 14px; text-align: center; }
+    .rband.low  { background: #e8faea; border: 2px solid #27ae60; }
+    .rband.sus  { background: #fffbe0; border: 2px solid #f39c12; }
+    .rband.elev { background: #fff0e0; border: 2px solid #e67e22; }
+    .rband.crit { background: #fff0f0; border: 2px solid #d63031; }
+    .rband .rl  { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
+    .rband.low .rl  { color: #1a7a40; }
+    .rband.sus .rl  { color: #a06000; }
+    .rband.elev .rl { color: #a04000; }
+    .rband.crit .rl { color: #922b21; }
+    .rband .rs  { font-size: 22px; font-weight: 800; margin-bottom: 6px; line-height: 1; }
+    .rband.low .rs  { color: #27ae60; }
+    .rband.sus .rs  { color: #f39c12; }
+    .rband.elev .rs { color: #e67e22; }
+    .rband.crit .rs { color: #d63031; }
+    .rband .ra  { font-size: 12px; color: #555; }
+
+    /* ── ALERT MOCK ── */
+    .alert-mock { background: #111827; border-radius: 12px; padding: 24px; font-family: 'Cascadia Code', 'Courier New', monospace; font-size: 13px; margin: 18px 0; }
+    .alert-mock .am-h { color: #ff6b6b; font-size: 15px; font-weight: 700; border-bottom: 1px solid #2d3748; padding-bottom: 10px; margin-bottom: 14px; }
+    .alert-mock .am-lbl { color: #718096; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-top: 10px; }
+    .alert-mock .am-val { color: #e2e8f0; margin-top: 2px; }
+    .alert-mock .am-crit { color: #fc8181; font-weight: 700; }
+    .alert-mock .am-warn { color: #f6ad55; font-weight: 700; }
+    .alert-mock .am-ok   { color: #68d391; font-weight: 700; }
+    .alert-mock .am-ai   { background: #1a2235; border-left: 3px solid #a78bfa; padding: 10px 14px; border-radius: 0 6px 6px 0; margin-top: 12px; color: #c4b5fd; font-size: 12px; line-height: 1.6; }
+
+    /* ── TIMELINE ── */
+    .tline { margin: 20px 0; }
+    .trow { display: grid; grid-template-columns: 90px 1fr; gap: 14px; margin-bottom: 16px; align-items: start; }
+    .twk { background: #d63031; color: white; border-radius: 8px; padding: 8px 4px; text-align: center; font-size: 12px; font-weight: 700; line-height: 1.3; }
+    .ttasks { background: #f7f7f9; border-radius: 8px; padding: 14px 16px; }
+    .ttasks h4 { font-size: 13px; font-weight: 700; color: #1a1a1a; margin-bottom: 8px; }
+    .ttasks ul { list-style: none; padding: 0; }
+    .ttasks ul li { font-size: 13px; color: #555; padding: 3px 0 3px 18px; position: relative; }
+    .ttasks ul li::before { content: '→'; position: absolute; left: 0; color: #d63031; }
+
+    /* ── SCORE BARS ── */
+    .sbar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .sbar-lbl { width: 190px; font-size: 13px; color: #333; flex-shrink: 0; }
+    .sbar-bg { flex: 1; background: #eee; border-radius: 20px; height: 10px; }
+    .sbar-fill { background: linear-gradient(90deg, #d63031, #e74c3c); border-radius: 20px; height: 10px; }
+    .sbar-num { width: 55px; text-align: right; font-size: 13px; font-weight: 700; color: #d63031; }
+
+    /* ── MARKET COMPARE ── */
+    .mkt { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+    @media (max-width: 650px) { .mkt { grid-template-columns: 1fr; } }
+    .mkt-col { border-radius: 10px; padding: 20px; }
+    .mkt-exists { background: #f0f4ff; border: 1px solid #2980b9; }
+    .mkt-unique { background: #fff5f5; border: 1px solid #d63031; }
+    .mkt-col h4 { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+    .mkt-exists h4 { color: #1a5a8a; }
+    .mkt-unique h4 { color: #922b21; }
+    .mkt-col ul { list-style: none; padding: 0; }
+    .mkt-col ul li { font-size: 13px; color: #444; padding: 4px 0 4px 20px; position: relative; }
+    .mkt-exists ul li::before { content: '✓'; position: absolute; left: 0; color: #2980b9; font-weight: 700; }
+    .mkt-unique ul li::before { content: '★'; position: absolute; left: 0; color: #d63031; }
+
+    /* ── VERDICT ── */
+    .verdict { background: linear-gradient(135deg, #d63031 0%, #922b21 100%); color: white; border-radius: 14px; padding: 36px; margin: 24px 0; text-align: center; }
+    .verdict h3 { font-size: 26px; font-weight: 800; margin-bottom: 10px; }
+    .verdict p { font-size: 15px; opacity: 0.9; max-width: 600px; margin: 0 auto; line-height: 1.6; }
+
+    p { font-size: 14px; color: #333; margin-bottom: 12px; }
+    p:last-child { margin-bottom: 0; }
+    ul.plain { list-style: none; padding: 0; margin: 10px 0; }
+    ul.plain li { font-size: 14px; color: #333; padding: 4px 0 4px 20px; position: relative; }
+    ul.plain li::before { content: '→'; position: absolute; left: 0; color: #d63031; }
+    h3 { font-size: 16px; font-weight: 700; color: #1a1a1a; margin: 20px 0 10px; }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════
+     HERO HEADER
+═════════════════════════════════════════════════════ -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="idea-badge">Storage Defender · Innovation Tank · Idea 5</div>
+    <h1>AI Gateway Connectivity Monitor<br>&amp; Security Alert System</h1>
+    <p class="tagline">Know when your security infrastructure goes dark — before tenants and thieves do.</p>
+    <div class="hero-chips">
+      <div class="chip"><div class="n">85</div><div class="l">/ 100</div></div>
+      <div class="chip"><div class="n">30</div><div class="l">Day Pilot</div></div>
+      <div class="chip"><div class="n">15/15</div><div class="l">Customer Value</div></div>
+      <div class="chip award"><div class="n">🏆 Best Customer Trust Innovation</div><div class="l">Idea 5 Award</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ════════════════════════════════════════════════════
+     SECTION 1 — PLAIN ENGLISH
+═════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="sec-hdr">
+    <div class="sec-num">1</div>
+    <h2>Plain English: The "Dark Moment" Problem</h2>
+  </div>
+
+  <p>Every camera and smart device at a Storage Defender facility talks to a <strong>gateway</strong>. That gateway is the bridge between your physical security hardware and the cloud. Right now, if a gateway goes completely silent — due to a power cut, internet outage, or someone physically disrupting it — <strong>nobody at SD gets automatically notified</strong>. The FM only finds out when a tenant calls to say their access doesn't work, or worse, when they arrive at the facility and find a break-in.</p>
+
+  <div class="callout yellow">
+    <strong>The most dangerous moment in storage facility security</strong> is not when an alarm goes off — it's the 15-minute window when security silently stops working and nobody knows. A motivated burglar who disables your gateway has a clean runway.
+  </div>
+
+  <p>Idea 5 fixes this by turning the gateway's silence into its own alert. Every 60 seconds, a background job asks: "Have we heard from each gateway recently?" If the answer is no for 5+ minutes, the system wakes up, analyzes <em>why</em> it might have gone offline, and sends a smart alert to exactly the right person — with an escalation ladder if nobody responds.</p>
+
+  <div class="g2">
+    <div class="card">
+      <h4>What Triggers This</h4>
+      <ul>
+        <li>Power cut to the facility</li>
+        <li>Internet/network outage</li>
+        <li>Someone uses a signal jamming device (chammer)</li>
+        <li>Gateway hardware failure or shutdown</li>
+        <li>Physical tampering or disconnection</li>
+        <li>Any event causing loss of cloud communication</li>
+      </ul>
+    </div>
+    <div class="card green">
+      <h4>What Happens Next</h4>
+      <ul>
+        <li>Detect silence within 60 seconds</li>
+        <li>Wait 5 minutes to confirm (not a blip)</li>
+        <li>Analyze context: was there motion right before it died?</li>
+        <li>AI classifies the outage type and risk level</li>
+        <li>Alert sent to the assigned Facility Manager</li>
+        <li>Escalate to secondary contacts if no acknowledgment</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout green">
+    <strong>The user's insight is correct:</strong> The gateway already sends heartbeat/communication data. The <code>lastContactedAt</code> field exists today in the SD GraphQL API. This idea is not about building new hardware — it's about <em>listening to data that's already there and acting on it intelligently</em>.
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SECTION 2 — MARKET REALITY CHECK
+═════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="sec-hdr">
+    <div class="sec-num">2</div>
+    <h2>Market Reality Check: Is This Already Done?</h2>
+  </div>
+
+  <p>Honest answer: <strong>basic gateway offline alerts exist in the market.</strong> Verkada, Eagle Eye Networks, and Avigilon all send a "device offline" email. But here's what none of them do — and what makes SD's version genuinely novel:</p>
+
+  <div class="mkt">
+    <div class="mkt-col mkt-exists">
+      <h4>✓ Already Exists in Market (Basic)</h4>
+      <ul>
+        <li>Verkada: sends email when camera goes offline</li>
+        <li>Eagle Eye: device health dashboard with offline status</li>
+        <li>Avigilon: VMS health alerts for disconnected cameras</li>
+        <li>OpenEye (storage-focused): basic camera offline notification</li>
+        <li>Generic IoT platforms: heartbeat ping + simple alert</li>
+      </ul>
+    </div>
+    <div class="mkt-col mkt-unique">
+      <h4>★ What SD's Version Adds (Novel)</h4>
+      <ul>
+        <li><strong>Pre-outage motion burst detection</strong> — did someone trigger activity 0–5 min before the gateway died?</li>
+        <li><strong>Jamming pattern recognition</strong> — 2+ gateways offline simultaneously = jamming probability score</li>
+        <li><strong>Outage type classification</strong> — power cut vs. network vs. jamming vs. hardware failure</li>
+        <li><strong>PMS tenant context</strong> — was a high-risk or delinquent tenant in the zone at time of outage?</li>
+        <li><strong>FM assignment + acknowledgment escalation</strong> — tracks whether FM responded and escalates to secondary</li>
+        <li><strong>AI-generated narrative</strong> — plain English summary of what happened and what to do</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout blue">
+    <strong>The jamming angle is real:</strong> RF signal jammers ("chammers") are used in real storage facility break-ins. Attackers block WiFi/cellular frequency to disable cameras before entering. No competitor detects this pattern — they just say "device offline." SD can say <em>"3 gateways at Facility A went offline within 90 seconds of each other at 2:14 AM after motion was detected in Zone C — this looks like a jamming attack."</em>
+  </div>
+
+  <div class="callout">
+    <strong>Verdict:</strong> The basic version exists. SD's enhanced version — with pre-outage correlation, jamming detection, PMS cross-reference, and AI classification — is genuinely novel, especially in the self-storage vertical. No direct competitor has this combination.
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SECTION 3 — ARCHITECTURE
+═════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="sec-hdr">
+    <div class="sec-num">3</div>
+    <h2>System Architecture: How It Works</h2>
+  </div>
+
+  <div class="arch">
+    <div class="arch-layer">
+      <div class="arch-icon">⏱️</div>
+      <div class="arch-body">
+        <strong>Layer 1 — Heartbeat Monitor (Cloud Scheduler + Cloud Run)</strong>
+        <p>Runs every 60 seconds. Queries all active gateways. Flags any where <code>lastContactedAt</code> &gt; 10 minutes ago. Writes initial <code>POSSIBLE_OUTAGE</code> event to BigQuery. Deduplicates so existing outages don't re-trigger.</p>
+      </div>
+    </div>
+    <div class="arch-arrow">▼</div>
+
+    <div class="arch-layer">
+      <div class="arch-icon">🔍</div>
+      <div class="arch-body">
+        <strong>Layer 2 — Confirmation Window (5-Minute Hold)</strong>
+        <p>Waits 5 minutes after initial detection, then re-checks. If gateway is back online → mark as recovered, no alert. If still offline → proceed to analysis. This eliminates false alarms from brief network blips (the most common cause of noisy alerts in IoT systems).</p>
+      </div>
+    </div>
+    <div class="arch-arrow">▼</div>
+
+    <div class="arch-layer">
+      <div class="arch-icon">📊</div>
+      <div class="arch-body">
+        <strong>Layer 3 — Pre-Outage Context Analyzer (BigQuery)</strong>
+        <p>Queries three data sources for the 10-minute window before loss: (1) motion/incident events from devices in the same zone, (2) simultaneous outage check — are other gateways at this facility also offline?, (3) time-of-day context — after-hours outage is 3× more suspicious than daytime. Builds a context bundle for classification.</p>
+      </div>
+    </div>
+    <div class="arch-arrow">▼</div>
+
+    <div class="arch-layer">
+      <div class="arch-icon">🤖</div>
+      <div class="arch-body">
+        <strong>Layer 4 — AI Risk Classifier (Claude Sonnet)</strong>
+        <p>Triggered only for SUSPICIOUS or higher risk (based on pre-outage signals). Receives the full context bundle and outputs: outage type, threat level, plain-English summary, and recommended FM action. Uses prompt caching for the system prompt. Cost: ~$0.02–0.08 per alert. Skipped entirely for NORMAL outages (no AI cost for routine blips).</p>
+      </div>
+    </div>
+    <div class="arch-arrow">▼</div>
+
+    <div class="arch-layer">
+      <div class="arch-icon">📣</div>
+      <div class="arch-body">
+        <strong>Layer 5 — Alert Router + Escalation Engine</strong>
+        <p>Routes alert to the FM assigned to the specific gateway (from <code>facility_managers</code> + <code>gateway_assignments</code>). Sends Email (SendGrid) + SMS (Twilio) + Slack. Creates an acknowledgment token with a time window (10 min for CRITICAL, 20 min for ELEVATED). Schedules an escalation check — if no ack within the window, notifies secondary contacts.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout blue">
+    <strong>Key design decision:</strong> The gateway cannot report its own death. If a power cut or jamming device kills it, the gateway can't send an "I'm going offline" message. Detection MUST be cloud-side: "we haven't heard from this gateway in 10 minutes." This is a <em>pull</em> model (cloud polls for silence), not a <em>push</em> model (device reports failure). Most competitors miss this distinction and only support push — meaning they can't detect jamming or power cuts.
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SECTION 4 — TECHNICAL BUILD PLAN
+═════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="sec-hdr">
+    <div class="sec-num">4</div>
+    <h2>Technical Build Plan: Code &amp; Queries</h2>
+  </div>
+
+  <h3>Step 1: Heartbeat Checker — Detect Silent Gateways</h3>
+  <div class="code">
+<span class="c">// Cloud Run job: runs every 60 seconds via Cloud Scheduler</span>
+<span class="k">const</span> { BigQuery } = require(<span class="s">'@google-cloud/bigquery'</span>);
+<span class="k">const</span> bq = <span class="k">new</span> BigQuery();
+
+<span class="k">async function</span> <span class="f">checkGatewayHeartbeats</span>() {
+  <span class="c">// Find gateways silent for 10+ minutes, not already flagged in last 30 min</span>
+  <span class="k">const</span> [rows] = <span class="k">await</span> bq.query(`
+    SELECT
+      d.id                                                 AS gateway_id,
+      d.facility_id,
+      d.name                                               AS gateway_name,
+      d.last_contacted_at,
+      TIMESTAMP_DIFF(CURRENT_TIMESTAMP(), d.last_contacted_at, MINUTE)
+                                                           AS minutes_silent,
+      f.name                                               AS facility_name,
+      f.timezone
+    FROM \`tod_backoffice.devices\` d
+    JOIN \`tod_backoffice.facilities\` f
+      ON f.id = d.facility_id
+    WHERE d.type = <span class="s">'gateway'</span>
+      AND d.is_active = TRUE
+      AND d.last_contacted_at &lt; TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 10 MINUTE)
+      AND NOT EXISTS (
+        SELECT 1
+        FROM \`sd_monitoring.gateway_outage_events\` e
+        WHERE e.gateway_id = d.id
+          AND e.detected_at &gt; TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 MINUTE)
+          AND e.status IN ('CONFIRMED','ALERTING','RECOVERED')
+      )
+  `);
+
+  <span class="k">for</span> (<span class="k">const</span> gw <span class="k">of</span> rows) {
+    <span class="c">// Write initial event — status PENDING (5-min confirmation hold)</span>
+    <span class="k">await</span> <span class="f">writeOutageEvent</span>({
+      gateway_id:   gw.gateway_id,
+      facility_id:  gw.facility_id,
+      detected_at:  <span class="k">new</span> Date().toISOString(),
+      minutes_silent: gw.minutes_silent,
+      status:       <span class="s">'PENDING'</span>,
+      facility_name: gw.facility_name,
+      timezone:     gw.timezone
+    });
+
+    <span class="c">// Schedule confirmation check in 5 minutes</span>
+    <span class="k">await</span> <span class="f">scheduleConfirmation</span>(gw.gateway_id, <span class="n">5 * 60 * 1000</span>);
+  }
+}
+  </div>
+
+  <h3>Step 2: Pre-Outage Context — What Happened Before the Silence?</h3>
+  <div class="code">
+<span class="k">async function</span> <span class="f">analyzePreOutageContext</span>(gatewayId, facilityId, lossTime) {
+  <span class="k">const</span> lossTs = <span class="k">new</span> Date(lossTime).toISOString();
+
+  <span class="c">// Query 1: Motion/activity events in 10 min before loss</span>
+  <span class="k">const</span> [motionEvents] = <span class="k">await</span> bq.query({
+    query: `
+      SELECT
+        i.id, i.device_id, i.zone_id, i.event_type, i.occurred_at,
+        TIMESTAMP_DIFF(@loss_time, i.occurred_at, MINUTE) AS mins_before_loss
+      FROM \`tod_backoffice.incidents\` i
+      WHERE i.facility_id = @facility_id
+        AND i.occurred_at BETWEEN TIMESTAMP_SUB(@loss_time, INTERVAL 10 MINUTE)
+                               AND @loss_time
+        AND i.event_type IN (
+          <span class="s">'motion_detected'</span>, <span class="s">'door_access'</span>, <span class="s">'alarm_triggered'</span>, <span class="s">'zone_entry'</span>
+        )
+      ORDER BY i.occurred_at DESC
+    `,
+    params: { facility_id: facilityId, loss_time: lossTs }
+  });
+
+  <span class="c">// Query 2: Other gateways at same facility going offline within ±3 minutes</span>
+  <span class="k">const</span> [simultaneousOutages] = <span class="k">await</span> bq.query({
+    query: `
+      SELECT COUNT(*) AS count
+      FROM \`sd_monitoring.gateway_outage_events\`
+      WHERE facility_id = @facility_id
+        AND gateway_id != @gateway_id
+        AND detected_at BETWEEN TIMESTAMP_SUB(@loss_time, INTERVAL 3 MINUTE)
+                             AND TIMESTAMP_ADD(@loss_time, INTERVAL 3 MINUTE)
+    `,
+    params: { facility_id: facilityId, gateway_id: gatewayId, loss_time: lossTs }
+  });
+
+  <span class="c">// Query 3: Gateway outage history (is this normal or unusual?)</span>
+  <span class="k">const</span> [history] = <span class="k">await</span> bq.query({
+    query: `
+      SELECT COUNT(*) AS outage_count_30d
+      FROM \`sd_monitoring.gateway_outage_events\`
+      WHERE gateway_id = @gateway_id
+        AND detected_at &gt; TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 DAY)
+        AND status = <span class="s">'CONFIRMED'</span>
+    `,
+    params: { gateway_id: gatewayId }
+  });
+
+  <span class="k">const</span> lossHour = <span class="k">new</span> Date(lossTime).getHours();
+  <span class="k">const</span> isAfterHours = lossHour &lt;= <span class="n">6</span> || lossHour &gt;= <span class="n">22</span>;
+
+  <span class="k">return</span> {
+    motion_events_before_loss: motionEvents,
+    motion_burst_count:        motionEvents.filter(e =&gt; e.mins_before_loss &lt;= <span class="n">5</span>).length,
+    simultaneous_outages:      simultaneousOutages[<span class="n">0</span>].count,
+    outage_count_30d:          history[<span class="n">0</span>].outage_count_30d,
+    is_after_hours:            isAfterHours,
+    loss_hour:                 lossHour
+  };
+}
+  </div>
+
+  <h3>Step 3: Risk Classifier — Score the Threat Level</h3>
+  <div class="code">
+<span class="k">function</span> <span class="f">classifyOutageRisk</span>(context) {
+  <span class="k">let</span> score = <span class="n">0</span>;
+  <span class="k">const</span> signals = [];
+
+  <span class="c">// Signal 1: Pre-outage motion burst (strongest indicator of intentional attack)</span>
+  <span class="k">if</span> (context.motion_burst_count &gt;= <span class="n">3</span>) {
+    score += <span class="n">35</span>;
+    signals.push(`${context.motion_burst_count} motion events in last 5 min before loss`);
+  } <span class="k">else if</span> (context.motion_burst_count &gt;= <span class="n">1</span>) {
+    score += <span class="n">15</span>;
+    signals.push(`${context.motion_burst_count} motion event(s) before loss`);
+  }
+
+  <span class="c">// Signal 2: Multiple gateways offline simultaneously → jamming pattern</span>
+  <span class="k">if</span> (context.simultaneous_outages &gt;= <span class="n">2</span>) {
+    score += <span class="n">30</span>;
+    signals.push(`${context.simultaneous_outages + 1} gateways offline simultaneously — POSSIBLE JAMMING`);
+  } <span class="k">else if</span> (context.simultaneous_outages === <span class="n">1</span>) {
+    score += <span class="n">15</span>;
+    signals.push(<span class="s">'2 gateways offline in same window — possible coordinated disruption'</span>);
+  }
+
+  <span class="c">// Signal 3: After-hours outage (10pm–6am)</span>
+  <span class="k">if</span> (context.is_after_hours) {
+    score += <span class="n">20</span>;
+    signals.push(`After-hours outage at ${context.loss_hour}:00 — elevated risk window`);
+  }
+
+  <span class="c">// Signal 4: No history of outages → unusual / first-time event</span>
+  <span class="k">if</span> (context.outage_count_30d === <span class="n">0</span>) {
+    score += <span class="n">10</span>;
+    signals.push(<span class="s">'No outages in past 30 days — gateway was stable'</span>);
+  }
+
+  <span class="c">// Outage type classification from signal pattern</span>
+  <span class="k">let</span> outage_type;
+  <span class="k">if</span> (context.simultaneous_outages &gt;= <span class="n">2</span>) {
+    outage_type = <span class="s">'POSSIBLE_JAMMING'</span>;
+  } <span class="k">else if</span> (context.simultaneous_outages === <span class="n">1</span>) {
+    <span class="c">// Both gateways + facility-wide → more likely power/network than jamming</span>
+    outage_type = score &gt;= <span class="n">35</span> ? <span class="s">'POSSIBLE_JAMMING'</span> : <span class="s">'NETWORK_OR_POWER'</span>;
+  } <span class="k">else if</span> (context.motion_burst_count &gt;= <span class="n">3</span>) {
+    outage_type = <span class="s">'SUSPICIOUS_TARGETED'</span>;
+  } <span class="k">else</span> {
+    outage_type = <span class="s">'DEVICE_OR_NETWORK_FAILURE'</span>;
+  }
+
+  <span class="k">const</span> risk_level =
+    score &gt;= <span class="n">60</span> ? <span class="s">'CRITICAL'</span>  :
+    score &gt;= <span class="n">35</span> ? <span class="s">'ELEVATED'</span>  :
+    score &gt;= <span class="n">15</span> ? <span class="s">'SUSPICIOUS'</span> : <span class="s">'NORMAL'</span>;
+
+  <span class="k">return</span> { score, risk_level, outage_type, signals,
+           trigger_claude: score &gt;= <span class="n">15</span> };
+}
+  </div>
+
+  <h3>Step 4: Acknowledgment &amp; Escalation Logic</h3>
+  <div class="code">
+<span class="k">async function</span> <span class="f">sendAlertWithEscalation</span>(outageEvent, classification, fm, secondaryContacts) {
+  <span class="k">const</span> ackWindowMin = classification.risk_level === <span class="s">'CRITICAL'</span>  ? <span class="n">10</span>
+                      : classification.risk_level === <span class="s">'ELEVATED'</span>  ? <span class="n">15</span>
+                      : <span class="n">20</span>;
+
+  <span class="c">// Build personalized alert message based on risk level</span>
+  <span class="k">const</span> ackToken = <span class="k">await</span> <span class="f">createAckToken</span>(outageEvent.id, fm.id, ackWindowMin);
+  <span class="k">const</span> alertPayload = <span class="f">buildAlertPayload</span>(outageEvent, classification, fm, ackToken);
+
+  <span class="c">// Send via all channels simultaneously</span>
+  <span class="k">await</span> Promise.all([
+    <span class="f">sendEmail</span>(fm.email, alertPayload),       <span class="c">// SendGrid template</span>
+    <span class="f">sendSMS</span>(fm.phone, alertPayload.sms_body),  <span class="c">// Twilio</span>
+    <span class="f">sendSlack</span>(fm.slack_channel, alertPayload), <span class="c">// Slack webhook</span>
+    <span class="f">createBackofficeNotification</span>(fm.user_id, alertPayload) <span class="c">// BackOffice API</span>
+  ]);
+
+  <span class="c">// Log alert event</span>
+  <span class="k">await</span> <span class="f">writeAlertLog</span>({ outage_event_id: outageEvent.id, fm_id: fm.id,
+    sent_at: <span class="k">new</span> Date(), ack_token: ackToken, ack_deadline_min: ackWindowMin });
+
+  <span class="c">// Schedule escalation check</span>
+  setTimeout(<span class="k">async</span> () =&gt; {
+    <span class="k">const</span> ack = <span class="k">await</span> <span class="f">checkAckStatus</span>(ackToken);
+    <span class="k">if</span> (!ack.acknowledged) {
+      <span class="c">// FM did not respond — escalate to all secondary contacts</span>
+      <span class="k">for</span> (<span class="k">const</span> contact <span class="k">of</span> secondaryContacts) {
+        <span class="k">await</span> Promise.all([
+          <span class="f">sendEmail</span>(contact.email, <span class="f">buildEscalationPayload</span>(outageEvent, classification, fm)),
+          <span class="f">sendSMS</span>(contact.phone, <span class="f">buildEscalationSMS</span>(outageEvent, fm))
+        ]);
+      }
+      <span class="k">await</span> <span class="f">writeEscalationLog</span>({ outage_event_id: outageEvent.id, escalated_at: <span class="k">new</span> Date() });
+    }
+  }, ackWindowMin * <span class="n">60 * 1000</span>);
+}
+  </div>
+
+  <h3>New BigQuery Tables Needed</h3>
+  <div class="code">
+<span class="c">-- Table 1: Track each detected outage event</span>
+CREATE TABLE <span class="t">`sd_monitoring.gateway_outage_events`</span> (
+  id              STRING NOT NULL,
+  gateway_id      STRING NOT NULL,
+  facility_id     STRING NOT NULL,
+  detected_at     TIMESTAMP NOT NULL,
+  confirmed_at    TIMESTAMP,
+  resolved_at     TIMESTAMP,
+  minutes_silent  INT64,
+  risk_level      STRING,            <span class="c">-- NORMAL | SUSPICIOUS | ELEVATED | CRITICAL</span>
+  outage_type     STRING,            <span class="c">-- POSSIBLE_JAMMING | NETWORK_OR_POWER | etc.</span>
+  risk_score      INT64,
+  pre_outage_motion_count INT64,
+  simultaneous_outages    INT64,
+  is_after_hours  BOOL,
+  claude_summary  STRING,
+  status          STRING             <span class="c">-- PENDING | CONFIRMED | ALERTING | RECOVERED</span>
+);
+
+<span class="c">-- Table 2: Alert and escalation tracking</span>
+CREATE TABLE <span class="t">`sd_monitoring.gateway_alert_log`</span> (
+  id               STRING NOT NULL,
+  outage_event_id  STRING NOT NULL,
+  fm_user_id       STRING NOT NULL,
+  sent_at          TIMESTAMP NOT NULL,
+  ack_token        STRING,
+  acknowledged_at  TIMESTAMP,
+  escalated_at     TIMESTAMP,
+  channels_used    ARRAY&lt;STRING&gt;     <span class="c">-- ['email','sms','slack','backoffice']</span>
+);
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SECTION 5 — CLAUDE DEEP DIVE
+═════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="sec-hdr">
+    <div class="sec-num">5</div>
+    <h2>Claude AI Deep Dive: What It Does &amp; When</h2>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <h4>When Claude Triggers</h4>
+      <ul>
+        <li>Risk score ≥ 15 (SUSPICIOUS or higher) only</li>
+        <li>NORMAL outages: no Claude call — zero AI cost</li>
+        <li>~$0.02–0.08 per SUSPICIOUS/ELEVATED/CRITICAL alert</li>
+        <li>Estimated: $3–8/month total across all facilities</li>
+        <li>Uses prompt caching — system prompt never re-sent</li>
+      </ul>
+    </div>
+    <div class="card green">
+      <h4>What Claude Receives</h4>
+      <ul>
+        <li>Gateway location, zone, facility name</li>
+        <li>Minutes silent and time of day</li>
+        <li>Number and types of motion events before loss</li>
+        <li>Simultaneous outage count (jamming indicator)</li>
+        <li>Gateway's 30-day outage history</li>
+        <li>Risk score and signals already computed</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>System Prompt (with Prompt Caching)</h3>
+  <div class="code">
+<span class="k">const</span> systemPrompt = {
+  role: <span class="s">'user'</span>,
+  content: [{
+    type: <span class="s">'text'</span>,
+    text: <span class="s">`You are an AI security analyst for Storage Defender, a self-storage facility monitoring company.
+
+Your job: Analyze gateway connectivity outages and classify their security risk for non-technical Facility Managers.
+
+Rules:
+- NEVER invent motion events or data not provided to you
+- NEVER include tenant names, personal info, or unit numbers unless provided
+- NEVER suggest police intervention unless risk_level is CRITICAL and signals clearly indicate intentional attack
+- Keep summaries under 60 words — FMs read these at 2am on a phone
+- Output valid JSON only — no commentary outside the JSON block
+
+Output format:
+{
+  "threat_level": "NORMAL | SUSPICIOUS | ELEVATED | CRITICAL",
+  "outage_classification": "POWER_FAILURE | NETWORK_OUTAGE | POSSIBLE_JAMMING | DEVICE_FAILURE | UNKNOWN",
+  "confidence_pct": 0-100,
+  "summary": "2-3 sentence plain English summary",
+  "recommended_action": "Specific immediate action for the FM",
+  "escalate_to_police": true/false,
+  "recovery_check_in_min": 15
+}`</span>,
+    cache_control: { type: <span class="s">'ephemeral'</span> }
+  }]
+};
+
+<span class="k">const</span> userMessage = {
+  role: <span class="s">'user'</span>,
+  content: `
+GATEWAY OUTAGE EVENT — ANALYSIS REQUESTED
+
+Facility: ${facility.name}
+Gateway: ${gateway.name} (Zone: ${gateway.zone_label})
+Time of Loss: ${lossTime} (${isAfterHours ? 'AFTER HOURS' : 'BUSINESS HOURS'})
+Minutes Silent: ${minutesSilent}
+
+Pre-Outage Activity (last 10 minutes):
+${motionEvents.length === 0
+  ? 'No motion or access events detected before loss.'
+  : motionEvents.map(e =>
+    `  - ${e.event_type} at ${e.occurred_at} (${e.mins_before_loss} min before loss)`
+  ).join('\n')}
+
+Simultaneous Outages at This Facility: ${simultaneousOutages}
+Gateway Outages Last 30 Days: ${outageCount30d}
+Computed Risk Score: ${riskScore}/100
+Detected Signals: ${signals.join('; ')}
+`
+};
+  </div>
+
+  <div class="callout green">
+    <strong>Cost control:</strong> On an average day with 200 facilities, maybe 2–5 gateways have suspicious-level outages. At ~$0.05/call, that's under $0.25/day = ~$7/month. NORMAL outages (the majority) bypass Claude entirely — you only pay for AI when the risk actually warrants it.
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SECTION 6 — SAMPLE ALERT OUTPUTS
+═════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="sec-hdr">
+    <div class="sec-num">6</div>
+    <h2>Sample Alert Outputs: What the FM Receives</h2>
+  </div>
+
+  <h3>CRITICAL Alert — Possible Jamming Attack (2:14 AM)</h3>
+  <div class="alert-mock">
+    <div class="am-h">🚨 CRITICAL — Gateway Communication Lost · Facility: Midtown Storage A</div>
+    <div class="am-lbl">STATUS</div>
+    <div class="am-val am-crit">⛔ CRITICAL — Possible Jamming Attack</div>
+    <div class="am-lbl">GATEWAY</div>
+    <div class="am-val">GW-07 · Zone C (Building 2 Entry) · Offline since 02:14 AM</div>
+    <div class="am-lbl">SIMULTANEOUS OUTAGES</div>
+    <div class="am-val am-crit">3 gateways offline within 90 seconds — JAMMING PATTERN DETECTED</div>
+    <div class="am-lbl">PRE-OUTAGE ACTIVITY</div>
+    <div class="am-val">5 motion events in Zone C between 02:09–02:14 AM</div>
+    <div class="am-lbl">AI ANALYSIS</div>
+    <div class="am-ai">
+      Three gateways at your facility went offline simultaneously at 2:14 AM following motion activity in Zone C. This pattern is consistent with a signal jamming device being used to disable security before an intrusion. Physical presence at the facility is not advised without law enforcement.
+      <br><br>
+      <strong>Recommended action: Call police immediately and do not enter the facility alone.</strong>
+      <br>Confidence: 87%
+    </div>
+    <div class="am-lbl">ACKNOWLEDGE BY</div>
+    <div class="am-val am-warn">02:24 AM · Reply CONFIRM to this SMS or click the link below</div>
+    <div class="am-lbl">ESCALATION</div>
+    <div class="am-val">If unacknowledged, Mike Johnson + Regional Manager will be notified at 02:24 AM</div>
+  </div>
+
+  <h3>ELEVATED Alert — Suspicious After-Hours Outage (11:45 PM)</h3>
+  <div class="alert-mock">
+    <div class="am-h">⚠️ ELEVATED — Gateway Communication Lost · Facility: Westside Units B</div>
+    <div class="am-lbl">STATUS</div>
+    <div class="am-val am-warn">⚠️ ELEVATED — Suspicious Timing</div>
+    <div class="am-lbl">GATEWAY</div>
+    <div class="am-val">GW-02 · Main Building · Offline since 11:45 PM</div>
+    <div class="am-lbl">PRE-OUTAGE ACTIVITY</div>
+    <div class="am-val">1 door access event at 11:42 PM (3 min before loss)</div>
+    <div class="am-lbl">HISTORY</div>
+    <div class="am-val am-ok">Gateway was stable for 30+ days — this is unusual</div>
+    <div class="am-lbl">AI ANALYSIS</div>
+    <div class="am-ai">
+      The main building gateway lost contact at 11:45 PM, three minutes after a door access event. The gateway has been fully stable for 30+ days, making this outage unusual. This may be a network issue but the timing and after-hours context warrant a check.
+      <br><br>
+      <strong>Recommended action: Check facility remotely if possible. If you cannot restore contact in 20 minutes, send someone to inspect.</strong>
+      <br>Confidence: 62%
+    </div>
+    <div class="am-lbl">ACKNOWLEDGE BY</div>
+    <div class="am-val">12:00 AM · 15-minute window</div>
+  </div>
+
+  <h3>NORMAL Alert — Routine Outage (2:15 PM, business hours)</h3>
+  <div class="alert-mock">
+    <div class="am-h">ℹ️ NOTICE — Gateway Communication Lost · Facility: Harbor Storage</div>
+    <div class="am-lbl">STATUS</div>
+    <div class="am-val am-ok">ℹ️ NORMAL — Likely network or power issue</div>
+    <div class="am-lbl">GATEWAY</div>
+    <div class="am-val">GW-01 · Office Building · Offline since 2:15 PM</div>
+    <div class="am-lbl">CONTEXT</div>
+    <div class="am-val">Business hours · No pre-outage activity · 3 outages this month (history of connectivity issues)</div>
+    <div class="am-lbl">AI ANALYSIS</div>
+    <div class="am-val">Not triggered — no AI cost for routine outages</div>
+    <div class="am-lbl">RECOMMENDED ACTION</div>
+    <div class="am-val">Check router/power at facility. This gateway has a history of intermittent connectivity — consider hardware replacement.</div>
+    <div class="am-lbl">ACKNOWLEDGE BY</div>
+    <div class="am-val">2:35 PM · 20-minute window</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SECTION 7 — RISK CLASSIFICATION SYSTEM
+═════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="sec-hdr">
+    <div class="sec-num">7</div>
+    <h2>Risk Classification System: The Four Bands</h2>
+  </div>
+
+  <div class="risk-grid">
+    <div class="rband low">
+      <div class="rl">Normal</div>
+      <div class="rs">0–14</div>
+      <div class="ra">Daytime · No prior activity · Repeat offender gateway<br><br>→ Email only · 20-min ack window · No AI cost</div>
+    </div>
+    <div class="rband sus">
+      <div class="rl">Suspicious</div>
+      <div class="rs">15–34</div>
+      <div class="ra">After-hours OR light motion before loss<br><br>→ Email + SMS · Claude triggered · 20-min ack window</div>
+    </div>
+    <div class="rband elev">
+      <div class="rl">Elevated</div>
+      <div class="rs">35–59</div>
+      <div class="ra">After-hours + motion burst OR 2 gateways down<br><br>→ Email + SMS + Slack · Claude triggered · 15-min ack window</div>
+    </div>
+    <div class="rband crit">
+      <div class="rl">Critical</div>
+      <div class="rs">60–100</div>
+      <div class="ra">Jamming pattern (3+ simultaneous) + motion burst<br><br>→ All channels · Claude triggered · 10-min ack window · Police recommendation</div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>Signal</th><th>Points</th><th>Why It Matters</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>3+ motion events in 5 min before loss</td>
+        <td>+35</td>
+        <td>Strong indicator someone was physically active in the zone before disabling security</td>
+      </tr>
+      <tr>
+        <td>2+ gateways offline simultaneously (±3 min)</td>
+        <td>+30</td>
+        <td>RF jammers disable all wireless devices in range at once — this is the clearest jamming signature</td>
+      </tr>
+      <tr>
+        <td>After-hours outage (10pm–6am)</td>
+        <td>+20</td>
+        <td>Break-ins at storage facilities are overwhelmingly after-hours — time multiplies risk</td>
+      </tr>
+      <tr>
+        <td>1–2 gateways offline simultaneously</td>
+        <td>+15</td>
+        <td>Possible coordinated disruption or facility-wide power issue — worth investigating</td>
+      </tr>
+      <tr>
+        <td>1–2 motion events before loss</td>
+        <td>+15</td>
+        <td>Minor correlation — could be normal activity or early-stage intrusion</td>
+      </tr>
+      <tr>
+        <td>No outage history in 30 days</td>
+        <td>+10</td>
+        <td>Stable gateways don't randomly fail — unusual silence is a data point</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SECTION 8 — ACCESS & PERMISSIONS
+═════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="sec-hdr">
+    <div class="sec-num">8</div>
+    <h2>Access &amp; Permissions Needed</h2>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>Resource</th><th>Access Needed</th><th>Purpose</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>tod_backoffice.devices</strong></td>
+        <td>BigQuery READ</td>
+        <td>Query gateways with <code>last_contacted_at</code> — field already exists in schema</td>
+        <td>✓ Field confirmed in existing GraphQL API</td>
+      </tr>
+      <tr>
+        <td><strong>tod_backoffice.incidents</strong></td>
+        <td>BigQuery READ</td>
+        <td>Query motion/access events in pre-outage window</td>
+        <td>✓ Existing table</td>
+      </tr>
+      <tr>
+        <td><strong>tod_backoffice.facilities</strong></td>
+        <td>BigQuery READ</td>
+        <td>Facility name, timezone for alert messages</td>
+        <td>✓ Existing table</td>
+      </tr>
+      <tr>
+        <td><strong>tod_backoffice.users / facility_managers</strong></td>
+        <td>BigQuery READ</td>
+        <td>FM contact info (email, phone, Slack ID) and gateway assignments</td>
+        <td>⚠️ Confirm table name and FM-to-gateway mapping schema</td>
+      </tr>
+      <tr>
+        <td><strong>sd_monitoring.gateway_outage_events</strong></td>
+        <td>BigQuery WRITE (new dataset)</td>
+        <td>Write detected outages, risk scores, Claude summaries</td>
+        <td>🔧 New table — needs dataset creation approval</td>
+      </tr>
+      <tr>
+        <td><strong>sd_monitoring.gateway_alert_log</strong></td>
+        <td>BigQuery WRITE (new dataset)</td>
+        <td>Audit log of alerts sent and acknowledgments received</td>
+        <td>🔧 New table</td>
+      </tr>
+      <tr>
+        <td><strong>Cloud Scheduler</strong></td>
+        <td>Create new job</td>
+        <td>Trigger heartbeat checker every 60 seconds via Cloud Run URL</td>
+        <td>🔧 New scheduler job — DevOps approval</td>
+      </tr>
+      <tr>
+        <td><strong>Twilio SMS</strong></td>
+        <td>Existing credentials</td>
+        <td>SMS alerts to FMs and secondary contacts</td>
+        <td>✓ Already used in SD (Idea 4 infrastructure)</td>
+      </tr>
+      <tr>
+        <td><strong>SendGrid Email</strong></td>
+        <td>Existing credentials + new template</td>
+        <td>Email alerts with HTML formatting and ack link</td>
+        <td>✓ Already used — new template needed</td>
+      </tr>
+      <tr>
+        <td><strong>Slack Webhooks</strong></td>
+        <td>Existing credentials</td>
+        <td>Slack alert to FM's channel or workspace</td>
+        <td>✓ Already used in SD</td>
+      </tr>
+      <tr>
+        <td><strong>BackOffice API createNotification()</strong></td>
+        <td>Internal API call</td>
+        <td>In-app notification in BackOffice portal</td>
+        <td>⚠️ Confirm notification type/category for gateway alerts</td>
+      </tr>
+      <tr>
+        <td><strong>Anthropic API (Claude Sonnet)</strong></td>
+        <td>Existing API key</td>
+        <td>AI outage classification — ~$3–8/month</td>
+        <td>✓ Already used in other SD ideas</td>
+      </tr>
+      <tr>
+        <td><strong>Secret Manager</strong></td>
+        <td>Read</td>
+        <td>Store Twilio, SendGrid, Anthropic credentials</td>
+        <td>✓ Already configured for other services</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout yellow">
+    <strong>Critical blocker #1:</strong> Confirm the FM-to-gateway assignment schema. Where does SD store which Facility Manager is responsible for which gateway? This drives the entire routing logic. If this mapping doesn't exist, it needs to be created (or defaulted to facility-level assignment) before anything can route correctly.
+  </div>
+  <div class="callout orange">
+    <strong>Critical blocker #2:</strong> Confirm <code>last_contacted_at</code> is updated in near real-time (every 1–5 minutes) by gateway communication. If it only updates hourly or on events, the 10-minute threshold needs to be adjusted accordingly.
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SECTION 9 — TIMELINE (30 DAYS)
+═════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="sec-hdr">
+    <div class="sec-num">9</div>
+    <h2>30-Day Pilot Timeline — Fastest of All 5 Ideas</h2>
+  </div>
+
+  <div class="callout green">
+    <strong>Why this is the fastest to pilot:</strong> The <code>lastContactedAt</code> field already exists. Motion event data already exists. Notification infrastructure (Twilio, SendGrid, Slack) is already in place from existing SD systems. The only new work is: (1) the heartbeat polling job, (2) the risk classifier, (3) the alert routing logic. No new hardware, no new data pipelines.
+  </div>
+
+  <div class="tline">
+    <div class="trow">
+      <div class="twk">Week 1<br>Days 1–7</div>
+      <div class="ttasks">
+        <h4>Data Validation &amp; Setup (BLOCKED on confirmations)</h4>
+        <ul>
+          <li>Confirm <code>last_contacted_at</code> update frequency with backend team</li>
+          <li>Confirm FM-to-gateway assignment table/schema</li>
+          <li>Confirm <code>incidents</code> table has motion event types needed</li>
+          <li>Create <code>sd_monitoring</code> BigQuery dataset + tables</li>
+          <li>Test query: find any gateway silent for 10+ min in past 30 days (baseline)</li>
+          <li>Document 5 sample gateways for pilot testing group</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="trow">
+      <div class="twk">Week 2<br>Days 8–14</div>
+      <div class="ttasks">
+        <h4>Core Engine Build</h4>
+        <ul>
+          <li>Build <code>checkGatewayHeartbeats()</code> Cloud Run job</li>
+          <li>Implement 5-minute confirmation hold logic</li>
+          <li>Build <code>analyzePreOutageContext()</code> with 3 BigQuery queries</li>
+          <li>Build <code>classifyOutageRisk()</code> scoring function</li>
+          <li>Unit test classifier with 10 historical outage scenarios</li>
+          <li>Set up Cloud Scheduler job (60-second interval)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="trow">
+      <div class="twk">Week 3<br>Days 15–21</div>
+      <div class="ttasks">
+        <h4>Claude Integration &amp; Alert Routing</h4>
+        <ul>
+          <li>Implement Claude API call with prompt caching</li>
+          <li>Test Claude output quality on 5 real historical scenarios</li>
+          <li>Build SendGrid email template (3 risk-level variants)</li>
+          <li>Build Twilio SMS messages with ack reply handling</li>
+          <li>Build Slack alert block with risk-level colour coding</li>
+          <li>Implement acknowledgment token + escalation scheduler</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="trow">
+      <div class="twk">Week 4<br>Days 22–30</div>
+      <div class="ttasks">
+        <h4>Pilot Run &amp; Validation (5 Facilities)</h4>
+        <ul>
+          <li>Deploy to 5 pilot facilities (FMs briefed and opted in)</li>
+          <li>Monitor alert volume — target: &lt; 3 false positive escalations/day</li>
+          <li>Collect FM feedback on alert clarity and action clarity</li>
+          <li>Tune confirmation window and risk thresholds based on real data</li>
+          <li>QA: manually trigger test outages and validate end-to-end flow</li>
+          <li>Prepare rollout plan for all facilities</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>Role</th><th>Time Required</th><th>Tasks</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Backend Engineer</td>
+        <td>~80 hours (2 weeks)</td>
+        <td>Heartbeat job, risk classifier, alert router, escalation logic</td>
+      </tr>
+      <tr>
+        <td>Data Engineer</td>
+        <td>~16 hours</td>
+        <td>BigQuery dataset, tables, query optimization</td>
+      </tr>
+      <tr>
+        <td>PM / Product</td>
+        <td>~8 hours</td>
+        <td>FM assignment schema confirmation, pilot FM onboarding, alert copy review</td>
+      </tr>
+      <tr>
+        <td>QA Engineer</td>
+        <td>~12 hours (Week 4)</td>
+        <td>End-to-end test: simulated outage → alert received → escalation fires</td>
+      </tr>
+      <tr>
+        <td>DevOps</td>
+        <td>~6 hours</td>
+        <td>Cloud Scheduler setup, Cloud Run deployment, Secret Manager entries</td>
+      </tr>
+      <tr>
+        <td><strong>Total</strong></td>
+        <td><strong>~122 hours</strong></td>
+        <td>30-day pilot for 5 facilities; full rollout in Week 5–6 if pilot succeeds</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SECTION 10 — FINAL SCORE & VERDICT
+═════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="sec-hdr">
+    <div class="sec-num">10</div>
+    <h2>Final Score &amp; Verdict</h2>
+  </div>
+
+  <div class="score-table">
+    <div class="sbar-row">
+      <div class="sbar-lbl">Revenue Impact</div>
+      <div class="sbar-bg"><div class="sbar-fill" style="width:70%"></div></div>
+      <div class="sbar-num">21 / 30</div>
+    </div>
+    <div class="sbar-row">
+      <div class="sbar-lbl">AI Innovation</div>
+      <div class="sbar-bg"><div class="sbar-fill" style="width:75%"></div></div>
+      <div class="sbar-num">15 / 20</div>
+    </div>
+    <div class="sbar-row">
+      <div class="sbar-lbl">Feasibility</div>
+      <div class="sbar-bg"><div class="sbar-fill" style="width:93%"></div></div>
+      <div class="sbar-num">14 / 15</div>
+    </div>
+    <div class="sbar-row">
+      <div class="sbar-lbl">Customer Value</div>
+      <div class="sbar-bg"><div class="sbar-fill" style="width:100%"></div></div>
+      <div class="sbar-num">15 / 15 ✦</div>
+    </div>
+    <div class="sbar-row">
+      <div class="sbar-lbl">Speed to Pilot</div>
+      <div class="sbar-bg"><div class="sbar-fill" style="width:90%"></div></div>
+      <div class="sbar-num">9 / 10</div>
+    </div>
+    <div class="sbar-row">
+      <div class="sbar-lbl">Scalability</div>
+      <div class="sbar-bg"><div class="sbar-fill" style="width:100%"></div></div>
+      <div class="sbar-num">10 / 10 ✦</div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>Category</th><th>Score</th><th>Reasoning</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Revenue Impact</td>
+        <td>21 / 30</td>
+        <td>Indirect — prevents churn from security failures, enables "Advanced Monitoring" premium tier, strong new-customer sales point. Less direct than Gap Detector's upsell path.</td>
+      </tr>
+      <tr>
+        <td>AI Innovation</td>
+        <td>15 / 20</td>
+        <td>Pre-outage correlation + jamming pattern detection is genuinely novel. Core heartbeat monitoring is commodity; the AI adds real intelligence on top of it.</td>
+      </tr>
+      <tr>
+        <td>Feasibility</td>
+        <td>14 / 15</td>
+        <td><code>lastContactedAt</code> already exists in the API schema. Motion event data exists. Notification infrastructure is live. Near-zero new data pipeline work needed.</td>
+      </tr>
+      <tr>
+        <td><strong>Customer Value</strong></td>
+        <td><strong>15 / 15 ✦ PERFECT</strong></td>
+        <td>Directly addresses the #1 trust concern: "What if your security infrastructure fails silently?" Being proactively told — with intelligence on WHY and WHAT TO DO — is the highest-value security promise SD can make.</td>
+      </tr>
+      <tr>
+        <td>Speed to Pilot</td>
+        <td>9 / 10</td>
+        <td>30-day pilot is the fastest of all 5 ideas. Only blocker: confirming FM assignment schema and <code>lastContactedAt</code> update frequency in Week 1.</td>
+      </tr>
+      <tr>
+        <td><strong>Scalability</strong></td>
+        <td><strong>10 / 10 ✦ PERFECT</strong></td>
+        <td>The exact same 60-second Cloud Scheduler job runs for 5 facilities or 5,000. Cost is flat (SQL query cost) until alerts actually fire. Scales to the entire fleet with zero architectural changes.</td>
+      </tr>
+      <tr>
+        <td><strong>TOTAL</strong></td>
+        <td><strong>84 / 100</strong></td>
+        <td>🏆 "Best Customer Trust Innovation" — Highest feasibility and customer value scores of all 5 ideas. Fastest to pilot. Every existing SD customer benefits from day one.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Comparison: Where Idea 5 Sits Among All 5</h3>
+  <table>
+    <thead>
+      <tr><th>Idea</th><th>Score</th><th>Best At</th><th>Timeline</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Idea 1 — Incident Intelligence Reporter</td><td>90/100</td><td>Overall highest score, CS reporting</td><td>45 days</td></tr>
+      <tr><td>Idea 2 — Smart Unit Gap Detector</td><td>88/100</td><td>Direct upsell revenue</td><td>45 days</td></tr>
+      <tr><td>Idea 3 — Health &amp; Churn Predictor</td><td>88/100</td><td>Customer retention</td><td>60 days</td></tr>
+      <tr><td>Idea 4 — Non-Payment Intelligence</td><td>87/100</td><td>AI innovation (19/20)</td><td>45 days</td></tr>
+      <tr style="background:#fff5f5;"><td><strong>Idea 5 — Gateway Connectivity Monitor</strong></td><td><strong>84/100</strong></td><td><strong>Customer trust, fastest pilot, highest feasibility</strong></td><td><strong>30 days ★</strong></td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout green">
+    <strong>The user's original insight is validated:</strong> "This is not a high-cost implementation, because the gateway heartbeat and communication status already exist." Correct. The <code>lastContactedAt</code> field is live in production. The AI layer (pre-outage correlation, jamming detection) is what elevates this from a commodity feature to a genuinely differentiated product capability that no self-storage competitor currently offers.
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     VERDICT BANNER
+═════════════════════════════════════════════════════ -->
+<div class="verdict">
+  <h3>🏆 Build This First</h3>
+  <p>Idea 5 is the highest-value, lowest-risk, fastest-to-ship innovation in the portfolio. It makes the single most important security promise a monitoring company can make: <em>"We will tell you the moment your security goes dark — and we'll tell you why."</em> Every existing SD customer benefits from day one of launch. No competitor in the self-storage vertical does this today.</p>
+</div>
+
+</div><!-- /wrap -->
+</body>
+</html>
