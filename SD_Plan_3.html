@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SD Innovation — Idea #3: AI Customer Health &amp; Churn Predictor</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green: #40c060;
+    --green-light: #60e080;
+    --navy: #0b1622;
+    --navy2: #0d1e30;
+    --navy3: #112238;
+    --white: #ffffff;
+    --text: #d0dcea;
+    --muted: rgba(255,255,255,0.45);
+    --border: rgba(255,255,255,0.08);
+  }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--navy); color: var(--text); }
+
+  .hero {
+    background: linear-gradient(135deg, #0a1a10 0%, #0c1e14 40%, #0a1a10 100%);
+    border-bottom: 3px solid var(--green);
+    padding: 50px 48px 44px;
+    position: relative; overflow: hidden;
+  }
+  .hero::after {
+    content: ''; position: absolute; top: -100px; right: -100px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(64,192,96,0.10) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .hero-tag {
+    display: inline-block;
+    background: rgba(64,192,96,0.15); border: 1px solid rgba(64,192,96,0.45);
+    color: var(--green); font-size: 0.7rem; font-weight: 700;
+    letter-spacing: 2.5px; text-transform: uppercase;
+    padding: 5px 16px; border-radius: 20px; margin-bottom: 16px;
+  }
+  .hero h1 { font-size: 2.4rem; font-weight: 900; color: var(--white); line-height: 1.15; margin-bottom: 12px; }
+  .hero h1 span { color: var(--green); }
+  .hero-sub { font-size: 1rem; color: rgba(255,255,255,0.55); max-width: 680px; line-height: 1.65; margin-bottom: 24px; }
+  .hero-pills { display: flex; flex-wrap: wrap; gap: 10px; }
+  .pill { display: flex; align-items: center; gap: 7px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; padding: 7px 14px; font-size: 0.78rem; color: rgba(255,255,255,0.65); font-weight: 500; }
+  .pill .pi { font-size: 1rem; }
+
+  .page { max-width: 1200px; margin: 0 auto; padding: 0 40px 60px; }
+
+  .plain-box { background: linear-gradient(135deg, #0a1e10, #081408); border: 1.5px solid rgba(64,192,96,0.35); border-radius: 16px; padding: 28px 32px; margin-bottom: 28px; }
+  .plain-box .pb-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .plain-box .pb-icon { font-size: 2rem; }
+  .plain-box .pb-title { font-size: 1.05rem; font-weight: 700; color: var(--white); }
+  .plain-box .pb-sub { font-size: 0.75rem; color: var(--muted); margin-top: 3px; }
+  .plain-box p { font-size: 0.9rem; line-height: 1.75; color: rgba(255,255,255,0.75); margin-bottom: 10px; }
+  .plain-box p:last-child { margin-bottom: 0; }
+
+  .section { padding: 44px 0 8px; }
+  .section-tag { display: inline-block; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--green); background: rgba(64,192,96,0.1); border: 1px solid rgba(64,192,96,0.25); padding: 4px 12px; border-radius: 6px; margin-bottom: 12px; }
+  .section h2 { font-size: 1.7rem; font-weight: 800; color: var(--white); margin-bottom: 8px; }
+  .section h2 span { color: var(--green); }
+  .section p.desc { font-size: 0.88rem; color: var(--muted); line-height: 1.6; margin-bottom: 28px; }
+  .divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 8px 0; }
+
+  /* ARCH */
+  .arch { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 28px; overflow-x: auto; }
+  .arch-title { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 22px; }
+  .arch-box { border: 1.5px solid; border-radius: 12px; padding: 14px 18px; flex-shrink: 0; min-width: 148px; text-align: center; }
+  .ab-icon { font-size: 1.6rem; margin-bottom: 6px; }
+  .ab-title { font-size: 0.82rem; font-weight: 700; color: var(--white); margin-bottom: 4px; }
+  .ab-sub { font-size: 0.65rem; color: var(--muted); line-height: 1.5; }
+  .ab-data    { background: rgba(40,100,200,0.12); border-color: rgba(40,100,200,0.35); }
+  .ab-engine  { background: rgba(64,192,96,0.10);  border-color: rgba(64,192,96,0.35); }
+  .ab-ai      { background: rgba(140,60,200,0.12); border-color: rgba(140,60,200,0.40); }
+  .ab-alert   { background: rgba(220,160,20,0.12); border-color: rgba(220,160,20,0.40); }
+  .ab-deliver { background: rgba(20,160,180,0.12); border-color: rgba(20,160,180,0.35); }
+
+  /* STEPS */
+  .steps { display: flex; flex-direction: column; gap: 0; }
+  .step { display: flex; gap: 20px; }
+  .step-num-wrap { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 44px; }
+  .step-num { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 800; color: var(--white); flex-shrink: 0; }
+  .sn1{background:linear-gradient(135deg,#106030,#20a050);}
+  .sn2{background:linear-gradient(135deg,#208040,#40c060);}
+  .sn3{background:linear-gradient(135deg,#7a10c0,#b040e0);}
+  .sn4{background:linear-gradient(135deg,#206080,#30a0c0);}
+  .sn5{background:linear-gradient(135deg,#a07010,#e0b020);}
+  .sn6{background:linear-gradient(135deg,#106080,#20a0c0);}
+  .sn7{background:linear-gradient(135deg,#901040,#e03060);}
+  .step-line { flex: 1; width: 2px; background: rgba(255,255,255,0.06); margin: 6px 0; min-height: 30px; }
+  .step-content { padding: 0 0 32px; flex: 1; }
+  .step-tag { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; margin-top: 10px; }
+  .step-title { font-size: 1rem; font-weight: 700; color: var(--white); margin-bottom: 10px; }
+  .step-body p { font-size: 0.87rem; line-height: 1.7; color: rgba(255,255,255,0.7); margin-bottom: 12px; }
+
+  /* CODE */
+  .code-block { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 18px 20px; font-family: 'Cascadia Code','Fira Mono','Courier New',monospace; font-size: 0.76rem; line-height: 1.65; color: #b0d0ff; overflow-x: auto; white-space: pre; margin: 12px 0; }
+  .cm { color: rgba(120,160,120,0.85); }
+  .kw { color: #60b0ff; }
+  .fn { color: #e0a060; }
+  .str { color: #80e080; }
+  .num { color: #e08060; }
+
+  /* CALLOUTS */
+  .callout { border-radius: 10px; padding: 14px 18px; margin: 12px 0; display: flex; gap: 12px; align-items: flex-start; font-size: 0.84rem; line-height: 1.65; }
+  .callout-success { background: rgba(40,160,80,0.10); border: 1px solid rgba(40,160,80,0.25); }
+  .callout-warn    { background: rgba(220,160,20,0.10); border: 1px solid rgba(220,160,20,0.25); }
+  .callout-info    { background: rgba(40,120,220,0.10); border: 1px solid rgba(40,120,220,0.25); }
+  .ci { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+
+  /* HEALTH SCORE VISUAL */
+  .health-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+  .health-card { border-radius: 12px; padding: 20px; border: 1.5px solid; }
+  .hc-healthy  { background: rgba(40,180,80,0.08);  border-color: rgba(40,180,80,0.3); }
+  .hc-attention{ background: rgba(220,180,20,0.08); border-color: rgba(220,180,20,0.3); }
+  .hc-risk     { background: rgba(220,100,20,0.08); border-color: rgba(220,100,20,0.3); }
+  .hc-critical { background: rgba(220,40,40,0.08);  border-color: rgba(220,40,40,0.3); }
+  .hc-score { font-size: 2.4rem; font-weight: 900; line-height: 1; margin-bottom: 4px; }
+  .hc-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; }
+  .hc-signals { display: flex; flex-direction: column; gap: 6px; }
+  .hc-sig { display: flex; align-items: center; gap: 8px; font-size: 0.72rem; color: rgba(255,255,255,0.6); }
+  .hc-bar-wrap { flex: 1; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; }
+  .hc-bar { height: 4px; border-radius: 2px; }
+  .hc-val { font-size: 0.7rem; font-weight: 600; width: 32px; text-align: right; }
+
+  /* SIGNAL WEIGHTS */
+  .weights-table { width: 100%; border-collapse: collapse; }
+  .weights-table th { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); padding: 10px 14px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .weights-table td { font-size: 0.82rem; padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); color: rgba(255,255,255,0.7); }
+  .weights-table tr:last-child td { border-bottom: none; }
+  .w-bar-wrap { display: flex; align-items: center; gap: 8px; }
+  .w-bar-bg { flex: 1; height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; }
+  .w-bar-fill { height: 6px; border-radius: 3px; }
+
+  /* CS DASHBOARD */
+  .cs-table { width: 100%; border-collapse: collapse; }
+  .cs-table th { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); padding: 10px 14px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .cs-table td { font-size: 0.8rem; padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); color: rgba(255,255,255,0.7); }
+  .cs-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .cs-btn { background: rgba(64,192,96,0.15); border: 1px solid rgba(64,192,96,0.4); color: var(--green-light); border-radius: 6px; padding: 4px 10px; font-size: 0.7rem; font-weight: 600; cursor: pointer; }
+  .badge-crit   { display:inline-block; background:rgba(220,40,40,0.2); color:#ff8080; border:1px solid rgba(220,40,40,0.4); border-radius:5px; padding:2px 8px; font-size:0.68rem; font-weight:700; }
+  .badge-risk   { display:inline-block; background:rgba(220,100,20,0.2); color:#ffb060; border:1px solid rgba(220,100,20,0.4); border-radius:5px; padding:2px 8px; font-size:0.68rem; font-weight:700; }
+  .badge-attn   { display:inline-block; background:rgba(220,180,20,0.2); color:#ffe060; border:1px solid rgba(220,180,20,0.4); border-radius:5px; padding:2px 8px; font-size:0.68rem; font-weight:700; }
+  .badge-health { display:inline-block; background:rgba(40,180,80,0.2); color:#60e090; border:1px solid rgba(40,180,80,0.4); border-radius:5px; padding:2px 8px; font-size:0.68rem; font-weight:700; }
+  .trend-down { color:#ff6060; }
+  .trend-up   { color:#60e090; }
+  .trend-flat { color:rgba(255,255,255,0.4); }
+
+  /* CLAUDE BOX */
+  .claude-box { background: linear-gradient(135deg,#140828,#0e0620); border: 1.5px solid rgba(140,60,200,0.40); border-radius: 16px; padding: 28px; }
+  .cb-head { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+  .cb-icon { font-size: 2.2rem; }
+  .cb-head h3 { font-size: 1.05rem; font-weight: 700; color: var(--white); }
+  .cb-sub { font-size: 0.72rem; color: rgba(160,80,255,0.7); margin-top: 3px; }
+  .cb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .cb-item { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 16px; }
+  .cb-item h5 { font-size: 0.78rem; font-weight: 700; color: rgba(160,80,255,0.85); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .cb-item ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .cb-item li { font-size: 0.8rem; color: rgba(255,255,255,0.65); padding-left: 14px; position: relative; line-height: 1.5; }
+  .cb-item li::before { content: '▸'; position: absolute; left: 0; color: rgba(140,60,200,0.7); font-size: 0.65rem; top: 2px; }
+
+  /* PLAYBOOK */
+  .playbook-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .pb-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 18px; }
+  .pb-signal { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
+  .pb-trigger { font-size: 0.8rem; color: var(--white); font-weight: 600; margin-bottom: 6px; }
+  .pb-action { font-size: 0.78rem; color: rgba(255,255,255,0.6); line-height: 1.5; }
+
+  /* ACCESS */
+  .access-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .access-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .access-card h4 { font-size: 0.82rem; font-weight: 700; color: var(--white); margin-bottom: 12px; }
+  .access-item { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .access-item:last-child { border-bottom: none; }
+  .ai-status { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
+  .have { background: rgba(40,180,80,0.2); color: #60e090; border: 1px solid rgba(40,180,80,0.4); }
+  .need { background: rgba(220,80,40,0.2); color: #ff8060; border: 1px solid rgba(220,80,40,0.4); }
+  .easy { background: rgba(40,120,220,0.2); color: #60b0ff; border: 1px solid rgba(40,120,220,0.4); }
+  .ai-name { font-size: 0.82rem; font-weight: 600; color: var(--white); margin-bottom: 3px; }
+  .ai-desc { font-size: 0.75rem; color: var(--muted); line-height: 1.5; }
+
+  /* TOOL GRID */
+  .tool-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .tool-card { border-radius: 12px; padding: 20px; border: 1.5px solid rgba(255,255,255,0.07); background: rgba(255,255,255,0.02); }
+  .tool-card.recommended { border-color: rgba(140,60,200,0.45); background: rgba(140,60,200,0.06); }
+  .rec-tag { font-size: 0.65rem; font-weight: 700; color: rgba(160,80,255,0.8); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .tool-card .tc-logo { font-size: 1.6rem; margin-bottom: 8px; }
+  .tool-card h4 { font-size: 0.92rem; font-weight: 700; color: var(--white); margin-bottom: 6px; }
+  .tool-card p { font-size: 0.78rem; color: var(--muted); margin-bottom: 10px; line-height: 1.5; }
+  .tool-card ul { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+  .tool-card li { font-size: 0.76rem; color: rgba(255,255,255,0.6); padding-left: 12px; position: relative; }
+  .tool-card li::before { content: '▸'; position: absolute; left: 0; color: var(--muted); font-size: 0.6rem; top: 2px; }
+
+  /* TIMELINE */
+  .timeline { display: flex; flex-direction: column; gap: 20px; }
+  .tl-week { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; overflow: hidden; }
+  .tl-week-label { background: rgba(64,192,96,0.08); border-bottom: 1px solid rgba(255,255,255,0.06); padding: 12px 20px; display: flex; align-items: center; gap: 12px; }
+  .wl-num { font-size: 0.85rem; font-weight: 800; color: var(--green); }
+  .wl-days { font-size: 0.72rem; color: var(--muted); }
+  .tl-tasks { padding: 12px 20px; display: flex; flex-direction: column; gap: 8px; }
+  .tl-task { display: flex; align-items: flex-start; gap: 10px; font-size: 0.82rem; color: rgba(255,255,255,0.65); line-height: 1.5; }
+  .tt-who { display: inline-block; border-radius: 4px; padding: 2px 7px; font-size: 0.62rem; font-weight: 700; flex-shrink: 0; text-transform: uppercase; letter-spacing: 0.5px; }
+  .who-pm   { background: rgba(64,144,224,0.2); color: #80c0ff; border: 1px solid rgba(64,144,224,0.3); }
+  .who-eng  { background: rgba(40,180,80,0.2); color: #70e090; border: 1px solid rgba(40,180,80,0.3); }
+  .who-data { background: rgba(220,140,20,0.2); color: #e8b040; border: 1px solid rgba(220,140,20,0.3); }
+  .who-qa   { background: rgba(140,60,200,0.2); color: #c080ff; border: 1px solid rgba(140,60,200,0.3); }
+  .who-cs   { background: rgba(20,160,180,0.2); color: #40d0e0; border: 1px solid rgba(20,160,180,0.3); }
+
+  .footer { border-top: 1px solid rgba(255,255,255,0.06); padding: 22px 40px; font-size: 0.72rem; color: var(--muted); }
+
+  @media (max-width: 900px) {
+    .hero { padding: 32px 20px 28px; }
+    .page { padding: 0 16px 40px; }
+    .cb-grid, .access-grid, .tool-grid, .health-grid, .playbook-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════ HERO ══════════ -->
+<div class="hero">
+  <div class="page" style="padding-bottom:0;">
+    <div class="hero-tag">SD Innovation Tank &nbsp;·&nbsp; Month 1 &nbsp;·&nbsp; Idea #3</div>
+    <h1>AI Customer Health &amp; <span>Churn Predictor</span></h1>
+    <p class="hero-sub">Monitors 5 real-time signals per customer, generates a health score 0–100, and alerts the CS team with a specific intervention playbook before the customer cancels — turning reactive support into proactive retention.</p>
+    <div class="hero-pills">
+      <div class="pill"><span class="pi">🛡️</span> Category: Customer Retention</div>
+      <div class="pill"><span class="pi">⭐</span> Score: 88 / 100</div>
+      <div class="pill"><span class="pi">💰</span> Revenue Impact: 27/30</div>
+      <div class="pill"><span class="pi">🤖</span> AI Innovation: 18/20</div>
+      <div class="pill"><span class="pi">📈</span> Scalability: 10/10</div>
+      <div class="pill"><span class="pi">⏱</span> Pilot: 60 days</div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+<hr class="divider">
+
+<!-- ═══════════ SECTION 1: PLAIN ENGLISH ═══════════ -->
+<div class="section">
+  <div class="section-tag">Section 1</div>
+  <h2>What is this? <span>(Plain English)</span></h2>
+  <p class="desc">No jargon. Read this first regardless of your background.</p>
+
+  <div class="plain-box">
+    <div class="pb-head">
+      <div class="pb-icon">🚗</div>
+      <div>
+        <div class="pb-title">Think of it like a car dashboard warning light — before the engine fails, not after</div>
+        <div class="pb-sub">Non-technical explanation</div>
+      </div>
+    </div>
+    <p>Right now, when an SD customer decides to cancel, the CS team usually finds out when it is too late — the customer has already made the decision. It's like only checking your oil level after the engine seizes.</p>
+    <p>This idea installs a <strong>"warning light"</strong> for every customer. The system watches 5 signals every day: Are their devices still online? Did they log into the portal this week? Are their incidents being resolved? Is their PMS sync working? Are their motion events trending up or down? It combines these into a single <strong>Health Score (0–100)</strong> per facility.</p>
+    <p>When a customer's score drops sharply — say from 76 down to 44 in one week — the system fires a Slack alert to the CS team: <em>"Riverside Storage score dropped 32 points. Primary cause: PMS sync has been broken for 9 days. Recommended action: Fix the storEDGE integration today."</em> The CS team gets the exact problem and the exact fix — not just a vague "customer seems unhappy".</p>
+  </div>
+
+  <div class="plain-box" style="background: linear-gradient(135deg,#0e1a10,#0a1408); border-color: rgba(40,160,60,0.35);">
+    <div class="pb-head">
+      <div class="pb-icon">👔</div>
+      <div>
+        <div class="pb-title">Why this protects more revenue than any new customer acquisition</div>
+        <div class="pb-sub">Business case — 60 seconds</div>
+      </div>
+    </div>
+    <p>SD's subscription is <strong>$12/device/month flat</strong>. A facility with 60 Smart Units pays <strong>$720/month</strong>. If that customer churns, SD loses $720/month — and the cost to acquire a replacement customer is typically 3–5× higher than retaining an existing one.</p>
+    <p>The CS team currently reacts to problems after customers complain. This system predicts which customers are heading toward churn <strong>before they complain</strong> — giving CS a 2–4 week window to intervene. A single retained 60-device customer = <strong>$720/month × 12 months = $8,640/year</strong> kept.</p>
+    <p>The signals are already available in tod_backoffice — broken PMS sync, device offline rates, zero portal logins. No new data collection. This is purely about connecting the dots that already exist.</p>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════ SECTION 2: ARCHITECTURE ═══════════ -->
+<div class="section">
+  <div class="section-tag">Section 2</div>
+  <h2>System <span>Architecture</span></h2>
+  <p class="desc">5 layers. Data is collected daily, scored, interpreted by Claude, then delivered to the CS team through Slack, dashboard, and email.</p>
+
+  <div class="arch">
+    <div class="arch-title">ARCHITECTURE OVERVIEW — AI Customer Health &amp; Churn Predictor Pipeline</div>
+
+    <div style="display:flex; align-items:flex-start; gap:0; overflow-x:auto; padding-bottom:12px; min-width:900px;">
+
+      <!-- BOX 1: Data Sources -->
+      <div style="display:flex;flex-direction:column;align-items:center;min-width:155px;">
+        <div class="arch-box ab-data" style="width:100%;">
+          <div class="ab-icon">🗄️</div>
+          <div class="ab-title">Signal Sources</div>
+          <div class="ab-sub">tod_backoffice<br>BigQuery<br>Firebase Auth</div>
+        </div>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;width:100%;">
+          <div style="background:rgba(40,100,200,0.1);border:1px solid rgba(40,100,200,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#80b0ff;">devices (uptime %)</div>
+          <div style="background:rgba(40,100,200,0.1);border:1px solid rgba(40,100,200,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#80b0ff;">user_sessions (logins)</div>
+          <div style="background:rgba(40,100,200,0.1);border:1px solid rgba(40,100,200,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#80b0ff;">tasks (resolution rate)</div>
+          <div style="background:rgba(40,100,200,0.1);border:1px solid rgba(40,100,200,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#80b0ff;">pms_integrations (sync)</div>
+          <div style="background:rgba(40,100,200,0.1);border:1px solid rgba(40,100,200,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#80b0ff;">incidents (trend)</div>
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 12px;padding-top:22px;flex-shrink:0;">
+        <div style="font-size:0.58rem;color:var(--green);font-weight:700;margin-bottom:3px;white-space:nowrap;">daily SQL</div>
+        <div style="display:flex;align-items:center;">
+          <div style="width:36px;height:2px;background:rgba(64,192,96,0.5);"></div>
+          <div style="width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:8px solid rgba(64,192,96,0.8);"></div>
+        </div>
+      </div>
+
+      <!-- BOX 2: Health Score Engine -->
+      <div style="display:flex;flex-direction:column;align-items:center;min-width:155px;">
+        <div class="arch-box ab-engine" style="width:100%;">
+          <div class="ab-icon">💚</div>
+          <div class="ab-title">Health Score Engine</div>
+          <div class="ab-sub">Cloud Run<br>Runs daily at 2am UTC<br>Writes to BigQuery</div>
+        </div>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;width:100%;">
+          <div style="background:rgba(64,192,96,0.08);border:1px solid rgba(64,192,96,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#80e0a0;">weighted score 0–100</div>
+          <div style="background:rgba(64,192,96,0.08);border:1px solid rgba(64,192,96,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#80e0a0;">score per signal</div>
+          <div style="background:rgba(64,192,96,0.08);border:1px solid rgba(64,192,96,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#80e0a0;">7-day trend delta</div>
+          <div style="background:rgba(64,192,96,0.08);border:1px solid rgba(64,192,96,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#80e0a0;">lowest signal flag</div>
+          <div style="background:rgba(64,192,96,0.08);border:1px solid rgba(64,192,96,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#80e0a0;">daily snapshot stored</div>
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 12px;padding-top:22px;flex-shrink:0;">
+        <div style="font-size:0.58rem;color:var(--green);font-weight:700;margin-bottom:3px;white-space:nowrap;">score JSON</div>
+        <div style="display:flex;align-items:center;">
+          <div style="width:36px;height:2px;background:rgba(64,192,96,0.5);"></div>
+          <div style="width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:8px solid rgba(64,192,96,0.8);"></div>
+        </div>
+      </div>
+
+      <!-- BOX 3: Claude AI -->
+      <div style="display:flex;flex-direction:column;align-items:center;min-width:155px;">
+        <div class="arch-box ab-ai" style="width:100%;border-color:rgba(140,60,200,0.55);">
+          <div class="ab-icon">🤖</div>
+          <div class="ab-title">Claude AI</div>
+          <div class="ab-sub">Anthropic API<br>claude-sonnet-4-6<br>Triggered on drop</div>
+        </div>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;width:100%;">
+          <div style="background:rgba(140,60,200,0.1);border:1px solid rgba(140,60,200,0.25);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#c080ff;">diagnoses root cause</div>
+          <div style="background:rgba(140,60,200,0.1);border:1px solid rgba(140,60,200,0.25);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#c080ff;">writes intervention plan</div>
+          <div style="background:rgba(140,60,200,0.1);border:1px solid rgba(140,60,200,0.25);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#c080ff;">drafts CS outreach msg</div>
+          <div style="background:rgba(140,60,200,0.1);border:1px solid rgba(140,60,200,0.25);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#c080ff;">only on score drops</div>
+          <div style="background:rgba(140,60,200,0.1);border:1px solid rgba(140,60,200,0.25);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#c080ff;">cached system prompt</div>
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 12px;padding-top:22px;flex-shrink:0;">
+        <div style="font-size:0.58rem;color:var(--green);font-weight:700;margin-bottom:3px;white-space:nowrap;">alert + playbook</div>
+        <div style="display:flex;align-items:center;">
+          <div style="width:36px;height:2px;background:rgba(64,192,96,0.5);"></div>
+          <div style="width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:8px solid rgba(64,192,96,0.8);"></div>
+        </div>
+      </div>
+
+      <!-- BOX 4: Delivery -->
+      <div style="display:flex;flex-direction:column;align-items:center;min-width:155px;">
+        <div class="arch-box ab-deliver" style="width:100%;">
+          <div class="ab-icon">📬</div>
+          <div class="ab-title">CS Delivery</div>
+          <div class="ab-sub">Real-time alerts<br>Dashboard<br>Weekly digest</div>
+        </div>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;width:100%;">
+          <div style="background:rgba(20,160,180,0.08);border:1px solid rgba(20,160,180,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#60d0e0;">Slack alert (score drop)</div>
+          <div style="background:rgba(20,160,180,0.08);border:1px solid rgba(20,160,180,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#60d0e0;">Looker Studio dashboard</div>
+          <div style="background:rgba(20,160,180,0.08);border:1px solid rgba(20,160,180,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#60d0e0;">Weekly digest email</div>
+          <div style="background:rgba(20,160,180,0.08);border:1px solid rgba(20,160,180,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#60d0e0;">BackOffice in-app alert</div>
+          <div style="background:rgba(20,160,180,0.08);border:1px solid rgba(20,160,180,0.2);border-radius:6px;padding:5px 8px;font-size:0.65rem;color:#60d0e0;">BigQuery history table</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Infra strip -->
+    <div style="margin-top:28px;padding:14px 18px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;">
+      <div style="font-size:0.62rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;">☁️ Running on — Google Cloud Platform</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;">
+        <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:5px 12px;font-size:0.72rem;color:rgba(255,255,255,0.55);">Cloud Run (daily scoring job)</span>
+        <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:5px 12px;font-size:0.72rem;color:rgba(255,255,255,0.55);">Cloud Scheduler (cron: 2am UTC daily)</span>
+        <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:5px 12px;font-size:0.72rem;color:rgba(255,255,255,0.55);">BigQuery (signal queries + history table)</span>
+        <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:5px 12px;font-size:0.72rem;color:rgba(255,255,255,0.55);">Cloud SQL — tod_backoffice (read-only)</span>
+        <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:5px 12px;font-size:0.72rem;color:rgba(255,255,255,0.55);">Anthropic Claude API (on score drop only)</span>
+        <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:5px 12px;font-size:0.72rem;color:rgba(255,255,255,0.55);">Slack Webhook (CS alerts)</span>
+        <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:5px 12px;font-size:0.72rem;color:rgba(255,255,255,0.55);">Looker Studio (CS dashboard)</span>
+        <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:5px 12px;font-size:0.72rem;color:rgba(255,255,255,0.55);">SendGrid (weekly CS digest)</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════ SECTION 3: BUILD PLAN ═══════════ -->
+<div class="section">
+  <div class="section-tag">Section 3</div>
+  <h2>Step-by-Step <span>Build Plan</span></h2>
+  <p class="desc">7 steps — from raw signal collection to live CS alerts with Claude-generated intervention playbooks.</p>
+
+  <!-- Signal weights table -->
+  <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:20px;margin-bottom:32px;">
+    <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:14px;">📊 Health Score Formula — 5 Weighted Signals (total: 100 points)</div>
+    <table class="weights-table">
+      <thead>
+        <tr><th>Signal</th><th>Weight</th><th>Bar</th><th>What it measures</th><th>Data source</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong style="color:#fff;">Device Uptime %</strong></td>
+          <td style="color:#60e090;font-weight:700;">30 pts</td>
+          <td><div class="w-bar-wrap"><div class="w-bar-bg"><div class="w-bar-fill" style="width:100%;background:rgba(40,180,80,0.7);"></div></div></div></td>
+          <td>% of active devices sending heartbeat in last 24 hrs</td>
+          <td style="color:var(--muted);">devices table</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#fff;">Portal Login Frequency</strong></td>
+          <td style="color:#80d0ff;font-weight:700;">25 pts</td>
+          <td><div class="w-bar-wrap"><div class="w-bar-bg"><div class="w-bar-fill" style="width:83%;background:rgba(40,120,220,0.7);"></div></div></div></td>
+          <td>Number of distinct login days in last 30 days (0 = disengaged)</td>
+          <td style="color:var(--muted);">user_sessions / Firebase</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#fff;">Task Resolution Rate</strong></td>
+          <td style="color:#ffa060;font-weight:700;">20 pts</td>
+          <td><div class="w-bar-wrap"><div class="w-bar-bg"><div class="w-bar-fill" style="width:67%;background:rgba(220,120,20,0.7);"></div></div></div></td>
+          <td>% of created tasks resolved within 7 days (last 30 days)</td>
+          <td style="color:var(--muted);">tasks table</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#fff;">PMS Sync Status</strong></td>
+          <td style="color:#e0c060;font-weight:700;">15 pts</td>
+          <td><div class="w-bar-wrap"><div class="w-bar-bg"><div class="w-bar-fill" style="width:50%;background:rgba(200,160,20,0.7);"></div></div></div></td>
+          <td>Days since last successful PMS sync (broken sync = 0 pts)</td>
+          <td style="color:var(--muted);">pms_integrations table</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#fff;">Incident Response Trend</strong></td>
+          <td style="color:#c080ff;font-weight:700;">10 pts</td>
+          <td><div class="w-bar-wrap"><div class="w-bar-bg"><div class="w-bar-fill" style="width:33%;background:rgba(140,60,200,0.7);"></div></div></div></td>
+          <td>Month-over-month change in escalated incident rate</td>
+          <td style="color:var(--muted);">incidents table</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="steps">
+
+    <!-- STEP 1 -->
+    <div class="step">
+      <div class="step-num-wrap"><div class="step-num sn1">1</div><div class="step-line"></div></div>
+      <div class="step-content">
+        <div class="step-tag" style="color:#40c060;">Data Layer</div>
+        <div class="step-title">Write BigQuery SQL — collect all 5 signals per facility, daily</div>
+        <div class="step-body">
+          <p>One query per signal. All run daily as part of the Cloud Run scoring job and return one row per facility.</p>
+          <div class="code-block"><span class="cm">-- Signal 1: Device uptime % (heartbeat in last 24 hrs)</span>
+<span class="kw">SELECT</span>
+  d.facility_id,
+  <span class="fn">COUNT</span>(d.id)                                                       <span class="kw">AS</span> total_devices,
+  <span class="fn">COUNTIF</span>(d.last_heartbeat >= <span class="fn">TIMESTAMP_SUB</span>(CURRENT_TIMESTAMP(), <span class="kw">INTERVAL</span> <span class="num">24</span> HOUR)) <span class="kw">AS</span> online_devices,
+  <span class="fn">ROUND</span>(<span class="fn">SAFE_DIVIDE</span>(
+    <span class="fn">COUNTIF</span>(d.last_heartbeat >= <span class="fn">TIMESTAMP_SUB</span>(CURRENT_TIMESTAMP(), <span class="kw">INTERVAL</span> <span class="num">24</span> HOUR)),
+    <span class="fn">COUNT</span>(d.id)) * <span class="num">100</span>, <span class="num">1</span>)                                            <span class="kw">AS</span> uptime_pct
+<span class="kw">FROM</span> `tod_backoffice.devices` d
+<span class="kw">WHERE</span> d.status = <span class="str">'active'</span>
+<span class="kw">GROUP BY</span> d.facility_id;
+
+<span class="cm">-- Signal 2: Portal login frequency (distinct login days, last 30d)</span>
+<span class="kw">SELECT</span>
+  u.facility_id,
+  <span class="fn">COUNT</span>(<span class="kw">DISTINCT</span> <span class="fn">DATE</span>(s.created_at))                 <span class="kw">AS</span> login_days_last_30,
+  <span class="fn">DATE_DIFF</span>(CURRENT_DATE(), <span class="fn">DATE</span>(<span class="fn">MAX</span>(s.created_at)), DAY) <span class="kw">AS</span> days_since_last_login
+<span class="kw">FROM</span> `tod_backoffice.user_sessions` s
+<span class="kw">JOIN</span>  `tod_backoffice.users` u <span class="kw">ON</span> u.id = s.user_id
+<span class="kw">WHERE</span> s.created_at >= <span class="fn">DATE_SUB</span>(CURRENT_DATE(), <span class="kw">INTERVAL</span> <span class="num">30</span> DAY)
+<span class="kw">GROUP BY</span> u.facility_id;
+
+<span class="cm">-- Signal 3: Task resolution rate (last 30 days)</span>
+<span class="kw">SELECT</span>
+  facility_id,
+  <span class="fn">COUNT</span>(*)                                                  <span class="kw">AS</span> total_tasks,
+  <span class="fn">COUNTIF</span>(status = <span class="str">'resolved'</span>)                              <span class="kw">AS</span> resolved_tasks,
+  <span class="fn">ROUND</span>(<span class="fn">SAFE_DIVIDE</span>(<span class="fn">COUNTIF</span>(status = <span class="str">'resolved'</span>), <span class="fn">COUNT</span>(*)) * <span class="num">100</span>, <span class="num">1</span>) <span class="kw">AS</span> resolution_rate_pct
+<span class="kw">FROM</span> `tod_backoffice.tasks`
+<span class="kw">WHERE</span> created_at >= <span class="fn">DATE_SUB</span>(CURRENT_DATE(), <span class="kw">INTERVAL</span> <span class="num">30</span> DAY)
+<span class="kw">GROUP BY</span> facility_id;
+
+<span class="cm">-- Signal 4: PMS sync health</span>
+<span class="kw">SELECT</span>
+  facility_id,
+  pms_type,
+  last_sync_at,
+  <span class="fn">DATE_DIFF</span>(CURRENT_DATE(), <span class="fn">DATE</span>(last_sync_at), DAY) <span class="kw">AS</span> days_since_sync,
+  <span class="kw">CASE</span>
+    <span class="kw">WHEN</span> <span class="fn">DATE_DIFF</span>(CURRENT_DATE(), <span class="fn">DATE</span>(last_sync_at), DAY) > <span class="num">7</span>  <span class="kw">THEN</span> <span class="str">'broken'</span>
+    <span class="kw">WHEN</span> <span class="fn">DATE_DIFF</span>(CURRENT_DATE(), <span class="fn">DATE</span>(last_sync_at), DAY) > <span class="num">3</span>  <span class="kw">THEN</span> <span class="str">'delayed'</span>
+    <span class="kw">ELSE</span> <span class="str">'healthy'</span>
+  <span class="kw">END</span> <span class="kw">AS</span> sync_health
+<span class="kw">FROM</span> `tod_backoffice.pms_integrations`
+<span class="kw">WHERE</span> is_active = <span class="kw">true</span>;</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step">
+      <div class="step-num-wrap"><div class="step-num sn2">2</div><div class="step-line"></div></div>
+      <div class="step-content">
+        <div class="step-tag" style="color:#60e080;">Scoring Engine</div>
+        <div class="step-title">Build the Health Score Engine — weighted score per facility, stored daily</div>
+        <div class="step-body">
+          <p>A Cloud Run service that collects all 5 signal query results, applies the weighted formula, outputs a <strong style="color:#fff;">health_score (0–100)</strong> per facility, and writes a daily snapshot to BigQuery. The history table enables trend tracking and score delta calculation.</p>
+          <div class="code-block"><span class="cm">// health-scorer.js</span>
+<span class="kw">function</span> <span class="fn">calculateHealthScore</span>(signals) {
+  <span class="cm">// Each signal scored 0–100 independently, then weighted</span>
+  <span class="kw">const</span> signal_scores = {
+    device_uptime:   signals.uptime_pct,                      <span class="cm">// 0–100 direct</span>
+    portal_logins:   <span class="fn">Math.min</span>(<span class="num">100</span>, signals.login_days_last_30 * <span class="num">5</span>),  <span class="cm">// 20+ days = 100</span>
+    task_resolution: signals.resolution_rate_pct,             <span class="cm">// 0–100 direct</span>
+    pms_sync:
+      signals.days_since_sync <= <span class="num">1</span> ? <span class="num">100</span> :
+      signals.days_since_sync <= <span class="num">3</span> ? <span class="num">70</span>  :
+      signals.days_since_sync <= <span class="num">7</span> ? <span class="num">30</span>  : <span class="num">0</span>,
+    incident_trend:
+      signals.mom_escalation_delta <= <span class="num">0</span> ? <span class="num">100</span> :  <span class="cm">// improving or flat</span>
+      signals.mom_escalation_delta <= <span class="num">10</span> ? <span class="num">60</span> : <span class="num">20</span>   <span class="cm">// worsening</span>
+  };
+
+  <span class="kw">const</span> weights = {
+    device_uptime: <span class="num">0.30</span>, portal_logins: <span class="num">0.25</span>,
+    task_resolution: <span class="num">0.20</span>, pms_sync: <span class="num">0.15</span>, incident_trend: <span class="num">0.10</span>
+  };
+
+  <span class="kw">const</span> health_score = <span class="fn">Math.round</span>(
+    Object.<span class="fn">keys</span>(weights).<span class="fn">reduce</span>((sum, key) =>
+      sum + (signal_scores[key] * weights[key]), <span class="num">0</span>)
+  );
+
+  <span class="cm">// Find the worst signal — this drives Claude's intervention</span>
+  <span class="kw">const</span> lowest_signal = Object.<span class="fn">entries</span>(signal_scores)
+    .<span class="fn">sort</span>(([, a], [, b]) => a - b)[<span class="num">0</span>][<span class="num">0</span>];
+
+  <span class="kw">return</span> { health_score, signal_scores, lowest_signal };
+}
+
+<span class="cm">// Daily job: score all facilities, store snapshot, detect drops</span>
+<span class="kw">async function</span> <span class="fn">runDailyScoring</span>() {
+  <span class="kw">const</span> facilities = <span class="kw">await</span> <span class="fn">getActiveFacilities</span>();
+
+  <span class="kw">for</span> (<span class="kw">const</span> facility <span class="kw">of</span> facilities) {
+    <span class="kw">const</span> signals  = <span class="kw">await</span> <span class="fn">collectSignals</span>(facility.id);
+    <span class="kw">const</span> result   = <span class="fn">calculateHealthScore</span>(signals);
+    <span class="kw">const</span> previous = <span class="kw">await</span> <span class="fn">getScoreFromDaysAgo</span>(facility.id, <span class="num">7</span>);
+    <span class="kw">const</span> delta    = result.health_score - (previous?.health_score ?? result.health_score);
+
+    <span class="cm">// Store daily snapshot to BigQuery history table</span>
+    <span class="kw">await</span> <span class="fn">writeSnapshot</span>(facility.id, result, delta);
+
+    <span class="cm">// Trigger Claude alert if score dropped significantly</span>
+    <span class="kw">if</span> (delta <= -<span class="num">15</span> || result.health_score < <span class="num">45</span>) {
+      <span class="kw">await</span> <span class="fn">triggerIntervention</span>(facility, result, delta);
+    }
+  }
+}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step">
+      <div class="step-num-wrap"><div class="step-num sn3">3</div><div class="step-line"></div></div>
+      <div class="step-content">
+        <div class="step-tag" style="color:#c080ff;">AI Layer — Claude</div>
+        <div class="step-title">Integrate Claude API — diagnose the drop and write a specific intervention playbook</div>
+        <div class="step-body">
+          <p>Claude is called <strong style="color:#fff;">only when a score drops ≥15 points in 7 days, or falls below 45</strong>. It reads the signal breakdown, identifies the primary cause, and writes a specific actionable recommendation for the CS team — not a generic "reach out to customer" message.</p>
+          <div class="code-block"><span class="cm">// claude-health-advisor.js</span>
+<span class="kw">async function</span> <span class="fn">generateIntervention</span>(facility, scoreResult, delta) {
+  <span class="kw">const</span> payload = {
+    facility_name:     facility.name,
+    current_score:     scoreResult.health_score,
+    score_delta_7d:    delta,            <span class="cm">// e.g. -32 (dropped 32 pts in 7 days)</span>
+    signal_scores:     scoreResult.signal_scores,
+    lowest_signal:     scoreResult.lowest_signal,
+    smart_unit_count:  facility.smart_unit_count,
+    monthly_sub_usd:   facility.smart_unit_count * <span class="num">12</span>,  <span class="cm">// e.g. $720/mo</span>
+    pms_type:          facility.pms_type           <span class="cm">// e.g. 'storEDGE'</span>
+  };
+
+  <span class="kw">const</span> response = <span class="kw">await</span> client.messages.<span class="fn">create</span>({
+    model:      <span class="str">"claude-sonnet-4-6"</span>,
+    max_tokens: <span class="num">500</span>,
+    system: [{
+      type: <span class="str">"text"</span>,
+      text: <span class="str">`You are a customer success analyst at Storage Defender.
+A customer's health score has dropped. Diagnose the primary cause from
+the signal data provided and write a specific, actionable intervention
+for the CS team to take TODAY. Be direct — name the exact signal that
+is failing and give a concrete next step. 2–3 short paragraphs.
+Always mention the customer's monthly subscription value so the CS
+team knows what retention is worth. Never invent data.`</span>,
+      cache_control: { type: <span class="str">"ephemeral"</span> }
+    }],
+    messages: [{ role: <span class="str">"user"</span>, content: <span class="fn">JSON.stringify</span>(payload, <span class="kw">null</span>, <span class="num">2</span>) }]
+  });
+
+  <span class="kw">return</span> response.content[<span class="num">0</span>].text;
+}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="step">
+      <div class="step-num-wrap"><div class="step-num sn4">4</div><div class="step-line"></div></div>
+      <div class="step-content">
+        <div class="step-tag" style="color:#30a0c0;">Slack Alerting</div>
+        <div class="step-title">Send real-time Slack alerts to CS channel when a score drops</div>
+        <div class="step-body">
+          <p>When the intervention is triggered, post a formatted alert to the CS Slack channel. The message includes: facility name, health score, 7-day delta, the specific failing signal, Claude's recommendation, and a link to the CS dashboard.</p>
+          <div class="code-block"><span class="cm">// slack-alert.js</span>
+<span class="kw">async function</span> <span class="fn">postHealthAlert</span>(facility, scoreResult, delta, claudeAdvice) {
+  <span class="kw">const</span> scoreColour =
+    scoreResult.health_score >= <span class="num">80</span> ? <span class="str">'#40c060'</span> :
+    scoreResult.health_score >= <span class="num">60</span> ? <span class="str">'#e0c020'</span> :
+    scoreResult.health_score >= <span class="num">40</span> ? <span class="str">'#e07020'</span> : <span class="str">'#e03040'</span>;
+
+  <span class="kw">await</span> slackWebhook.<span class="fn">send</span>({
+    text: <span class="str">`⚠️ Customer health drop: *${facility.name}*`</span>,
+    attachments: [{
+      color: scoreColour,
+      fields: [
+        { title: <span class="str">'Health Score'</span>, value: <span class="str">`${scoreResult.health_score}/100`</span>,   short: <span class="kw">true</span> },
+        { title: <span class="str">'7-Day Change'</span>, value: <span class="str">`${delta} pts`</span>,                    short: <span class="kw">true</span> },
+        { title: <span class="str">'Failing Signal'</span>, value: scoreResult.lowest_signal,          short: <span class="kw">true</span> },
+        { title: <span class="str">'Monthly Sub'</span>, value: <span class="str">`$${facility.smart_unit_count * 12}/mo`</span>, short: <span class="kw">true</span> },
+        { title: <span class="str">'AI Recommendation'</span>, value: claudeAdvice }
+      ]
+    }]
+  });
+}</div>
+          <div class="callout callout-success">
+            <div class="ci">💡</div>
+            <p><strong>Why Slack first?</strong> SD's CS team already uses Slack daily. A Slack alert requires zero new tooling — just a webhook URL. The Looker Studio dashboard is for long-term tracking; Slack is for same-day action.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="step">
+      <div class="step-num-wrap"><div class="step-num sn5">5</div><div class="step-line"></div></div>
+      <div class="step-content">
+        <div class="step-tag" style="color:#e0b020;">CS Dashboard</div>
+        <div class="step-title">Build Looker Studio dashboard — all customers ranked by health score + trend</div>
+        <div class="step-body">
+          <p>A <strong style="color:#fff;">Looker Studio dashboard</strong> connected directly to the BigQuery health_scores history table. The CS team can view all facilities, filter by score band (Critical / At Risk / Needs Attention / Healthy), and see the 30-day trend per customer.</p>
+          <div class="callout callout-info">
+            <div class="ci">📊</div>
+            <p><strong>Setup time: ~4 hours</strong> once the BigQuery history table is populated. Connect Looker Studio, add date range filter, create score band chart, add trend sparkline per row. CS manager gets a Monday morning view of every at-risk account.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 6 -->
+    <div class="step">
+      <div class="step-num-wrap"><div class="step-num sn6">6</div><div class="step-line"></div></div>
+      <div class="step-content">
+        <div class="step-tag" style="color:#20a0c0;">Weekly Digest</div>
+        <div class="step-title">Send weekly CS manager digest — top 10 at-risk accounts with trends</div>
+        <div class="step-body">
+          <p>Every Monday morning, send an automated email digest to the CS manager listing the 10 lowest-scoring accounts, their week-over-week delta, and the primary failing signal for each. Uses SendGrid with a simple HTML template — no Claude needed for the digest (just templated data).</p>
+          <div class="code-block"><span class="cm">// weekly-digest.js (no Claude needed — templated data only)</span>
+<span class="kw">const</span> atRiskAccounts = <span class="kw">await</span> bigquery.<span class="fn">query</span>(<span class="str">`
+  SELECT facility_name, health_score, delta_7d, lowest_signal,
+         smart_unit_count * 12 AS monthly_sub_usd
+  FROM   tod_backoffice.health_scores
+  WHERE  DATE(scored_at) = CURRENT_DATE()
+  ORDER BY health_score ASC
+  LIMIT  10
+`</span>);
+
+<span class="kw">await</span> sendgrid.<span class="fn">send</span>({
+  to:      CS_MANAGER_EMAIL,
+  subject: <span class="str">`SD Weekly Health Report — ${atRiskAccounts.filter(r => r.health_score < 60).length} accounts need attention`</span>,
+  html:    <span class="fn">digestTemplate</span>({ accounts: atRiskAccounts })
+});</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 7 -->
+    <div class="step">
+      <div class="step-num-wrap"><div class="step-num sn7">7</div></div>
+      <div class="step-content">
+        <div class="step-tag" style="color:#e03060;">Testing & Validation</div>
+        <div class="step-title">Backfill 30 days of history, validate scores, pilot with CS team</div>
+        <div class="step-body">
+          <p>Before going live, <strong style="color:#fff;">backfill 30 days of historical score data</strong> by running the scoring engine against past BigQuery snapshots. This gives the CS team an immediate trend view from day one — not a blank dashboard.</p>
+          <p>Have the CS team manually review the bottom 10 scored facilities and confirm: does the score match their intuition about which customers are actually struggling? Iterate on signal weights if needed.</p>
+          <div class="callout callout-warn">
+            <div class="ci">⚠️</div>
+            <p><strong>Key validation:</strong> Confirm that <code style="background:rgba(255,255,255,0.08);padding:1px 5px;border-radius:3px;font-size:0.72rem;">user_sessions</code> (or Firebase auth logs) is accessible in tod_backoffice or BigQuery before building — portal login frequency is the second-heaviest signal (25 pts) and it needs a reliable data source.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════ SECTION 4: CLAUDE AI DETAIL ═══════════ -->
+<div class="section">
+  <div class="section-tag">Section 4</div>
+  <h2>Claude AI — <span>Deep Dive</span></h2>
+  <p class="desc">Claude is used only when needed — triggered by score drops, not on every daily run. This keeps costs minimal and impact maximal.</p>
+
+  <div class="claude-box">
+    <div class="cb-head">
+      <div class="cb-icon">🤖</div>
+      <div>
+        <h3>Claude Sonnet 4.6 — Anthropic API</h3>
+        <div class="cb-sub">Model ID: claude-sonnet-4-6 &nbsp;|&nbsp; SDK: @anthropic-ai/sdk &nbsp;|&nbsp; Called only on score drops (≥15 pts or score &lt;45)</div>
+      </div>
+    </div>
+
+    <div class="cb-grid">
+      <div class="cb-item">
+        <h5>What Claude Does Here</h5>
+        <ul>
+          <li>Reads the signal score breakdown (which signals are low)</li>
+          <li>Identifies the primary root cause of the score drop</li>
+          <li>Writes a specific CS intervention (not generic)</li>
+          <li>Names the exact action: "fix storEDGE sync", "schedule training", etc.</li>
+          <li>Includes the customer's monthly subscription value ($12 × devices)</li>
+        </ul>
+      </div>
+      <div class="cb-item">
+        <h5>Why Only on Score Drops?</h5>
+        <ul>
+          <li>Healthy customers don't need intervention — calling Claude daily for all 200+ facilities wastes budget</li>
+          <li>Triggered-only approach: ~10–20 alerts/day across entire fleet</li>
+          <li>Cost drops from ~$40/month (daily all) to ~$3–5/month (triggered only)</li>
+          <li>Alerts feel more urgent when they're selective, not noise</li>
+        </ul>
+      </div>
+      <div class="cb-item">
+        <h5>Cost Estimate (per month)</h5>
+        <ul>
+          <li>~15 score drop events/day × 30 days = 450 API calls/month</li>
+          <li>~500 output tokens per intervention</li>
+          <li>System prompt cached per batch (5-minute TTL)</li>
+          <li>Estimated: <strong>~$3–5 USD/month</strong> for all alerts</li>
+          <li>Scales with fleet size — still negligible vs retention revenue</li>
+        </ul>
+      </div>
+      <div class="cb-item">
+        <h5>What Claude Must NOT Do</h5>
+        <ul>
+          <li>Must not invent churn probability % (not enough data for this yet)</li>
+          <li>Must not invent revenue figures — only use devices × $12</li>
+          <li>Must not be alarmist — tone is "here is a specific thing to fix" not "this customer is leaving"</li>
+          <li>Must cite the exact failing signal so CS can verify independently</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:16px;">
+      <div style="font-size:0.65rem;font-weight:700;color:rgba(160,80,255,0.7);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;">📝 Sample Claude Output — what appears in the CS Slack alert</div>
+      <p style="font-size:0.84rem;color:rgba(255,255,255,0.75);line-height:1.7;font-style:italic;">"<strong style="color:#fff;">Riverside Storage</strong> health score dropped 32 points this week (76 → 44). The primary cause is a <strong style="color:#fff;">broken PMS sync — storEDGE last synced 9 days ago</strong>, which means tenant move-in/move-out data is stale and the facility manager may already be noticing data discrepancies.</p>
+      <p style="font-size:0.84rem;color:rgba(255,255,255,0.75);line-height:1.7;font-style:italic;margin-top:8px;">Secondary signal: portal logins dropped to <strong style="color:#fff;">2 days this month</strong> (down from 14 last month) — this is consistent with a frustrated customer who stops using the product when it stops syncing correctly.</p>
+      <p style="font-size:0.84rem;color:rgba(255,255,255,0.75);line-height:1.7;font-style:italic;margin-top:8px;">Recommended action: Contact the facility manager <strong style="color:#e05c1a;">today</strong> and offer to fix the storEDGE integration sync — this is typically a 15-minute fix. Riverside Storage is a <strong style="color:#fff;">$720/month account (60 devices × $12)</strong>. Resolving the sync issue should restore their score above 70 within 48 hours."</p>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════ SECTION 5: SAMPLE OUTPUT ═══════════ -->
+<div class="section">
+  <div class="section-tag">Section 5</div>
+  <h2>Sample Output <span>Preview</span></h2>
+  <p class="desc">Three views: health score cards, CS dashboard, and the intervention playbook by signal.</p>
+
+  <!-- Health score cards -->
+  <div style="margin-bottom:8px;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--muted);">📊 Health Score Bands — what each score level means</div>
+  <div class="health-grid" style="margin-bottom:28px;">
+    <div class="health-card hc-healthy">
+      <div class="hc-score" style="color:#60e090;">87</div>
+      <div class="hc-label" style="color:#40c060;">Healthy</div>
+      <div class="hc-signals">
+        <div class="hc-sig">Device Uptime <div class="hc-bar-wrap"><div class="hc-bar" style="width:95%;background:#40c060;"></div></div><div class="hc-val" style="color:#60e090;">95%</div></div>
+        <div class="hc-sig">Portal Logins <div class="hc-bar-wrap"><div class="hc-bar" style="width:80%;background:#40c060;"></div></div><div class="hc-val" style="color:#60e090;">80</div></div>
+        <div class="hc-sig">Task Res.     <div class="hc-bar-wrap"><div class="hc-bar" style="width:88%;background:#40c060;"></div></div><div class="hc-val" style="color:#60e090;">88%</div></div>
+        <div class="hc-sig">PMS Sync      <div class="hc-bar-wrap"><div class="hc-bar" style="width:100%;background:#40c060;"></div></div><div class="hc-val" style="color:#60e090;">100</div></div>
+        <div class="hc-sig">Inc. Trend    <div class="hc-bar-wrap"><div class="hc-bar" style="width:80%;background:#40c060;"></div></div><div class="hc-val" style="color:#60e090;">80</div></div>
+      </div>
+    </div>
+    <div class="health-card hc-risk">
+      <div class="hc-score" style="color:#ff8060;">44</div>
+      <div class="hc-label" style="color:#e07030;">AT RISK — Alert fired</div>
+      <div class="hc-signals">
+        <div class="hc-sig">Device Uptime <div class="hc-bar-wrap"><div class="hc-bar" style="width:82%;background:#e07030;"></div></div><div class="hc-val" style="color:#ffa060;">82%</div></div>
+        <div class="hc-sig">Portal Logins <div class="hc-bar-wrap"><div class="hc-bar" style="width:10%;background:#e03040;"></div></div><div class="hc-val" style="color:#ff6060;">10</div></div>
+        <div class="hc-sig">Task Res.     <div class="hc-bar-wrap"><div class="hc-bar" style="width:55%;background:#e0b020;"></div></div><div class="hc-val" style="color:#ffe060;">55%</div></div>
+        <div class="hc-sig">PMS Sync      <div class="hc-bar-wrap"><div class="hc-bar" style="width:0%;background:#e03040;"></div></div><div class="hc-val" style="color:#ff6060;">0</div></div>
+        <div class="hc-sig">Inc. Trend    <div class="hc-bar-wrap"><div class="hc-bar" style="width:60%;background:#e0b020;"></div></div><div class="hc-val" style="color:#ffe060;">60</div></div>
+      </div>
+    </div>
+    <div class="health-card hc-critical" style="border-color:rgba(220,40,40,0.4);">
+      <div class="hc-score" style="color:#ff5050;">22</div>
+      <div class="hc-label" style="color:#e03030;">CRITICAL — Urgent action</div>
+      <div class="hc-signals">
+        <div class="hc-sig">Device Uptime <div class="hc-bar-wrap"><div class="hc-bar" style="width:40%;background:#e03040;"></div></div><div class="hc-val" style="color:#ff6060;">40%</div></div>
+        <div class="hc-sig">Portal Logins <div class="hc-bar-wrap"><div class="hc-bar" style="width:0%;background:#e03040;"></div></div><div class="hc-val" style="color:#ff6060;">0</div></div>
+        <div class="hc-sig">Task Res.     <div class="hc-bar-wrap"><div class="hc-bar" style="width:20%;background:#e03040;"></div></div><div class="hc-val" style="color:#ff6060;">20%</div></div>
+        <div class="hc-sig">PMS Sync      <div class="hc-bar-wrap"><div class="hc-bar" style="width:0%;background:#e03040;"></div></div><div class="hc-val" style="color:#ff6060;">0</div></div>
+        <div class="hc-sig">Inc. Trend    <div class="hc-bar-wrap"><div class="hc-bar" style="width:20%;background:#e03040;"></div></div><div class="hc-val" style="color:#ff6060;">20</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CS Dashboard -->
+  <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:24px;margin-bottom:24px;">
+    <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:4px;">CS Team Dashboard — Customer Health Ranking (Looker Studio)</div>
+    <div style="font-size:0.72rem;color:rgba(255,255,255,0.3);margin-bottom:16px;">Sorted by health score ascending · Red = needs action today</div>
+    <table class="cs-table">
+      <thead>
+        <tr><th>Facility</th><th>Score</th><th>7d Trend</th><th>Monthly Sub</th><th>Failing Signal</th><th>Status</th><th>Action</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong style="color:#fff;">Northgate Self Store</strong></td>
+          <td style="color:#ff5050;font-weight:700;">22</td>
+          <td class="trend-down">↓ −38 pts</td>
+          <td style="color:#60e090;">$360/mo</td>
+          <td style="color:#ffa060;">Device Uptime (40%)</td>
+          <td><span class="badge-crit">CRITICAL</span></td>
+          <td><button class="cs-btn">View Alert ↗</button></td>
+        </tr>
+        <tr>
+          <td><strong style="color:#fff;">Riverside Storage</strong></td>
+          <td style="color:#ff8060;font-weight:700;">44</td>
+          <td class="trend-down">↓ −32 pts</td>
+          <td style="color:#60e090;">$720/mo</td>
+          <td style="color:#ffa060;">PMS Sync broken 9d</td>
+          <td><span class="badge-risk">AT RISK</span></td>
+          <td><button class="cs-btn">View Alert ↗</button></td>
+        </tr>
+        <tr>
+          <td><strong style="color:#fff;">Downtown Mini Storage</strong></td>
+          <td style="color:#ffe060;font-weight:700;">58</td>
+          <td class="trend-down">↓ −12 pts</td>
+          <td style="color:#60e090;">$960/mo</td>
+          <td style="color:#ffa060;">Portal Logins (2 days)</td>
+          <td><span class="badge-attn">NEEDS ATTN</span></td>
+          <td><button class="cs-btn">View Alert ↗</button></td>
+        </tr>
+        <tr>
+          <td><strong style="color:#fff;">Oakwood Vaults</strong></td>
+          <td style="color:#60e090;font-weight:700;">87</td>
+          <td class="trend-up">↑ +5 pts</td>
+          <td style="color:#60e090;">$1,140/mo</td>
+          <td style="color:rgba(255,255,255,0.3);">—</td>
+          <td><span class="badge-health">HEALTHY</span></td>
+          <td><button class="cs-btn" style="opacity:0.4;">No action</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Playbook -->
+  <div style="margin-bottom:10px;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--muted);">🗂️ Intervention Playbook — Claude recommends based on the lowest signal</div>
+  <div class="playbook-grid">
+    <div class="pb-card">
+      <div class="pb-signal" style="color:#e03040;">Low Device Uptime (&lt;70%)</div>
+      <div class="pb-trigger">Trigger: uptime_pct drops below 70%</div>
+      <div class="pb-action">Hardware connectivity issue. Escalate to SD Support team to investigate offline devices. Offer the facility manager a same-day fix call. Check gateway status in the BackOffice device panel.</div>
+    </div>
+    <div class="pb-card">
+      <div class="pb-signal" style="color:#e07030;">Low Portal Logins (&lt;5 days/month)</div>
+      <div class="pb-trigger">Trigger: login_days_last_30 &lt; 5</div>
+      <div class="pb-action">Disengaged customer. Send the AI Monthly Value Report (Idea #1) immediately. Schedule a 30-min training call. CS team to check if the facility manager changed role or left the company.</div>
+    </div>
+    <div class="pb-card">
+      <div class="pb-signal" style="color:#e0b020;">Low Task Resolution (&lt;50%)</div>
+      <div class="pb-trigger">Trigger: resolution_rate_pct &lt; 50%</div>
+      <div class="pb-action">Incidents piling up unresolved — customer may feel overwhelmed or undertrained. Offer an incident response workflow review. Check if the escalation matrix is configured correctly in Manage Facility.</div>
+    </div>
+    <div class="pb-card">
+      <div class="pb-signal" style="color:#e03040;">Broken PMS Sync (&gt;7 days)</div>
+      <div class="pb-trigger">Trigger: days_since_sync &gt; 7</div>
+      <div class="pb-action">Silent churn signal — stale tenant data causes data accuracy complaints. Fix the PMS integration (storEDGE / SiteLink / SSM) — typically a 15-minute config fix. Most common cause: API key expired or webhook endpoint changed.</div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════ SECTION 6: ACCESS ═══════════ -->
+<div class="section">
+  <div class="section-tag">Section 6</div>
+  <h2>Access &amp; <span>Permissions Needed</span></h2>
+  <p class="desc">What SD already has vs what needs to be set up before starting.</p>
+
+  <div class="access-grid">
+    <div class="access-card">
+      <h4>✅ Already Have</h4>
+      <div class="access-item">
+        <div class="ai-status have">✓</div>
+        <div class="ai-text">
+          <div class="ai-name">BigQuery access (Hevo pipeline)</div>
+          <div class="ai-desc">tod_backoffice → BigQuery already synced. devices, tasks, pms_integrations, incidents tables all available.</div>
+        </div>
+      </div>
+      <div class="access-item">
+        <div class="ai-status have">✓</div>
+        <div class="ai-text">
+          <div class="ai-name">pms_integrations table (sync status)</div>
+          <div class="ai-desc">Directly available in tod_backoffice. last_sync_at and is_active fields exist per facility.</div>
+        </div>
+      </div>
+      <div class="access-item">
+        <div class="ai-status have">✓</div>
+        <div class="ai-text">
+          <div class="ai-name">Google Cloud Platform (GCP)</div>
+          <div class="ai-desc">Cloud Run, Cloud Scheduler, Looker Studio already used. No new cloud infrastructure needed.</div>
+        </div>
+      </div>
+      <div class="access-item">
+        <div class="ai-status have">✓</div>
+        <div class="ai-text">
+          <div class="ai-name">Slack (SD uses Slack integration)</div>
+          <div class="ai-desc">SD already has Slack webhooks built in for notifications. The CS Slack channel already exists — just need a webhook URL for it.</div>
+        </div>
+      </div>
+      <div class="access-item">
+        <div class="ai-status have">✓</div>
+        <div class="ai-text">
+          <div class="ai-name">Anthropic account (Claude Code CLI)</div>
+          <div class="ai-desc">SD already uses Claude Code. Same account can issue a production API key for Claude Sonnet.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="access-card">
+      <h4>🔑 Need to Get / Confirm</h4>
+      <div class="access-item">
+        <div class="ai-status need">!</div>
+        <div class="ai-text">
+          <div class="ai-name">user_sessions / portal login data source</div>
+          <div class="ai-desc">Confirm where portal login data lives — tod_backoffice user_sessions table, or Firebase Auth logs, or both. This is the second-highest weighted signal (25 pts) and must be accessible before building.</div>
+        </div>
+      </div>
+      <div class="access-item">
+        <div class="ai-status need">!</div>
+        <div class="ai-text">
+          <div class="ai-name">Anthropic API Key</div>
+          <div class="ai-desc">Create at console.anthropic.com. Store in GCP Secret Manager. ~$3–5/month for triggered-only use.</div>
+        </div>
+      </div>
+      <div class="access-item">
+        <div class="ai-status need">!</div>
+        <div class="ai-text">
+          <div class="ai-name">BigQuery write permission (health_scores table)</div>
+          <div class="ai-desc">Scoring engine needs bigquery.dataEditor on a new health_scores history table. Service account update needed from DevOps.</div>
+        </div>
+      </div>
+      <div class="access-item">
+        <div class="ai-status easy">~</div>
+        <div class="ai-text">
+          <div class="ai-name">CS Slack webhook URL</div>
+          <div class="ai-desc">CS team creates a Slack incoming webhook for their channel. 2-minute task in Slack settings.</div>
+        </div>
+      </div>
+      <div class="access-item">
+        <div class="ai-status easy">~</div>
+        <div class="ai-text">
+          <div class="ai-name">CS team sign-off on alert thresholds</div>
+          <div class="ai-desc">CS team must agree on: alert trigger (≥15 pt drop? ≥20?), critical threshold (below 45?), and which Slack channel receives alerts — before launch.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════ SECTION 7: AI TOOL OPTIONS ═══════════ -->
+<div class="section">
+  <div class="section-tag">Section 7</div>
+  <h2>AI Tool <span>Options</span></h2>
+  <p class="desc">Health scoring itself is rule-based. Claude is used only for generating intervention text on score drops. Here are the options.</p>
+
+  <div class="tool-grid">
+    <div class="tool-card recommended">
+      <div class="rec-tag">⭐ Recommended</div>
+      <div class="tc-logo">🤖</div>
+      <h4>Claude Sonnet 4.6</h4>
+      <p>Best at diagnosing complex multi-signal situations and writing concise, specific, actionable text.</p>
+      <ul>
+        <li>Triggered-only = ~$3–5/month (not daily cost)</li>
+        <li>Understands nuance: "low PMS sync + low logins = very different from low logins alone"</li>
+        <li>Prompt caching for batch triggers</li>
+        <li>SD already has Anthropic account</li>
+        <li>Easiest to tune via system prompt</li>
+      </ul>
+    </div>
+    <div class="tool-card alt">
+      <div class="tc-logo">📋</div>
+      <h4>Rule-Based Templates</h4>
+      <p>No AI — use if-else logic to pick a pre-written playbook based on the lowest signal.</p>
+      <ul>
+        <li>Zero API cost</li>
+        <li>Faster to build for pilot</li>
+        <li>Less context-aware — misses compound signals</li>
+        <li>Good fallback if API key is delayed</li>
+        <li>Can layer Claude on top in v2</li>
+      </ul>
+    </div>
+    <div class="tool-card alt">
+      <div class="tc-logo">🔵</div>
+      <h4>Google Gemini (Vertex AI)</h4>
+      <p>Keeps everything within GCP. Good backup if Anthropic access is delayed.</p>
+      <ul>
+        <li>Native GCP — no external vendor</li>
+        <li>Free tier available for low volume</li>
+        <li>More Vertex AI setup complexity</li>
+        <li>Slightly weaker at structured instruction following</li>
+        <li>Viable option for cost-sensitive pilot</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════ SECTION 8: 60-DAY TIMELINE ═══════════ -->
+<div class="section">
+  <div class="section-tag">Section 8</div>
+  <h2>60-Day <span>Execution Timeline</span></h2>
+  <p class="desc">60 days because signal validation and CS calibration take longer than pure build work. The first 2 weeks are data verification — getting signal queries wrong wastes everything downstream.</p>
+
+  <div class="timeline">
+    <div class="tl-week">
+      <div class="tl-week-label">
+        <div class="wl-num">Week 1–2</div>
+        <div class="wl-days">Days 1–14</div>
+      </div>
+      <div class="tl-tasks">
+        <div class="tl-task"><span class="tt-who who-pm">PM</span><span class="tt-text">Define signal thresholds with CS team — what score triggers an alert? What does "healthy" look like for a typical SD customer?</span></div>
+        <div class="tl-task"><span class="tt-who who-data">Data</span><span class="tt-text">Write and validate all 5 signal SQL queries against real facility data in BigQuery — confirm user_sessions / login data is accessible</span></div>
+        <div class="tl-task"><span class="tt-who who-data">Data</span><span class="tt-text">Manually score 10 known customers using the formula — cross-check with CS team: do scores match CS team's gut feeling about account health?</span></div>
+        <div class="tl-task"><span class="tt-who who-eng">Eng</span><span class="tt-text">Create Cloud Run scaffold + Cloud Scheduler cron (daily 2am UTC) + BigQuery health_scores history table</span></div>
+      </div>
+    </div>
+
+    <div class="tl-week">
+      <div class="tl-week-label">
+        <div class="wl-num">Week 3–4</div>
+        <div class="wl-days">Days 15–28</div>
+      </div>
+      <div class="tl-tasks">
+        <div class="tl-task"><span class="tt-who who-eng">Eng</span><span class="tt-text">Build Health Score Engine — collectSignals(), calculateHealthScore(), writeSnapshot() — run against all active facilities</span></div>
+        <div class="tl-task"><span class="tt-who who-eng">Eng</span><span class="tt-text">Integrate Claude API — generateIntervention() with prompt caching, triggered only on score drops ≥15 pts or score &lt;45</span></div>
+        <div class="tl-task"><span class="tt-who who-eng">Eng</span><span class="tt-text">Build Slack alerting — postHealthAlert() with formatted attachment, score colour, failing signal, Claude advice</span></div>
+        <div class="tl-task"><span class="tt-who who-qa">QA</span><span class="tt-text">Unit tests for score formula — validate boundary conditions, signal weights, delta calculation, trigger logic</span></div>
+      </div>
+    </div>
+
+    <div class="tl-week">
+      <div class="tl-week-label">
+        <div class="wl-num">Week 5–6</div>
+        <div class="wl-days">Days 29–42</div>
+      </div>
+      <div class="tl-tasks">
+        <div class="tl-task"><span class="tt-who who-data">Data</span><span class="tt-text">Backfill 30 days of historical scores — run scoring engine against past BigQuery data so the dashboard shows trends from day one</span></div>
+        <div class="tl-task"><span class="tt-who who-data">Data</span><span class="tt-text">Build Looker Studio CS dashboard — health score ranking, trend chart, signal breakdown, score band filter</span></div>
+        <div class="tl-task"><span class="tt-who who-eng">Eng</span><span class="tt-text">Build weekly CS digest email (SendGrid) — top 10 at-risk accounts, no Claude needed for digest</span></div>
+        <div class="tl-task"><span class="tt-who who-cs">CS</span><span class="tt-text">CS team reviews first 5 Slack alert samples — is the Claude recommendation specific enough? Does it match what they'd actually do?</span></div>
+      </div>
+    </div>
+
+    <div class="tl-week">
+      <div class="tl-week-label">
+        <div class="wl-num">Week 7–8</div>
+        <div class="wl-days">Days 43–60</div>
+      </div>
+      <div class="tl-tasks">
+        <div class="tl-task"><span class="tt-who who-eng">Eng</span><span class="tt-text">Deploy to production — enable for all active facilities, verify daily job runs cleanly, no false positives flooding CS Slack</span></div>
+        <div class="tl-task"><span class="tt-who who-cs">CS</span><span class="tt-text">CS team acts on first 10 real alerts — log outcome: did the intervention restore the score? Did the customer respond positively?</span></div>
+        <div class="tl-task"><span class="tt-who who-pm">PM</span><span class="tt-text">Measure: how many alerted customers were retained vs churned? Compare vs baseline (no alert) to validate churn prevention effectiveness</span></div>
+        <div class="tl-task"><span class="tt-who who-qa">QA</span><span class="tt-text">Monitor pipeline health — Cloud Logging alerts for scoring job failure, Slack delivery error, BigQuery write error</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════ FINAL CALLOUT ═══════════ -->
+<div class="section" style="padding-bottom:20px;">
+  <div style="background:linear-gradient(135deg,#081808,#0a1e0a);border:1.5px solid rgba(64,192,96,0.4);border-radius:16px;padding:28px 32px;display:flex;gap:20px;align-items:flex-start;">
+    <div style="font-size:2.5rem;flex-shrink:0;">🛡️</div>
+    <div>
+      <div style="font-size:1.1rem;font-weight:800;color:#fff;margin-bottom:8px;">Summary — Why Idea #3 wins the Customer Impact Award</div>
+      <div style="font-size:0.86rem;color:rgba(255,255,255,0.65);line-height:1.65;">
+        All 5 signals are already in <strong style="color:#fff;">tod_backoffice — no new data collection needed</strong>. The health score formula is transparent, explainable, and adjustable. Claude is triggered only when needed — keeping AI cost under <strong style="color:#fff;">$5/month</strong> while delivering specific, actionable interventions. The Slack alert tells the CS team <em>exactly what to do</em>, not just that something is wrong. A single retained 60-device customer = <strong style="color:#40c060;">$720/month × 12 = $8,640/year preserved</strong>. The dashboard gives CS a daily ranked view of every at-risk account — turning retention from reactive firefighting into <strong style="color:#40c060;">proactive, data-driven customer success</strong>. 10/10 scalability score: as SD grows, the value of this system compounds with every new customer added to the fleet.
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div class="footer">
+  SD Innovation Tank — Idea #3 Technical Execution Plan &nbsp;|&nbsp; Storage Defender &nbsp;|&nbsp; teamofdefenders.atlassian.net &nbsp;|&nbsp; May 2026
+</div>
+
+</body>
+</html>
