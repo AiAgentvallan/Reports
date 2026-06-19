@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMS Keyword Handling — Renter Impact Analysis</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6fb; color: #1a1a2e; font-size: 14px; }
+
+  /* ── Header ── */
+  .header { background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 60%, #1a56a0 100%); color: #fff; padding: 36px 48px 30px; }
+  .header h1 { font-size: 24px; font-weight: 700; }
+  .header p  { color: #94a3b8; margin-top: 6px; font-size: 13px; }
+  .badge-row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+  .badge { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.22); border-radius: 20px; padding: 4px 14px; font-size: 12px; color: #e2e8f0; }
+
+  /* ── Layout ── */
+  .container { max-width: 1100px; margin: 0 auto; padding: 30px 20px; }
+  .section { background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); margin-bottom: 26px; overflow: hidden; }
+  .section-header { padding: 14px 22px; border-bottom: 1px solid #e8ecf2; display: flex; align-items: center; gap: 10px; }
+  .section-header h2 { font-size: 14px; font-weight: 700; color: #0f172a; }
+  .section-body { padding: 20px 22px; }
+  .icon { font-size: 18px; }
+
+  /* ── Tables ── */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: #f1f5f9; color: #475569; font-weight: 700; padding: 10px 14px; text-align: left; border-bottom: 2px solid #e2e8f0; font-size: 12px; text-transform: uppercase; letter-spacing: 0.4px; }
+  td { padding: 10px 14px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #fafbfc; }
+
+  /* ── Status chips ── */
+  .chip { display: inline-block; border-radius: 20px; padding: 3px 12px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+  .chip-yes    { background: #dcfce7; color: #166534; }
+  .chip-no     { background: #fee2e2; color: #991b1b; }
+  .chip-gap    { background: #fef9c3; color: #78350f; }
+  .chip-add    { background: #ede9fe; color: #4c1d95; }
+  .chip-high   { background: #fee2e2; color: #991b1b; }
+  .chip-med    { background: #fef9c3; color: #78350f; }
+  .chip-low    { background: #f0fdf4; color: #166534; }
+  .chip-multi  { background: #e0f2fe; color: #0369a1; }
+
+  /* ── Call-out boxes ── */
+  .callout { border-radius: 8px; padding: 12px 16px; margin: 12px 0; font-size: 13px; display: flex; gap: 12px; }
+  .callout-blue   { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+  .callout-green  { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+  .callout-orange { background: #fff7ed; border: 1px solid #fed7aa; color: #9a3412; }
+  .callout-red    { background: #fff1f2; border: 1px solid #fecdd3; color: #9f1239; }
+  .callout-icon { font-size: 18px; flex-shrink: 0; }
+  .callout-body { flex: 1; }
+  .callout-body strong { display: block; margin-bottom: 4px; }
+
+  /* ── SMS preview ── */
+  .sms-preview { background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #3b82f6; border-radius: 6px; padding: 10px 14px; font-size: 12px; font-style: italic; color: #1e293b; margin: 8px 0; }
+
+  /* ── Two-col ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media(max-width:700px){ .grid-2 { grid-template-columns: 1fr; } }
+  .mini-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; }
+  .mini-card h4 { font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+
+  /* ── word pill ── */
+  .pill { display: inline-block; background: #1e293b; color: #e2e8f0; border-radius: 4px; padding: 2px 9px; font-size: 12px; font-family: 'Consolas', monospace; margin: 2px 3px; }
+  .pill.green  { background: #166534; }
+  .pill.red    { background: #991b1b; }
+  .pill.purple { background: #4c1d95; }
+  .pill.gray   { background: #64748b; }
+
+  /* ── Section divider ── */
+  .divider { border: none; border-top: 1px solid #e2e8f0; margin: 16px 0; }
+
+  /* ── Source tag ── */
+  .source { font-size: 11px; color: #94a3b8; font-family: 'Consolas', monospace; }
+
+  /* ── Priority bar ── */
+  .pbar { display: flex; align-items: center; gap: 8px; }
+  .pbar-fill { height: 6px; border-radius: 3px; }
+  .pbar-high   { background: #ef4444; }
+  .pbar-med    { background: #f59e0b; }
+  .pbar-low    { background: #22c55e; }
+
+  code { background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 4px; padding: 1px 6px; font-family: 'Consolas', monospace; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<div class="header">
+  <h1>📱 SMS Keyword Handling — Renter Impact Analysis</h1>
+  <p>Storage Defender · Motion Alert SMS Reply System · Backend: tod_message_processor/core/alert.ex</p>
+  <div class="badge-row">
+    <span class="badge">✅ 8 YES words handled</span>
+    <span class="badge">✅ 4 NO words handled</span>
+    <span class="badge">⚠️ 14 gap words identified</span>
+    <span class="badge">👤 Renter impact: High</span>
+    <span class="badge">📅 June 2026</span>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ══ HOW IT WORKS ══ -->
+<div class="section">
+  <div class="section-header"><span class="icon">🔍</span><h2>How the Backend Processes SMS Replies</h2></div>
+  <div class="section-body">
+    <div class="grid-2">
+      <div>
+        <div class="callout callout-blue">
+          <div class="callout-icon">📲</div>
+          <div class="callout-body">
+            <strong>Renter receives this SMS:</strong>
+            "StorageDefender: Motion detected in Unit 980 at Mason Facility on Jun 18 8:13 PM. Was this you? Reply Yes/No"
+          </div>
+        </div>
+        <div style="margin-top:12px; font-size:13px; line-height:1.8; color:#374151;">
+          The renter's reply goes to Twilio → RabbitMQ → <code>alert_interactor.ex</code> → <code>alert.ex</code> where it's matched against the keyword lists using a regex pattern.
+        </div>
+      </div>
+      <div class="mini-card">
+        <h4>Backend Regex Pattern</h4>
+        <code style="display:block; word-break:break-all; font-size:11px; padding:8px; background:#0f172a; color:#86efac; border-radius:4px; line-height:1.6;">
+          ~r/^\s*[[:punct:]]*\s*(keyword)\s*[[:punct:]]*\s*$/i
+        </code>
+        <ul style="margin-top:10px; padding-left:16px; font-size:12px; color:#475569; line-height:1.8;">
+          <li>Case-insensitive (YES = yes = Yes)</li>
+          <li>Allows punctuation edges — "Yes!" works</li>
+          <li>Keyword must be the <strong>only word</strong></li>
+          <li>"Yes please" → ❌ FAILS (extra word)</li>
+          <li>"it was me" → ❌ FAILS (multi-word)</li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div style="font-size:13px; color:#475569; margin-bottom:10px;">Three possible outcomes for every reply:</div>
+    <table>
+      <tr>
+        <th>Backend Result</th>
+        <th>Alert Status</th>
+        <th>What happens to the incident</th>
+        <th>SMS sent back to renter</th>
+      </tr>
+      <tr>
+        <td><span class="chip chip-yes">:claim_accept</span></td>
+        <td><code>:confirmed</code></td>
+        <td>Incident resolved — <strong>presence_confirmed</strong></td>
+        <td>"Thank you, this notification was cleared!"</td>
+      </tr>
+      <tr>
+        <td><span class="chip chip-no">:claim_deny</span></td>
+        <td><code>:denied</code></td>
+        <td>Incident escalated — facility manager notified, Slack alert</td>
+        <td>"Thanks for confirming, please contact [Facility] during office hours"</td>
+      </tr>
+      <tr>
+        <td><span class="chip chip-gap">:claim_unparseable</span></td>
+        <td><code>:bad_response</code></td>
+        <td>Incident <strong>stays open</strong> — nothing escalated, nothing cleared</td>
+        <td>"Hi [FirstName], thanks for your reply! If you need help with Unit [#], please contact the facility at [Phone]"</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══ CURRENTLY HANDLED ══ -->
+<div class="section">
+  <div class="section-header"><span class="icon">✅</span><h2>Currently Handled Keywords (Dev Team Already Implemented)</h2></div>
+  <div class="section-body">
+    <p class="source" style="margin-bottom:14px;">Source: storagedefender/tod_message_processor/lib/tod_message_processor/core/alert.ex — lines 42–52</p>
+    <div class="grid-2">
+
+      <!-- YES TABLE -->
+      <div>
+        <table>
+          <tr><th colspan="3" style="background:#dcfce7; color:#166534;">✅ YES — Clears the incident (claim_accept)</th></tr>
+          <tr><th>Word</th><th>Variations that also work</th><th>Renter usage</th></tr>
+          <tr><td><span class="pill green">yes</span></td><td>"Yes", "YES", "yes!", "Yes.", " yes "</td><td>Very common ✅</td></tr>
+          <tr><td><span class="pill green">yeah</span></td><td>"Yeah!", "YEAH", "yeah."</td><td>Common informal ✅</td></tr>
+          <tr><td><span class="pill green">yep</span></td><td>"Yep!", "YEP"</td><td>Common informal ✅</td></tr>
+          <tr><td><span class="pill green">yup</span></td><td>"Yup!", "YUP?"</td><td>Common informal ✅</td></tr>
+          <tr><td><span class="pill green">yea</span></td><td>"Yea!", "YEA"</td><td>Less common ✅</td></tr>
+          <tr><td><span class="pill green">affirmative</span></td><td>"Affirmative.", "AFFIRMATIVE"</td><td>Formal / military ✅</td></tr>
+          <tr><td><span class="pill green">aye</span></td><td>"Aye!", "AYE"</td><td>Regional / informal ✅</td></tr>
+          <tr><td><span class="pill green">sure</span></td><td>"Sure!", "Sure.", "SURE"</td><td>Common informal ✅</td></tr>
+        </table>
+      </div>
+
+      <!-- NO TABLE -->
+      <div>
+        <table>
+          <tr><th colspan="3" style="background:#fee2e2; color:#991b1b;">🚫 NO — Escalates the incident (claim_deny)</th></tr>
+          <tr><th>Word</th><th>Variations that also work</th><th>Renter usage</th></tr>
+          <tr><td><span class="pill red">no</span></td><td>"No!", "NO", "no.", " no "</td><td>Very common ✅</td></tr>
+          <tr><td><span class="pill red">nope</span></td><td>"Nope!", "NOPE", "Nope."</td><td>Common informal ✅</td></tr>
+          <tr><td><span class="pill red">nah</span></td><td>"Nah!", "NAH"</td><td>Common informal ✅</td></tr>
+          <tr><td><span class="pill red">naw</span></td><td>"Naw", "NAW"</td><td>Regional informal ✅</td></tr>
+          <tr><td colspan="3" style="background:#fef2f2; color:#9ca3af; font-style:italic; text-align:center; font-size:12px;">Only 4 NO words vs 8 YES words — asymmetric coverage</td></tr>
+        </table>
+
+        <div class="callout callout-orange" style="margin-top:12px;">
+          <div class="callout-icon">⚠️</div>
+          <div class="callout-body">
+            <strong>Important note on punctuation edge rule:</strong>
+            Only ONE group of punctuation is allowed at the very start or end.
+            <br>"Yes!" ✅ &nbsp; "Yes." ✅ &nbsp; ", ,yes" ❌ &nbsp; "Yes sir!" ❌
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ GAP ANALYSIS ══ -->
+<div class="section">
+  <div class="section-header"><span class="icon">⚠️</span><h2>Gap Analysis — Words NOT Handled (Renter Types These, System Ignores Intent)</h2></div>
+  <div class="section-body">
+    <div class="callout callout-red">
+      <div class="callout-icon">🚨</div>
+      <div class="callout-body">
+        <strong>All words below → :claim_unparseable → incident stays open forever until it times out.</strong>
+        The renter gets a generic help SMS. Their motion is never cleared, and depending on facility config, can trigger a false alert or unnecessary follow-up.
+      </div>
+    </div>
+
+    <div style="margin-top:16px;">
+    <table>
+      <tr>
+        <th>Reply Word</th>
+        <th>Intended Meaning</th>
+        <th>Renter Profile Who Types This</th>
+        <th>Impact</th>
+        <th>Priority to Fix</th>
+      </tr>
+
+      <!-- HIGH PRIORITY -->
+      <tr style="background:#fff9f9;">
+        <td><span class="pill">correct</span></td>
+        <td><span class="chip chip-yes">YES — It was me</span></td>
+        <td>Professional renter confirming ownership; very natural reply</td>
+        <td>Incident stays open → facility manager gets a false alert</td>
+        <td>
+          <div class="pbar"><div class="pbar-fill pbar-high" style="width:90px;"></div><span class="chip chip-high">HIGH</span></div>
+        </td>
+      </tr>
+      <tr style="background:#fff9f9;">
+        <td><span class="pill">ok</span> &nbsp;<span class="pill gray">okay</span></td>
+        <td><span class="chip chip-yes">YES — It was me</span></td>
+        <td>Extremely common; most casual SMS users reply with "ok"</td>
+        <td>Incident stays open → unnecessary escalation</td>
+        <td>
+          <div class="pbar"><div class="pbar-fill pbar-high" style="width:90px;"></div><span class="chip chip-high">HIGH</span></div>
+        </td>
+      </tr>
+      <tr style="background:#fff9f9;">
+        <td><span class="pill">y</span></td>
+        <td><span class="chip chip-yes">YES — It was me</span></td>
+        <td>Young renters / fast repliers using single-letter shorthand</td>
+        <td>Incident not cleared — renter thinks they responded correctly</td>
+        <td>
+          <div class="pbar"><div class="pbar-fill pbar-high" style="width:90px;"></div><span class="chip chip-high">HIGH</span></div>
+        </td>
+      </tr>
+      <tr style="background:#fff9f9;">
+        <td><span class="pill">n</span></td>
+        <td><span class="chip chip-no">NO — Wasn't me</span></td>
+        <td>Fast repliers using single-letter shorthand</td>
+        <td>Incident not escalated — break-in not reported to facility</td>
+        <td>
+          <div class="pbar"><div class="pbar-fill pbar-high" style="width:90px;"></div><span class="chip chip-high">HIGH</span></div>
+        </td>
+      </tr>
+      <tr style="background:#fff9f9;">
+        <td><span class="pill">confirmed</span> &nbsp;<span class="pill gray">confirm</span></td>
+        <td><span class="chip chip-yes">YES — It was me</span></td>
+        <td>Business renters / security-aware users — very natural in security context</td>
+        <td>Incident stays open — renter is confused when nothing resolves</td>
+        <td>
+          <div class="pbar"><div class="pbar-fill pbar-high" style="width:90px;"></div><span class="chip chip-high">HIGH</span></div>
+        </td>
+      </tr>
+      <tr style="background:#fff9f9;">
+        <td><span class="pill">negative</span></td>
+        <td><span class="chip chip-no">NO — Wasn't me</span></td>
+        <td>Formal users; common in security/military contexts</td>
+        <td>Incident not escalated — break-in not reported</td>
+        <td>
+          <div class="pbar"><div class="pbar-fill pbar-high" style="width:90px;"></div><span class="chip chip-high">HIGH</span></div>
+        </td>
+      </tr>
+
+      <!-- MEDIUM PRIORITY -->
+      <tr>
+        <td><span class="pill">absolutely</span></td>
+        <td><span class="chip chip-yes">YES — It was me</span></td>
+        <td>Emphatic yes — some renters naturally reply this way</td>
+        <td>Incident stays open despite clear intent</td>
+        <td>
+          <div class="pbar"><div class="pbar-fill pbar-med" style="width:60px;"></div><span class="chip chip-med">MEDIUM</span></div>
+        </td>
+      </tr>
+      <tr>
+        <td><span class="pill">right</span></td>
+        <td><span class="chip chip-yes">YES — It was me</span></td>
+        <td>"Right" as affirmative — common in certain regions</td>
+        <td>Incident stays open</td>
+        <td>
+          <div class="pbar"><div class="pbar-fill pbar-med" style="width:60px;"></div><span class="chip chip-med">MEDIUM</span></div>
+        </td>
+      </tr>
+      <tr>
+        <td><span class="pill">definitely</span></td>
+        <td><span class="chip chip-yes">YES — It was me</span></td>
+        <td>Strong confirmation</td>
+        <td>Incident stays open</td>
+        <td>
+          <div class="pbar"><div class="pbar-fill pbar-med" style="width:60px;"></div><span class="chip chip-med">MEDIUM</span></div>
+        </td>
+      </tr>
+      <tr>
+        <td><span class="pill">true</span></td>
+        <td><span class="chip chip-yes">YES — It was me</span></td>
+        <td>Less common but used</td>
+        <td>Incident stays open</td>
+        <td>
+          <div class="pbar"><div class="pbar-fill pbar-med" style="width:60px;"></div><span class="chip chip-med">MEDIUM</span></div>
+        </td>
+      </tr>
+      <tr>
+        <td><span class="pill">deny</span></td>
+        <td><span class="chip chip-no">NO — Wasn't me</span></td>
+        <td>Formal / security-context users</td>
+        <td>Incident not escalated</td>
+        <td>
+          <div class="pbar"><div class="pbar-fill pbar-med" style="width:60px;"></div><span class="chip chip-med">MEDIUM</span></div>
+        </td>
+      </tr>
+      <tr>
+        <td><span class="pill">wrong</span></td>
+        <td><span class="chip chip-no">NO — Wasn't me</span></td>
+        <td>"wrong person" implication</td>
+        <td>Incident not escalated</td>
+        <td>
+          <div class="pbar"><div class="pbar-fill pbar-med" style="width:60px;"></div><span class="chip chip-med">MEDIUM</span></div>
+        </td>
+      </tr>
+
+      <!-- MULTI-WORD — STRUCTURAL LIMITATION -->
+      <tr style="background:#f0f9ff;">
+        <td><span class="pill gray">not me</span></td>
+        <td><span class="chip chip-no">NO — Wasn't me</span></td>
+        <td>Extremely natural human reply — "not me"</td>
+        <td>Regex cannot match — multi-word phrases structurally unsupported</td>
+        <td>
+          <div class="pbar"><div class="pbar-fill pbar-high" style="width:90px;"></div><span class="chip chip-multi">REGEX LIMIT</span></div>
+        </td>
+      </tr>
+      <tr style="background:#f0f9ff;">
+        <td><span class="pill gray">wasn't me</span></td>
+        <td><span class="chip chip-no">NO — Wasn't me</span></td>
+        <td>Very natural — "wasn't me"</td>
+        <td>Regex cannot match — multi-word</td>
+        <td>
+          <div class="pbar"><div class="pbar-fill pbar-high" style="width:90px;"></div><span class="chip chip-multi">REGEX LIMIT</span></div>
+        </td>
+      </tr>
+      <tr style="background:#f0f9ff;">
+        <td><span class="pill gray">it was me</span></td>
+        <td><span class="chip chip-yes">YES — It was me</span></td>
+        <td>Full sentence reply</td>
+        <td>Regex cannot match — multi-word</td>
+        <td>
+          <div class="pbar"><div class="pbar-fill pbar-high" style="width:90px;"></div><span class="chip chip-multi">REGEX LIMIT</span></div>
+        </td>
+      </tr>
+      <tr style="background:#f0f9ff;">
+        <td><span class="pill gray">yes please</span> &nbsp;<span class="pill gray">yes it was</span></td>
+        <td><span class="chip chip-yes">YES — It was me</span></td>
+        <td>Polite/verbose repliers</td>
+        <td>Extra word breaks regex — "yes" alone would work</td>
+        <td>
+          <div class="pbar"><div class="pbar-fill pbar-med" style="width:60px;"></div><span class="chip chip-multi">REGEX LIMIT</span></div>
+        </td>
+      </tr>
+    </table>
+    </div>
+
+    <div class="callout callout-blue" style="margin-top:16px;">
+      <div class="callout-icon">💡</div>
+      <div class="callout-body">
+        <strong>Blue rows = Regex structural limit.</strong> Multi-word phrases cannot be fixed by just adding keywords — the regex pattern itself only supports single-word replies. Fixing these requires changing the matching algorithm (e.g. check if reply <em>starts with</em> or <em>contains</em> a keyword instead of the full-string match).
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ RECOMMENDED ADDITIONS ══ -->
+<div class="section">
+  <div class="section-header"><span class="icon">🛠️</span><h2>Recommended Additions — What Dev Team Should Add to alert.ex</h2></div>
+  <div class="section-body">
+    <p style="font-size:13px; color:#475569; margin-bottom:16px;">
+      File to edit: <code>storagedefender/tod_message_processor/lib/tod_message_processor/core/alert.ex</code> lines 42–52
+    </p>
+
+    <div class="grid-2">
+      <!-- CURRENT -->
+      <div class="mini-card">
+        <h4 style="color:#166534;">Current YES list (8 words)</h4>
+        <div style="margin:6px 0;">
+          <span class="pill green">yes</span>
+          <span class="pill green">yeah</span>
+          <span class="pill green">yep</span>
+          <span class="pill green">yup</span>
+          <span class="pill green">yea</span>
+          <span class="pill green">affirmative</span>
+          <span class="pill green">aye</span>
+          <span class="pill green">sure</span>
+        </div>
+        <hr class="divider">
+        <h4 style="color:#991b1b; margin-top:10px;">Current NO list (4 words)</h4>
+        <div style="margin:6px 0;">
+          <span class="pill red">no</span>
+          <span class="pill red">nope</span>
+          <span class="pill red">nah</span>
+          <span class="pill red">naw</span>
+        </div>
+      </div>
+
+      <!-- RECOMMENDED -->
+      <div class="mini-card" style="border-color:#a5b4fc;">
+        <h4 style="color:#4c1d95;">Recommended YES additions (8 more)</h4>
+        <div style="margin:6px 0;">
+          <span class="pill purple">y</span>
+          <span class="pill purple">ok</span>
+          <span class="pill purple">okay</span>
+          <span class="pill purple">correct</span>
+          <span class="pill purple">confirmed</span>
+          <span class="pill purple">confirm</span>
+          <span class="pill purple">absolutely</span>
+          <span class="pill purple">right</span>
+        </div>
+        <hr class="divider">
+        <h4 style="color:#4c1d95; margin-top:10px;">Recommended NO additions (4 more)</h4>
+        <div style="margin:6px 0;">
+          <span class="pill purple">n</span>
+          <span class="pill purple">negative</span>
+          <span class="pill purple">deny</span>
+          <span class="pill purple">wrong</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:18px;">
+      <table>
+        <tr>
+          <th>Change</th>
+          <th>Current list</th>
+          <th>After adding</th>
+          <th>Code change needed</th>
+        </tr>
+        <tr>
+          <td><strong>YES list</strong></td>
+          <td>8 words</td>
+          <td>16 words</td>
+          <td>Add to <code>@valid_claim_accept_responses</code> in <code>alert.ex:42</code></td>
+        </tr>
+        <tr>
+          <td><strong>NO list</strong></td>
+          <td>4 words</td>
+          <td>8 words</td>
+          <td>Add to <code>@valid_claim_deny_responses</code> in <code>alert.ex:52</code></td>
+        </tr>
+        <tr>
+          <td><strong>Multi-word phrases</strong></td>
+          <td colspan="2">Cannot be handled with current regex</td>
+          <td>Requires algorithm change: instead of full-string match, use <em>starts-with</em> or <em>contains</em> keyword at start of message</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- After code snippet -->
+    <div style="margin-top:16px; background:#0f172a; border-radius:8px; padding:16px 18px; font-family:'Consolas',monospace; font-size:12px; color:#e2e8f0; line-height:1.8;">
+      <span style="color:#64748b;"># alert.ex — suggested update</span><br><br>
+      <span style="color:#fde047;">@valid_claim_accept_responses</span> [<br>
+      &nbsp;&nbsp;<span style="color:#86efac;">"yes"</span>, <span style="color:#86efac;">"yeah"</span>, <span style="color:#86efac;">"yep"</span>, <span style="color:#86efac;">"yup"</span>, <span style="color:#86efac;">"yea"</span>,<br>
+      &nbsp;&nbsp;<span style="color:#86efac;">"affirmative"</span>, <span style="color:#86efac;">"aye"</span>, <span style="color:#86efac;">"sure"</span>,<br>
+      &nbsp;&nbsp;<span style="color:#a5f3fc;">"y"</span>, <span style="color:#a5f3fc;">"ok"</span>, <span style="color:#a5f3fc;">"okay"</span>, <span style="color:#a5f3fc;">"correct"</span>, <span style="color:#64748b;font-style:italic;"># NEW</span><br>
+      &nbsp;&nbsp;<span style="color:#a5f3fc;">"confirmed"</span>, <span style="color:#a5f3fc;">"confirm"</span>, <span style="color:#a5f3fc;">"absolutely"</span>, <span style="color:#a5f3fc;">"right"</span> <span style="color:#64748b;font-style:italic;"># NEW</span><br>
+      ]<br><br>
+      <span style="color:#fde047;">@valid_claim_deny_responses</span> [<br>
+      &nbsp;&nbsp;<span style="color:#fca5a5;">"no"</span>, <span style="color:#fca5a5;">"nope"</span>, <span style="color:#fca5a5;">"nah"</span>, <span style="color:#fca5a5;">"naw"</span>,<br>
+      &nbsp;&nbsp;<span style="color:#a5f3fc;">"n"</span>, <span style="color:#a5f3fc;">"negative"</span>, <span style="color:#a5f3fc;">"deny"</span>, <span style="color:#a5f3fc;">"wrong"</span> <span style="color:#64748b;font-style:italic;"># NEW</span><br>
+      ]
+    </div>
+  </div>
+</div>
+
+<!-- ══ RENTER IMPACT SUMMARY ══ -->
+<div class="section">
+  <div class="section-header"><span class="icon">👤</span><h2>Renter Impact Summary</h2></div>
+  <div class="section-body">
+    <div class="callout callout-orange" style="margin-bottom:16px;">
+      <div class="callout-icon">🏪</div>
+      <div class="callout-body">
+        <strong>Who are renters?</strong>
+        Storage unit customers at facilities using Storage Defender. They receive SMS motion alerts when their unit triggers a sensor during access hours. They reply to confirm or deny the motion. Many are not tech-savvy and will reply with whatever feels natural.
+      </div>
+    </div>
+
+    <table>
+      <tr>
+        <th>Scenario</th>
+        <th>Renter replies</th>
+        <th>System sees</th>
+        <th>Real-world impact on renter</th>
+      </tr>
+      <tr>
+        <td>Renter was in their unit, replies naturally</td>
+        <td><span class="pill gray">correct</span> or <span class="pill gray">ok</span></td>
+        <td><span class="chip chip-gap">:claim_unparseable</span></td>
+        <td>Renter thinks they responded. Facility manager still gets an alert. Potential unnecessary contact / visit to the unit. Renter is confused why they're still being contacted.</td>
+      </tr>
+      <tr>
+        <td>Renter types single letter (common on mobile)</td>
+        <td><span class="pill gray">y</span> or <span class="pill gray">n</span></td>
+        <td><span class="chip chip-gap">:claim_unparseable</span></td>
+        <td>For "y": motion not cleared, facility alerted unnecessarily.<br>For "n": break-in NOT reported — safety risk.</td>
+      </tr>
+      <tr>
+        <td>Renter wasn't in unit, replies naturally</td>
+        <td><span class="pill gray">not me</span> or <span class="pill gray">wasn't me</span></td>
+        <td><span class="chip chip-gap">:claim_unparseable</span></td>
+        <td>Potential break-in is NOT escalated to facility manager. Security risk — the facility is never alerted even though the renter clearly communicated denial.</td>
+      </tr>
+      <tr>
+        <td>Renter confirms with "confirmed"</td>
+        <td><span class="pill gray">confirmed</span></td>
+        <td><span class="chip chip-gap">:claim_unparseable</span></td>
+        <td>Business/professional renters often use this word. Motion not cleared — facility gets an alert for a legitimate access.</td>
+      </tr>
+      <tr>
+        <td>Renter replies with sentence</td>
+        <td><span class="pill gray">yes it was me</span></td>
+        <td><span class="chip chip-gap">:claim_unparseable</span></td>
+        <td>Even though the message clearly starts with "yes", regex requires single word only. Incident stays open.</td>
+      </tr>
+      <tr style="background:#f0fdf4;">
+        <td>Renter uses any recognized word</td>
+        <td><span class="pill green">yes</span> <span class="pill green">yeah</span> <span class="pill green">yep</span> etc.</td>
+        <td><span class="chip chip-yes">:claim_accept ✅</span></td>
+        <td>Incident cleared correctly. No follow-up needed.</td>
+      </tr>
+      <tr style="background:#fff1f2;">
+        <td>Renter uses recognized NO word</td>
+        <td><span class="pill red">no</span> <span class="pill red">nope</span> etc.</td>
+        <td><span class="chip chip-no">:claim_deny ✅</span></td>
+        <td>Incident escalated correctly. Facility manager notified. Security response triggered.</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══ QUICK REF ══ -->
+<div class="section">
+  <div class="section-header"><span class="icon">📋</span><h2>Quick Reference — Complete Word List (Current + Recommended)</h2></div>
+  <div class="section-body">
+    <table>
+      <tr>
+        <th>Word</th>
+        <th>Intent</th>
+        <th>Currently handled?</th>
+        <th>Priority to add</th>
+        <th>Notes</th>
+      </tr>
+      <tr><td><code>yes</code></td><td>YES</td><td><span class="chip chip-yes">✅ Handled</span></td><td>—</td><td>Primary recognized word</td></tr>
+      <tr><td><code>yeah</code></td><td>YES</td><td><span class="chip chip-yes">✅ Handled</span></td><td>—</td><td></td></tr>
+      <tr><td><code>yep</code></td><td>YES</td><td><span class="chip chip-yes">✅ Handled</span></td><td>—</td><td></td></tr>
+      <tr><td><code>yup</code></td><td>YES</td><td><span class="chip chip-yes">✅ Handled</span></td><td>—</td><td></td></tr>
+      <tr><td><code>yea</code></td><td>YES</td><td><span class="chip chip-yes">✅ Handled</span></td><td>—</td><td></td></tr>
+      <tr><td><code>affirmative</code></td><td>YES</td><td><span class="chip chip-yes">✅ Handled</span></td><td>—</td><td></td></tr>
+      <tr><td><code>aye</code></td><td>YES</td><td><span class="chip chip-yes">✅ Handled</span></td><td>—</td><td></td></tr>
+      <tr><td><code>sure</code></td><td>YES</td><td><span class="chip chip-yes">✅ Handled</span></td><td>—</td><td></td></tr>
+      <tr style="background:#faf5ff;"><td><code>y</code></td><td>YES</td><td><span class="chip chip-gap">❌ Gap</span></td><td><span class="chip chip-high">HIGH</span></td><td>Single-letter shorthand — very common on mobile</td></tr>
+      <tr style="background:#faf5ff;"><td><code>ok</code></td><td>YES</td><td><span class="chip chip-gap">❌ Gap</span></td><td><span class="chip chip-high">HIGH</span></td><td>One of the most common SMS replies</td></tr>
+      <tr style="background:#faf5ff;"><td><code>okay</code></td><td>YES</td><td><span class="chip chip-gap">❌ Gap</span></td><td><span class="chip chip-high">HIGH</span></td><td>Variant of ok</td></tr>
+      <tr style="background:#faf5ff;"><td><code>correct</code></td><td>YES</td><td><span class="chip chip-gap">❌ Gap</span></td><td><span class="chip chip-high">HIGH</span></td><td>Confirmed via CloudTalk test Jun 18 2026</td></tr>
+      <tr style="background:#faf5ff;"><td><code>confirmed</code></td><td>YES</td><td><span class="chip chip-gap">❌ Gap</span></td><td><span class="chip chip-high">HIGH</span></td><td>Natural security-context affirmative</td></tr>
+      <tr style="background:#faf5ff;"><td><code>confirm</code></td><td>YES</td><td><span class="chip chip-gap">❌ Gap</span></td><td><span class="chip chip-high">HIGH</span></td><td></td></tr>
+      <tr style="background:#faf5ff;"><td><code>absolutely</code></td><td>YES</td><td><span class="chip chip-gap">❌ Gap</span></td><td><span class="chip chip-med">MEDIUM</span></td><td></td></tr>
+      <tr style="background:#faf5ff;"><td><code>right</code></td><td>YES</td><td><span class="chip chip-gap">❌ Gap</span></td><td><span class="chip chip-med">MEDIUM</span></td><td>Regional affirmative</td></tr>
+      <tr style="background:#faf5ff;"><td><code>definitely</code></td><td>YES</td><td><span class="chip chip-gap">❌ Gap</span></td><td><span class="chip chip-med">MEDIUM</span></td><td></td></tr>
+      <tr style="background:#faf5ff;"><td><code>true</code></td><td>YES</td><td><span class="chip chip-gap">❌ Gap</span></td><td><span class="chip chip-low">LOW</span></td><td></td></tr>
+      <tr><td><code>no</code></td><td>NO</td><td><span class="chip chip-yes">✅ Handled</span></td><td>—</td><td>Primary recognized word</td></tr>
+      <tr><td><code>nope</code></td><td>NO</td><td><span class="chip chip-yes">✅ Handled</span></td><td>—</td><td></td></tr>
+      <tr><td><code>nah</code></td><td>NO</td><td><span class="chip chip-yes">✅ Handled</span></td><td>—</td><td></td></tr>
+      <tr><td><code>naw</code></td><td>NO</td><td><span class="chip chip-yes">✅ Handled</span></td><td>—</td><td></td></tr>
+      <tr style="background:#faf5ff;"><td><code>n</code></td><td>NO</td><td><span class="chip chip-gap">❌ Gap</span></td><td><span class="chip chip-high">HIGH</span></td><td>Single-letter shorthand — safety risk if not handled</td></tr>
+      <tr style="background:#faf5ff;"><td><code>negative</code></td><td>NO</td><td><span class="chip chip-gap">❌ Gap</span></td><td><span class="chip chip-high">HIGH</span></td><td>Natural NO variant</td></tr>
+      <tr style="background:#faf5ff;"><td><code>deny</code></td><td>NO</td><td><span class="chip chip-gap">❌ Gap</span></td><td><span class="chip chip-med">MEDIUM</span></td><td></td></tr>
+      <tr style="background:#faf5ff;"><td><code>wrong</code></td><td>NO</td><td><span class="chip chip-gap">❌ Gap</span></td><td><span class="chip chip-med">MEDIUM</span></td><td></td></tr>
+      <tr style="background:#e0f2fe;"><td><code>not me</code></td><td>NO</td><td><span class="chip chip-multi">❌ Regex Limit</span></td><td><span class="chip chip-high">HIGH (algo change)</span></td><td>Multi-word — needs algorithm change, not just keyword addition</td></tr>
+      <tr style="background:#e0f2fe;"><td><code>wasn't me</code></td><td>NO</td><td><span class="chip chip-multi">❌ Regex Limit</span></td><td><span class="chip chip-high">HIGH (algo change)</span></td><td>Multi-word — very natural human reply</td></tr>
+      <tr style="background:#e0f2fe;"><td><code>it was me</code></td><td>YES</td><td><span class="chip chip-multi">❌ Regex Limit</span></td><td><span class="chip chip-med">MEDIUM (algo change)</span></td><td>Multi-word</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- Footer -->
+<div style="text-align:center; padding:24px; color:#94a3b8; font-size:12px;">
+  Storage Defender QA · SMS Keyword Gap Analysis · June 2026 · Source: tod_message_processor/core/alert.ex
+</div>
+
+</div>
+</body>
+</html>
