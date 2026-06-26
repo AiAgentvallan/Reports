@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Motion SMS — BE Gap Scenarios (Needs Backend Dev)</title>
+<style>
+:root{
+  --navy:#1A1200;--hdr:#3D2000;--accent:#D97706;--bg:#FFF8F0;--surf:#FFF;
+  --bdr:#F0D5A0;--txt:#1C1200;--txt2:#7B4A00;--txt3:#B08030;
+  --blok-bg:#FEE2E2;--blok-tx:#991B1B;--blok-bd:#FCA5A5;
+  --pend-bg:#FEF3C7;--pend-tx:#78350F;
+  --done-bg:#D1FAE5;--done-tx:#065F46;
+  --mw-bg:#EDE9FE;--mw-tx:#5B21B6;--mw-bd:#A78BFA;
+  --fix-bg:#ECFDF5;--fix-bd:#6EE7B7;--fix-tx:#065F46;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:13px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);line-height:1.5}
+
+/* ── HEADER ── */
+.hdr{background:var(--hdr);color:#fff;padding:18px 28px}
+.hdr h1{font-size:1.35rem;font-weight:700;display:flex;align-items:center;gap:10px}
+.hdr p{color:#F5C97A;font-size:.78rem;margin-top:4px}
+.hdr-chips{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.hdr-chip{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:2px 11px;font-size:.72rem;color:#F5C97A}
+
+/* ── BANNER ── */
+.banner{background:#FFFBEB;border-bottom:3px solid var(--accent);padding:16px 28px}
+.banner-title{font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--accent);margin-bottom:8px}
+.banner-body{font-size:.8rem;color:var(--txt2);line-height:1.6}
+.banner-body strong{color:var(--txt)}
+
+/* ── CODE FIX BLOCK ── */
+.fix-section{padding:14px 28px;background:#F9FAFB;border-bottom:1px solid var(--bdr)}
+.fix-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fix-box{border-radius:6px;padding:12px 14px;font-size:.73rem}
+.fix-current{background:#FEF2F2;border:1px solid #FCA5A5}
+.fix-desired{background:var(--fix-bg);border:1px solid var(--fix-bd)}
+.fix-label{font-weight:800;font-size:.68rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.fix-current .fix-label{color:#991B1B}
+.fix-desired .fix-label{color:var(--fix-tx)}
+pre{font-family:'Consolas','SF Mono',monospace;font-size:.72rem;line-height:1.6;white-space:pre-wrap;margin:0}
+.fix-current pre{color:#7F1D1D}
+.fix-desired pre{color:#064E3B}
+.fix-note{background:var(--mw-bg);border:1px solid var(--mw-bd);border-radius:6px;padding:10px 14px;font-size:.74rem;color:var(--mw-tx);margin-top:10px}
+.fix-note strong{font-weight:700}
+
+/* ── TOOLBAR ── */
+.toolbar{background:#5C3000;padding:10px 28px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;position:sticky;top:0;z-index:50}
+.toolbar input,.toolbar select{background:#3D2000;border:1px solid rgba(255,255,255,.25);color:#F5C97A;border-radius:5px;padding:5px 10px;font-size:.75rem;outline:none}
+.toolbar input::placeholder{color:#9B6A2A}
+.toolbar label{color:#C48A30;font-size:.73rem}
+.toolbar input:focus,.toolbar select:focus{border-color:var(--accent)}
+
+/* ── STATS ── */
+.stats{padding:9px 28px;background:#FEF9EC;border-bottom:1px solid var(--bdr);font-size:.73rem;color:var(--txt2);display:flex;gap:16px;flex-wrap:wrap}
+.stats span strong{color:var(--txt)}
+
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.76rem}
+th{background:#FEF3C7;color:var(--txt2);font-weight:700;padding:8px 12px;text-align:left;font-size:.67rem;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--bdr);white-space:nowrap;cursor:pointer;user-select:none}
+th:hover{background:#FDE68A}
+td{padding:7px 12px;border-bottom:1px solid #FBF0D8;vertical-align:middle}
+tr.data-row:hover td{background:#FFFBF0;cursor:pointer}
+tr.data-row.expanded td{background:#FEF9EC}
+.mono{font-family:'Consolas','SF Mono',monospace;font-size:.73rem;color:#B45309}
+.word{font-family:'Consolas','SF Mono',monospace;background:#FEF3C7;color:#92400E;padding:1px 6px;border-radius:3px;font-size:.76rem;font-weight:600}
+.b{display:inline-flex;align-items:center;gap:3px;border-radius:20px;padding:2px 8px;font-size:.67rem;font-weight:700;white-space:nowrap}
+.b-blok{background:var(--blok-bg);color:var(--blok-tx)}
+.b-mw{background:var(--mw-bg);color:var(--mw-tx)}
+.b-fix{background:var(--fix-bg);color:var(--fix-tx)}
+.cat-chip{display:inline-block;border-radius:4px;padding:1px 7px;font-size:.65rem;font-weight:700;font-family:'Consolas',monospace}
+.cat-DH-SR{background:#DBEAFE;color:#1E40AF}
+.cat-DH-TR{background:#EDE9FE;color:#5B21B6}
+
+/* ── EXPAND ── */
+.expand-icon{font-size:.8rem;margin-left:4px;transition:transform .15s}
+.expanded .expand-icon{transform:rotate(90deg)}
+.expand-row{display:none}
+.expand-row.open{display:table-row}
+.expand-row td{padding:0;background:#FFF8F0;border-bottom:2px solid var(--accent)}
+.flow-box{padding:14px 20px 14px 32px}
+.flow-title{font-size:.73rem;font-weight:700;color:var(--txt2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.flow-steps{display:flex;flex-direction:column;gap:6px}
+.step{display:grid;grid-template-columns:170px 1fr;gap:8px;align-items:start;font-size:.74rem}
+.step-label{font-weight:700;font-size:.65rem;text-transform:uppercase;letter-spacing:.4px;padding:3px 0}
+.step-msg{padding:5px 10px;border-radius:4px;border-left:3px solid;line-height:1.5}
+
+/* Role colors (same as main doc) */
+.r-setup .step-label{color:#6B7A8D}
+.r-setup .step-msg{background:#F4F6F9;border-color:#C5CDD8;color:#445272}
+.r-event .step-label{color:#374151}
+.r-event .step-msg{background:#F0F0F0;border-color:#9CA3AF;color:#374151;font-style:italic}
+.r-s2p .step-label{color:#1D6CE6}
+.r-s2p .step-msg{background:#EFF6FF;border-color:#1D6CE6;color:#1E3A5F}
+.r-p2s .step-label{color:#059669}
+.r-p2s .step-msg{background:#F0FDF4;border-color:#34D399;color:#065F46;font-weight:600}
+.r-s2sec .step-label{color:#7C3AED}
+.r-s2sec .step-msg{background:#F5F3FF;border-color:#A78BFA;color:#4C1D95}
+.r-sec2s .step-label{color:#0D9488}
+.r-sec2s .step-msg{background:#F0FDFA;border-color:#2DD4BF;color:#115E59;font-weight:600}
+.r-s2cross .step-label{color:#D97706}
+.r-s2cross .step-msg{background:#FFFBEB;border-color:#FCD34D;color:#78350F}
+.r-fm .step-label{color:#DC2626}
+.r-fm .step-msg{background:#FFF1F2;border-color:#FCA5A5;color:#7F1D1D}
+.r-slack .step-label{color:#7E5BEF}
+.r-slack .step-msg{background:#FAF5FF;border-color:#C4B5FD;color:#4C1D95}
+/* Incident — red for bad_response */
+.r-incident .step-label{color:#B45309}
+.r-incident .step-msg{background:#FEF9EC;border-color:#F59E0B;color:#78350F;font-weight:700;white-space:pre-line}
+.r-wait .step-label{color:#D97706}
+.r-wait .step-msg{background:#FFFBEB;border-color:#FBBF24;color:#92400E;font-style:italic}
+/* HELP SMS — highlighted differently from cleared */
+.r-help .step-label{color:#DC2626}
+.r-help .step-msg{background:#FFF1F2;border-color:#F87171;color:#7F1D1D;font-weight:600}
+
+.page-info{font-size:.72rem;color:var(--txt3);text-align:right;padding:6px 28px}
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>⚠️ Motion SMS — BE Gap Scenarios · Requires Backend Development</h1>
+  <p>Storage Defender · tod_message_processor · June 2026 · These scenarios CANNOT be automated until backend adds the missing keywords to alert.ex</p>
+  <div class="hdr-chips">
+    <span class="hdr-chip">133 total scenarios</span>
+    <span class="hdr-chip">19 unrecognized YES words</span>
+    <span class="hdr-chip">4 multi-word phrases need algo change</span>
+    <span class="hdr-chip">Current behavior: help SMS sent (bad_response)</span>
+  </div>
+</div>
+
+<div class="banner">
+  <div class="banner-title">⛔ Why these scenarios are blocked</div>
+  <div class="banner-body">
+    When a renter replies with a word like <strong>"absolutely"</strong>, <strong>"ok"</strong>, or <strong>"correct"</strong>, the backend function <code>do_response/2</code>
+    in <strong>alert.ex</strong> tries to match the reply against <code>@valid_claim_accept_responses</code> and <code>@valid_claim_deny_responses</code>.
+    If no match is found, the word falls into the <code>true → :claim_unparseable</code> catch-all.
+    This sets <code>alert.status = :bad_response</code> and sends a help SMS to the renter instead of clearing the incident.
+    <br><br>
+    The renter <strong>intended to say YES</strong> but the system did not understand — the incident stays open and the renter is confused.
+    <strong>Fix:</strong> add the 15 missing single words to <code>@valid_claim_accept_responses</code>.
+    The 4 multi-word phrases additionally need a regex algorithm change.
+  </div>
+</div>
+
+<div class="fix-section">
+  <div class="fix-grid">
+    <div class="fix-box fix-current">
+      <div class="fix-label">❌ Current state in alert.ex (lines 42–52)</div>
+      <pre>@valid_claim_accept_responses [
+  "yes",
+  "yeah",
+  "yep",
+  "yup",
+  "yea",
+  "affirmative",
+  "aye",
+  "sure"
+]
+@valid_claim_deny_responses ["no","nope","nah","naw"]</pre>
+    </div>
+    <div class="fix-box fix-desired">
+      <div class="fix-label">✅ Required change — add 15 single words</div>
+      <pre>@valid_claim_accept_responses [
+  # ── Already handled ───────────────────
+  "yes", "yeah", "yep", "yup", "yea",
+  "affirmative", "aye", "sure",
+  # ── Add these (simple additions) ──────
+  "ya", "yah", "yeh",
+  "certainly", "absolutely", "definitely",
+  "indeed", "agreed", "correct", "right",
+  "ok", "okay", "alright",
+  "uh-huh", "mm-hmm"
+]
+# NO list unchanged — already complete</pre>
+    </div>
+  </div>
+  <div class="fix-note">
+    <strong>⚠️ 4 multi-word phrases need a separate algorithm change</strong> — the current regex
+    <code>~r/^\s*[[:punct:]]*\s*(keyword)\s*[[:punct:]]*\s*$/i</code> only matches a
+    <em>single</em> keyword token. Phrases with spaces ("of course", "no problem", "sounds good", "for sure")
+    will never match. A new matching path is needed (e.g. normalize spaces, or extend the regex to allow
+    internal spaces). These are the hardest 4 words to fix.
+  </div>
+</div>
+
+<div class="toolbar">
+  <label>🔍</label>
+  <input type="text" id="search" placeholder="Search TC ID or word..." style="width:200px">
+  <label>Category:</label>
+  <select id="filterCat">
+    <option value="">All Categories</option>
+    <option value="DH-SR">DH-SR · During Hours · Single Responder</option>
+    <option value="DH-TR">DH-TR · During Hours · Two Responders</option>
+  </select>
+  <label>Word Type:</label>
+  <select id="filterMW">
+    <option value="">All</option>
+    <option value="single">Single-word gap (simple backend fix)</option>
+    <option value="multi">Multi-word phrase (algo change needed)</option>
+  </select>
+  <label style="margin-left:auto;color:#9B6A2A;font-size:.7rem" id="rowCount"></label>
+</div>
+
+<div class="stats" id="statsBar"></div>
+
+<div class="tbl-wrap">
+  <table id="mainTable">
+    <thead>
+      <tr>
+        <th>TC ID</th>
+        <th>Cat</th>
+        <th>Scenario</th>
+        <th>Gap Word</th>
+        <th>Used As</th>
+        <th>Current Outcome</th>
+        <th>Fix Type</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+<div class="page-info">Click any row to expand the full end-to-end flow showing current behavior + desired behavior after backend fix</div>
+
+<script>
+// ── SMS TEMPLATES ────────────────────────────────────────────────────────────
+const T = {
+  motionAlert: '"StorageDefender: Motion detected in Unit [Unit#] at [Facility Name]. Was this you? If so, reply YES. If not, reply NO."',
+  help:        '"Hi [FirstName], thanks for your reply! If you need help with Unit [Unit#], please contact the facility at [Phone#]."',
+  cleared:     '"StorageDefender: Thank you, this notification was cleared!"',
+  bridge:      '"StorageDefender: Thanks for confirming & will notify your secondary phone number."',
+  crossYes:    '"StorageDefender: [Secondary Mobile #] confirmed the Motion Alert in Unit [Unit#]."'
+};
+
+// ── ONLY THE 19 BE GAP YES WORDS ─────────────────────────────────────────────
+const GAP_YES = [
+  {w:'ya',         mw:false},
+  {w:'yah',        mw:false},
+  {w:'yeh',        mw:false},
+  {w:'certainly',  mw:false},
+  {w:'absolutely', mw:false},
+  {w:'definitely', mw:false},
+  {w:'indeed',     mw:false},
+  {w:'agreed',     mw:false},
+  {w:'correct',    mw:false},
+  {w:'right',      mw:false},
+  {w:'ok',         mw:false},
+  {w:'okay',       mw:false},
+  {w:'alright',    mw:false},
+  {w:'uh-huh',     mw:false},
+  {w:'mm-hmm',     mw:false},
+  {w:'of course',  mw:true},
+  {w:'no problem', mw:true},
+  {w:'sounds good',mw:true},
+  {w:'for sure',   mw:true}
+];
+
+const NO = [
+  {w:'no'},  {w:'nope'}, {w:'nah'}, {w:'naw'}
+];
+
+// Index of each gap word in the original 27-word YES list (for TC ID calculation)
+const ALL_YES_WORDS = [
+  'yes','yeah','yep','yup','yea','ya','yah','yeh','affirmative','aye','sure',
+  'certainly','absolutely','definitely','indeed','agreed','correct','right',
+  'ok','okay','alright','of course','no problem','sounds good','for sure','uh-huh','mm-hmm'
+];
+function yesIdx(w){ return ALL_YES_WORDS.indexOf(w); }
+
+function pad(n){ return String(n).padStart(3,'0'); }
+const step = (role, msg) => ({role, msg});
+
+const SETUP_DH  = step('setup','Facility "9348d571-2a94-48f7-bba9-07ef644f3963" access hours validated for current IST test window (during-hours mode)');
+const SETUP_DH2 = step('setup','Facility access hours validated (during-hours). Two responders configured: Primary (escalationLevel:1), Secondary (escalationLevel:2)');
+const EVENT     = step('event','Motion event published to RabbitMQ via gateway: 00-80-00-00-00-03-09-ea');
+
+// ── FLOW BUILDER FOR GAP YES WORD ────────────────────────────────────────────
+function gapSingleRespFlow(w, context){
+  // context: 'primary' | 'secondary_after_primary_no' | 'secondary_after_primary_timeout'
+  const who = context === 'primary' ? 'primary' : 'secondary';
+  return [
+    step('incident',
+      `⚠️ CURRENT BEHAVIOR: bad_response — incident stays OPEN\n`+
+      `System received "${w}" but it is NOT in @valid_claim_accept_responses in alert.ex.\n`+
+      `Backend classifies it as :claim_unparseable → sends help SMS instead of clearing incident.\n\n`+
+      `🎯 DESIRED BEHAVIOR (after adding "${w}" to @valid_claim_accept_responses):\n`+
+      `${who==='primary'?'Primary':'Secondary'} gets "Thank you, this notification was cleared!" → incident becomes presence_confirmed`)
+  ];
+}
+
+const S = [];
+
+// ── GROUP 1: DH-SR — Primary replies gap YES word (19 TCs) ──────────────────
+GAP_YES.forEach(y => {
+  const i = yesIdx(y.w);
+  S.push({
+    id:`DH-SR-${pad(i+1)}`, cat:'DH-SR', mw:y.mw,
+    name:`During Hours · Single Responder · Primary replies "${y.w}"`,
+    gapWord:y.w, usedAs:'Primary YES reply',
+    currentOutcome:'bad_response — help SMS sent, incident stays open',
+    fixType: y.mw ? 'Algo change + add to list' : 'Add to @valid_claim_accept_responses',
+    flow:[
+      SETUP_DH, EVENT,
+      step('s2p', T.motionAlert),
+      step('p2s', `"${y.w}" — renter intends to confirm it was them`),
+      step('help', T.help + `  ← CURRENT: help SMS because "${y.w}" is unrecognized`),
+      step('fm',   '✗ Not sent — :claim_unparseable does not trigger FM notification'),
+      step('slack','✗ Not triggered'),
+      ...gapSingleRespFlow(y.w, 'primary')
+    ]
+  });
+});
+
+// ── GROUP 2: DH-TR — Primary replies gap YES word (19 TCs) ──────────────────
+GAP_YES.forEach(y => {
+  const i = yesIdx(y.w);
+  S.push({
+    id:`DH-TR-${pad(i+1)}`, cat:'DH-TR', mw:y.mw,
+    name:`During Hours · Two Responders · Primary "${y.w}" → Secondary NOT contacted`,
+    gapWord:y.w, usedAs:'Primary YES reply',
+    currentOutcome:'bad_response — help SMS to primary; secondary never notified',
+    fixType: y.mw ? 'Algo change + add to list' : 'Add to @valid_claim_accept_responses',
+    flow:[
+      SETUP_DH2, EVENT,
+      step('s2p', T.motionAlert),
+      step('p2s', `"${y.w}" — primary intends to confirm it was them`),
+      step('help', T.help + `  ← CURRENT: help SMS because "${y.w}" is unrecognized`),
+      step('s2sec','✗ Secondary receives NO SMS — :claim_unparseable does not escalate to secondary'),
+      step('fm',   '✗ Not sent'),
+      step('slack','✗ Not triggered'),
+      ...gapSingleRespFlow(y.w, 'primary')
+    ]
+  });
+});
+
+// ── GROUP 3: DH-TR — Primary NO → Secondary gap YES (76 TCs = 4 NO × 19 GAP) ─
+let id3 = 28;
+const NO_IDX = [0,1,2,3]; // no,nope,nah,naw
+NO_IDX.forEach(ni => {
+  const n = NO[ni];
+  // advance id3 past the 8 backend-ready YES words for this NO word
+  // The full 27-YES ordering: positions 0-4 (yes,yeah,yep,yup,yea) = backend ready
+  // position 5-7 (ya,yah,yeh) = gap; 8-10 (affirmative,aye,sure) = ready; 11-26 = gap
+  // id numbering: id2b starts at 28, increments per (NO word × YES word in original order)
+  const baseForThisNo = 28 + ni*27;
+  GAP_YES.forEach(y => {
+    const yIdx = yesIdx(y.w);
+    const tcNum = baseForThisNo + yIdx;
+    S.push({
+      id:`DH-TR-${pad(tcNum)}`, cat:'DH-TR', mw:y.mw,
+      name:`During Hours · Two Responders · Primary "${n.w}" → Secondary "${y.w}" → BE Gap`,
+      gapWord:y.w, usedAs:`Secondary YES reply (after primary "${n.w}")`,
+      currentOutcome:'bad_response — help SMS to secondary, incident stays open',
+      fixType: y.mw ? 'Algo change + add to list' : 'Add to @valid_claim_accept_responses',
+      flow:[
+        SETUP_DH2, EVENT,
+        step('s2p',   T.motionAlert),
+        step('p2s',   `"${n.w}" — primary denies the motion`),
+        step('s2p',   T.bridge),
+        step('s2sec', T.motionAlert + ' (secondary receives motion alert)'),
+        step('sec2s', `"${y.w}" — secondary intends to confirm it was them`),
+        step('help',  T.help + `  ← CURRENT: help SMS to secondary because "${y.w}" is unrecognized`),
+        step('fm',    '✗ Not sent — :claim_unparseable from secondary does not trigger FM'),
+        step('slack', '✗ Not triggered'),
+        ...gapSingleRespFlow(y.w, 'secondary')
+      ]
+    });
+  });
+});
+
+// ── GROUP 4: DH-TR — Primary No Response → Secondary gap YES (19 TCs) ────────
+GAP_YES.forEach(y => {
+  const i = yesIdx(y.w);
+  S.push({
+    id:`DH-TR-${pad(161+i)}`, cat:'DH-TR', mw:y.mw,
+    name:`During Hours · Two Responders · Primary no response (timeout) → Secondary "${y.w}"`,
+    gapWord:y.w, usedAs:`Secondary YES reply (after primary 5-min timeout)`,
+    currentOutcome:'bad_response — help SMS to secondary after primary timeout',
+    fixType: y.mw ? 'Algo change + add to list' : 'Add to @valid_claim_accept_responses',
+    flow:[
+      SETUP_DH2, EVENT,
+      step('s2p',   T.motionAlert),
+      step('wait',  '⏳ 5 minutes pass — primary does not reply; system escalates to secondary'),
+      step('s2sec', T.motionAlert + ' (secondary receives alert after primary 5-min timeout)'),
+      step('sec2s', `"${y.w}" — secondary intends to confirm it was them`),
+      step('help',  T.help + `  ← CURRENT: help SMS to secondary because "${y.w}" is unrecognized`),
+      step('fm',    '✗ Not sent'),
+      step('slack', '✗ Not triggered'),
+      ...gapSingleRespFlow(y.w, 'secondary')
+    ]
+  });
+});
+
+// ── RENDER ───────────────────────────────────────────────────────────────────
+const ROLE_LABEL = {
+  setup:'⚙ SETUP', event:'📡 MOTION EVENT',
+  s2p:'🔵 SYSTEM → PRIMARY', p2s:'🟢 PRIMARY REPLIES',
+  s2sec:'🟣 SYSTEM → SECONDARY', sec2s:'🟤 SECONDARY REPLIES',
+  s2cross:'🟠 SYSTEM → PRIMARY (CROSS-NOTIFY)',
+  fm:'🔴 FM SMS', slack:'💜 SLACK',
+  incident:'📋 INCIDENT OUTCOME',
+  help:'🚨 SYSTEM RESPONSE (CURRENT — HELP SMS)',
+  wait:'⏳ WAIT'
+};
+
+function renderFlow(flow){
+  return flow.map(f=>{
+    const lbl = ROLE_LABEL[f.role]||f.role.toUpperCase();
+    return `<div class="step r-${f.role}"><div class="step-label">${lbl}</div><div class="step-msg">${f.msg}</div></div>`;
+  }).join('');
+}
+
+let openRow = null;
+
+function renderTable(data){
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML='';
+  data.forEach(sc => {
+    const tr = document.createElement('tr');
+    tr.className='data-row';
+    tr.innerHTML=`
+      <td class="mono">${sc.id} <span class="expand-icon">▶</span></td>
+      <td><span class="cat-chip cat-${sc.cat}">${sc.cat}</span></td>
+      <td style="max-width:320px;line-height:1.35">${sc.name}</td>
+      <td><span class="word">${sc.gapWord}</span>${sc.mw?' <span class="b b-mw" style="font-size:.6rem">multi-word</span>':''}</td>
+      <td style="font-size:.72rem;color:var(--txt2)">${sc.usedAs}</td>
+      <td><span class="b b-blok">⚠️ bad_response (stays open)</span></td>
+      <td style="font-size:.72rem;color:${sc.mw?'var(--mw-tx)':'var(--txt2)'}">${sc.fixType}</td>`;
+    const expTr = document.createElement('tr');
+    expTr.className='expand-row';
+    expTr.innerHTML=`<td colspan="7"><div class="flow-box"><div class="flow-title">End-to-End Flow — ${sc.id} · "${sc.gapWord}" · Current behavior + fix required</div><div class="flow-steps">${renderFlow(sc.flow)}</div></div></td>`;
+    tr.addEventListener('click',()=>{
+      const wasOpen = expTr.classList.contains('open');
+      if(openRow && openRow!==expTr){
+        openRow.classList.remove('open');
+        openRow.previousElementSibling&&openRow.previousElementSibling.classList.remove('expanded');
+      }
+      expTr.classList.toggle('open',!wasOpen);
+      tr.classList.toggle('expanded',!wasOpen);
+      openRow = wasOpen?null:expTr;
+    });
+    tbody.appendChild(tr);
+    tbody.appendChild(expTr);
+  });
+  const total=data.length, mw=data.filter(s=>s.mw).length;
+  document.getElementById('statsBar').innerHTML=
+    `<span><strong>${total}</strong> scenarios shown</span>
+     <span><strong style="color:var(--blok-tx)">${total-mw}</strong> single-word gap (simple fix)</span>
+     <span><strong style="color:var(--mw-tx)">${mw}</strong> multi-word phrase (algo change needed)</span>`;
+  document.getElementById('rowCount').textContent=`${total} of ${S.length} scenarios`;
+}
+
+function applyFilters(){
+  const q   = document.getElementById('search').value.toLowerCase();
+  const cat = document.getElementById('filterCat').value;
+  const mwF = document.getElementById('filterMW').value;
+  const filtered = S.filter(sc=>{
+    if(cat && sc.cat!==cat) return false;
+    if(mwF==='single' && sc.mw) return false;
+    if(mwF==='multi' && !sc.mw) return false;
+    if(q && !sc.id.toLowerCase().includes(q) && !sc.gapWord.toLowerCase().includes(q) && !sc.name.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  renderTable(filtered);
+}
+
+document.getElementById('search').addEventListener('input',applyFilters);
+document.getElementById('filterCat').addEventListener('change',applyFilters);
+document.getElementById('filterMW').addEventListener('change',applyFilters);
+
+renderTable(S);
+</script>
+</body>
+</html>
