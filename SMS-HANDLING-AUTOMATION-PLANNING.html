@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Motion SMS — Backend-Supported Scenarios</title>
+<style>
+:root{
+  --navy:#0C1E38;--blue:#163460;--accent:#1D6CE6;--bg:#F5F7FB;--surf:#FFF;
+  --bdr:#DDE3EF;--txt:#18253D;--txt2:#445272;--txt3:#7B90B3;
+  --done-bg:#D1FAE5;--done-tx:#065F46;
+  --pend-bg:#FEF3C7;--pend-tx:#78350F;
+  --blok-bg:#FEE2E2;--blok-tx:#991B1B;
+  --be-bg:#DBEAFE;--be-tx:#1E40AF;
+  --need-bg:#EDE9FE;--need-tx:#5B21B6;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:13px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);line-height:1.5}
+.hdr{background:var(--navy);color:#fff;padding:18px 28px}
+.hdr h1{font-size:1.35rem;font-weight:700}
+.hdr p{color:#8CA5C8;font-size:.78rem;margin-top:3px}
+.toolbar{background:var(--blue);padding:10px 28px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;position:sticky;top:0;z-index:50}
+.toolbar input,.toolbar select{background:#1E3D6A;border:1px solid rgba(255,255,255,.2);color:#CBD5E1;border-radius:5px;padding:5px 10px;font-size:.75rem;outline:none}
+.toolbar input::placeholder{color:#6B8AAD}
+.toolbar label{color:#8CA5C8;font-size:.73rem}
+.stats{padding:10px 28px;background:#EEF2FA;border-bottom:1px solid var(--bdr);font-size:.73rem;color:var(--txt2);display:flex;gap:16px}
+.stats span strong{color:var(--txt)}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.76rem}
+th{background:#E8EDF8;color:var(--txt2);font-weight:700;padding:8px 12px;text-align:left;font-size:.67rem;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--bdr);white-space:nowrap;cursor:pointer;user-select:none}
+th:hover{background:#DDE4F2}
+td{padding:7px 12px;border-bottom:1px solid #F0F4FA;vertical-align:middle}
+tr.data-row:hover td{background:#FAFBFF;cursor:pointer}
+tr.data-row.expanded td{background:#EFF4FF}
+.mono{font-family:'Consolas','SF Mono',monospace;font-size:.73rem;color:var(--accent)}
+.word{font-family:'Consolas','SF Mono',monospace;background:#EEF3FF;color:var(--txt);padding:1px 6px;border-radius:3px;font-size:.76rem;font-weight:600}
+.b{display:inline-flex;align-items:center;gap:3px;border-radius:20px;padding:2px 8px;font-size:.67rem;font-weight:700;white-space:nowrap}
+.b-done{background:var(--done-bg);color:var(--done-tx)}
+.b-pend{background:var(--pend-bg);color:var(--pend-tx)}
+.b-blok{background:var(--blok-bg);color:var(--blok-tx)}
+.b-be{background:var(--be-bg);color:var(--be-tx)}
+.b-nd{background:var(--need-bg);color:var(--need-tx)}
+.expand-row{display:none}
+.expand-row.open{display:table-row}
+.expand-row td{padding:0;background:#F7FAFF;border-bottom:2px solid var(--accent)}
+.flow-box{padding:14px 20px 14px 32px}
+.flow-title{font-size:.73rem;font-weight:700;color:var(--txt2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.flow-steps{display:flex;flex-direction:column;gap:6px}
+.step{display:grid;grid-template-columns:160px 1fr;gap:8px;align-items:start;font-size:.74rem}
+.step-label{font-weight:700;font-size:.65rem;text-transform:uppercase;letter-spacing:.4px;padding:3px 0;display:flex;align-items:center;gap:4px}
+.step-msg{padding:5px 10px;border-radius:4px;border-left:3px solid;line-height:1.45}
+/* Role colors */
+.r-setup .step-label{color:#6B7A8D}
+.r-setup .step-msg{background:#F4F6F9;border-color:#C5CDD8;color:#445272}
+.r-event .step-label{color:#374151}
+.r-event .step-msg{background:#F0F0F0;border-color:#9CA3AF;color:#374151;font-style:italic}
+.r-s2p .step-label{color:var(--accent)}
+.r-s2p .step-msg{background:#EFF6FF;border-color:var(--accent);color:#1E3A5F}
+.r-p2s .step-label{color:#059669}
+.r-p2s .step-msg{background:#F0FDF4;border-color:#34D399;color:#065F46;font-weight:600}
+.r-s2sec .step-label{color:#7C3AED}
+.r-s2sec .step-msg{background:#F5F3FF;border-color:#A78BFA;color:#4C1D95}
+.r-sec2s .step-label{color:#0D9488}
+.r-sec2s .step-msg{background:#F0FDFA;border-color:#2DD4BF;color:#115E59;font-weight:600}
+.r-s2cross .step-label{color:#D97706}
+.r-s2cross .step-msg{background:#FFFBEB;border-color:#FCD34D;color:#78350F}
+.r-fm .step-label{color:#DC2626}
+.r-fm .step-msg{background:#FFF1F2;border-color:#FCA5A5;color:#7F1D1D}
+.r-slack .step-label{color:#7E5BEF}
+.r-slack .step-msg{background:#FAF5FF;border-color:#C4B5FD;color:#4C1D95}
+.r-incident .step-label{color:#374151}
+.r-incident .step-msg{background:#F9FAFB;border-color:#6B7280;color:#374151;font-weight:700;white-space:pre-line}
+.r-wait .step-label{color:#D97706}
+.r-wait .step-msg{background:#FFFBEB;border-color:#FBBF24;color:#92400E;font-style:italic}
+.hidden{display:none}
+.expand-icon{font-size:.8rem;margin-left:4px;transition:transform .15s}
+.expanded .expand-icon{transform:rotate(90deg)}
+.cat-chip{display:inline-block;border-radius:4px;padding:1px 7px;font-size:.65rem;font-weight:700;font-family:'Consolas',monospace}
+.cat-DH-SR{background:#DBEAFE;color:#1E40AF}
+.cat-DH-TR{background:#EDE9FE;color:#5B21B6}
+.cat-AH-SR{background:#D1FAE5;color:#065F46}
+.cat-AH-TR{background:#DCFCE7;color:#166534}
+.cat-VU{background:#FEF3C7;color:#78350F}
+.cat-OH{background:#FEE2E2;color:#991B1B}
+.page-info{font-size:.72rem;color:var(--txt3);text-align:right;padding:6px 28px}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>Motion Event SMS — Backend-Supported Scenarios · End-to-End Flow Detail</h1>
+  <p>Storage Defender · Test Fac DEMO 4 · tod_message_processor · June 2026 &nbsp;|&nbsp; ✅ YES words: yes, yeah, yep, yup, yea, affirmative, aye, sure &nbsp;|&nbsp; ✅ NO words: no, nope, nah, naw &nbsp;|&nbsp; BE Gap scenarios excluded (see separate document)</p>
+</div>
+
+<div class="toolbar">
+  <label>🔍</label>
+  <input type="text" id="search" placeholder="Search TC ID or keyword..." style="width:220px">
+  <label>Category:</label>
+  <select id="filterCat">
+    <option value="">All Categories</option>
+    <option value="DH-SR">DH-SR · During Hours · Single Responder</option>
+    <option value="DH-TR">DH-TR · During Hours · Two Responders</option>
+    <option value="AH-SR">AH-SR · After Hours · Single Responder</option>
+    <option value="AH-TR">AH-TR · After Hours · Two Responders</option>
+    <option value="VU">VU · Vacant Unit</option>
+    <option value="OH">OH · Occupied Unit After Hours</option>
+  </select>
+  <label>Status:</label>
+  <select id="filterStatus">
+    <option value="">All</option>
+    <option value="done">✅ Done</option>
+    <option value="pending">🔄 Pending</option>
+  </select>
+  <label style="margin-left:auto;color:#6B8AAD;font-size:.7rem" id="rowCount"></label>
+</div>
+
+<div class="stats" id="statsBar"></div>
+
+<div class="tbl-wrap">
+  <table id="mainTable">
+    <thead>
+      <tr>
+        <th>TC ID</th>
+        <th>Cat</th>
+        <th>Scenario</th>
+        <th>Primary Reply</th>
+        <th>Secondary Reply</th>
+        <th>Incident Outcome</th>
+        <th>Backend</th>
+        <th>QA Status</th>
+        <th>Ref</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+<div class="page-info">Click any row to expand the full end-to-end SMS flow</div>
+
+<script>
+// ── SMS TEMPLATES ────────────────────────────────────────────────────────────
+const T = {
+  motionAlert: '"StorageDefender: Motion detected in Unit [Unit#] at [Facility Name]. Was this you? If so, reply YES. If not, reply NO."',
+  cleared:     '"StorageDefender: Thank you, this notification was cleared!"',
+  deniedSingle:'"StorageDefender: Thanks for confirming. Please contact [Facility Name] at [Phone#] during office hours."',
+  bridge:      '"StorageDefender: Thanks for confirming & will notify your secondary phone number."',
+  help:        '"Hi [FirstName], thanks for your reply! If you need help with Unit [Unit#], please contact the facility at [Phone#]."',
+  fm:          '"StorageDefender: Motion Detected at [Facility Name], in [Unit#] on [Date], at [Time]."',
+  crossYes:    '"StorageDefender: [Secondary Mobile #] confirmed the Motion Alert in Unit [Unit#]."',
+  crossNo:     '"StorageDefender: [Secondary Mobile #] confirmed the Motion in Unit [Unit#] was not them. We are notifying your facility."',
+  ahInfo:      '"StorageDefender: Motion detected in Unit [Unit#] at [Facility Name] at [Time]. Please contact [Facility Phone#] if needed."'
+};
+
+// ── KEYWORD LISTS ────────────────────────────────────────────────────────────
+const YES = [
+  {w:'yes',        be:true,  doneRef:'SMS-01'},
+  {w:'yeah',       be:true},
+  {w:'yep',        be:true},
+  {w:'yup',        be:true},
+  {w:'yea',        be:true},
+  {w:'ya',         be:false},
+  {w:'yah',        be:false},
+  {w:'yeh',        be:false},
+  {w:'affirmative',be:true},
+  {w:'aye',        be:true},
+  {w:'sure',       be:true},
+  {w:'certainly',  be:false},
+  {w:'absolutely', be:false},
+  {w:'definitely', be:false},
+  {w:'indeed',     be:false},
+  {w:'agreed',     be:false},
+  {w:'correct',    be:false},
+  {w:'right',      be:false},
+  {w:'ok',         be:false},
+  {w:'okay',       be:false},
+  {w:'alright',    be:false},
+  {w:'of course',  be:false, mw:true},
+  {w:'no problem', be:false, mw:true},
+  {w:'sounds good',be:false, mw:true},
+  {w:'for sure',   be:false, mw:true},
+  {w:'uh-huh',     be:false},
+  {w:'mm-hmm',     be:false}
+];
+
+const NO = [
+  {w:'no',   be:true, doneRef:'SMS-02'},
+  {w:'nope', be:true},
+  {w:'nah',  be:true},
+  {w:'naw',  be:true}
+];
+
+// ── FLOW STEP BUILDER ────────────────────────────────────────────────────────
+const step = (role, msg) => ({role, msg});
+const SETUP_DH = step('setup','Facility "9348d571-2a94-48f7-bba9-07ef644f3963" access hours are validated for the current IST test window (during-hours mode confirmed)');
+const SETUP_AH = step('setup','Facility access hours configured to AFTER HOURS for current IST window via UpdateFacility mutation');
+const SETUP_DH2 = step('setup','Facility access hours validated for current IST window. Two responders configured: Primary (escalationLevel: 1), Secondary (escalationLevel: 2)');
+const EVENT    = step('event','Motion event published to RabbitMQ via device gateway: 00-80-00-00-00-03-09-ea');
+
+// ── SCENARIO BUILDER ─────────────────────────────────────────────────────────
+const S = [];
+
+// ── DH-SR YES (27) ────────────────────────────────────────────────────────
+YES.forEach((y,i) => {
+  const isBlocked = !y.be;
+  S.push({
+    id:`DH-SR-${pad(i+1)}`, cat:'DH-SR',
+    name:`During Hours · Single Responder · Primary replies "${y.w}"`,
+    pReply:y.w, sReply:'—', be:y.be, mw:!!y.mw,
+    status: y.doneRef?'done': y.be?'pending':'blocked',
+    ref:y.doneRef||'',
+    incident: isBlocked ? 'bad_response — stays OPEN (BE Gap)' : 'presence_confirmed',
+    flow: isBlocked ? [
+      SETUP_DH, EVENT,
+      step('s2p', T.motionAlert),
+      step('p2s', `"${y.w}" — renter intends to confirm it was them`),
+      step('s2p', T.help),
+      step('fm',  '✗ Not sent — :claim_unparseable does not trigger FM notification'),
+      step('slack','✗ Not triggered'),
+      step('incident',`⚠️ bad_response — incident stays OPEN. "${y.w}" is NOT in @valid_claim_accept_responses in alert.ex. System cannot match it → :claim_unparseable → help SMS sent instead of clearing the incident.\n\n🎯 DESIRED behavior after backend adds "${y.w}" to alert.ex: System → Primary sends cleared SMS + incident becomes presence_confirmed`)
+    ] : [
+      SETUP_DH, EVENT,
+      step('s2p', T.motionAlert),
+      step('p2s', `"${y.w}"`),
+      step('s2p', T.cleared),
+      step('fm',  '✗ Not sent — primary confirmed it was them; incident closed before escalation'),
+      step('slack','✗ Not triggered — incident resolved before escalation threshold'),
+      step('incident','✅ presence_confirmed — incident CLOSED by primary responder')
+    ]
+  });
+});
+
+// ── DH-SR NO (4) ─────────────────────────────────────────────────────────
+NO.forEach((n,i) => {
+  S.push({
+    id:`DH-SR-${pad(28+i)}`, cat:'DH-SR',
+    name:`During Hours · Single Responder · Primary replies "${n.w}"`,
+    pReply:n.w, sReply:'—', be:true, mw:false,
+    status:n.doneRef?'done':'pending', ref:n.doneRef||'', incident:'denied',
+    flow:[
+      SETUP_DH, EVENT,
+      step('s2p', T.motionAlert),
+      step('p2s', `"${n.w}"`),
+      step('s2p', T.deniedSingle),
+      step('fm',  `✅ Sent: ${T.fm}`),
+      step('slack','✅ Triggered (~10 sec after denial) — Slack #security-alerts channel'),
+      step('incident','⚠️ denied — facility notified via FM SMS and Slack alert')
+    ]
+  });
+});
+
+// ── DH-SR OTHER (5) ───────────────────────────────────────────────────────
+S.push({
+  id:'DH-SR-032', cat:'DH-SR',
+  name:'During Hours · Single Responder · Primary sends invalid reply ("HELLO")',
+  pReply:'"HELLO" (invalid)', sReply:'—', be:true, mw:false,
+  status:'done', ref:'SMS-03', incident:'bad_response (stays open)',
+  flow:[
+    SETUP_DH, EVENT,
+    step('s2p', T.motionAlert),
+    step('p2s', '"HELLO" — does not match any YES keyword or NO keyword in @valid_claim_accept_responses / @valid_claim_deny_responses'),
+    step('s2p', T.help),
+    step('fm',  '✗ Not sent — invalid reply classified as :claim_unparseable; does not trigger FM notification'),
+    step('slack','✗ Not triggered — bad_response does not auto-escalate to Slack'),
+    step('incident','⚠️ bad_response — incident stays OPEN, awaiting valid reply or 5-min timeout')
+  ]
+});
+
+S.push({
+  id:'DH-SR-033', cat:'DH-SR',
+  name:'During Hours · Single Responder · No response — 5-minute timeout fires',
+  pReply:'(no reply within 5 min)', sReply:'—', be:true, mw:false,
+  status:'done', ref:'ESC-03', incident:'unexplained',
+  flow:[
+    SETUP_DH, EVENT,
+    step('s2p', T.motionAlert),
+    step('wait','⏳ 5-minute timer starts — primary responder does NOT reply within the window'),
+    step('s2p', '(no additional SMS to primary at timeout — timer expires silently)'),
+    step('fm',  `✅ Sent after 5-min timeout per escalation matrix: ${T.fm}`),
+    step('slack','✅ Triggered after 5-minute no-response timeout'),
+    step('incident','⚠️ unexplained — no acknowledgement received; incident escalated, facility notified')
+  ]
+});
+
+S.push({
+  id:'DH-SR-034', cat:'DH-SR',
+  name:'During Hours · Single Responder · Delayed YES — reply arrives after 5-min timeout window',
+  pReply:'"yes" (late — after timeout)', sReply:'—', be:true, mw:false,
+  status:'pending', ref:'', incident:'TBD (escalation state depends on timing)',
+  flow:[
+    SETUP_DH, EVENT,
+    step('s2p', T.motionAlert),
+    step('wait','⏳ >5 minutes pass — timeout fires, FM SMS and Slack already sent at 5-min mark'),
+    step('fm',  `✅ Already sent at timeout: ${T.fm}`),
+    step('slack','✅ Already triggered at 5-minute timeout'),
+    step('p2s', '"yes" — primary replies AFTER the 5-minute timeout window has fired'),
+    step('s2p', `${T.help} (system treats late reply as informational; timeout already processed)`),
+    step('incident','⚠️ Incident already in escalated/unexplained state — late YES does NOT retroactively clear it. Final state: unexplained')
+  ]
+});
+
+S.push({
+  id:'DH-SR-035', cat:'DH-SR',
+  name:'During Hours · Single Responder · Delayed NO — reply arrives after 5-min timeout window',
+  pReply:'"no" (late — after timeout)', sReply:'—', be:true, mw:false,
+  status:'pending', ref:'', incident:'TBD',
+  flow:[
+    SETUP_DH, EVENT,
+    step('s2p', T.motionAlert),
+    step('wait','⏳ >5 minutes pass — timeout fires, FM and Slack already sent'),
+    step('fm',  `✅ Already sent at timeout: ${T.fm}`),
+    step('slack','✅ Already triggered at timeout'),
+    step('p2s', '"no" — primary replies AFTER timeout has fired'),
+    step('s2p', `${T.help} (late reply treated as informational — timeout already processed)`),
+    step('incident','⚠️ Incident already escalated — late NO does NOT re-trigger FM/Slack. Final state: unexplained')
+  ]
+});
+
+S.push({
+  id:'DH-SR-036', cat:'DH-SR',
+  name:'During Hours · Single Responder · Delayed invalid reply — arrives after 5-min timeout window',
+  pReply:'"HELLO" (invalid, late)', sReply:'—', be:true, mw:false,
+  status:'pending', ref:'', incident:'TBD',
+  flow:[
+    SETUP_DH, EVENT,
+    step('s2p', T.motionAlert),
+    step('wait','⏳ >5 minutes pass — timeout fires, FM and Slack already sent'),
+    step('fm',  `✅ Already sent at timeout: ${T.fm}`),
+    step('slack','✅ Already triggered at timeout'),
+    step('p2s', '"HELLO" — invalid reply arrives after timeout'),
+    step('s2p', `${T.help} (help SMS still sent to primary even though timeout already fired)`),
+    step('incident','⚠️ Incident already escalated — late invalid reply does not further change escalation state')
+  ]
+});
+
+// ── DH-TR PRIMARY YES (27) ────────────────────────────────────────────────
+YES.forEach((y,i) => {
+  const doneRef = i===0?'SMS-04/SMS-07':null;
+  const isBlocked = !y.be;
+  S.push({
+    id:`DH-TR-${pad(i+1)}`, cat:'DH-TR',
+    name:`During Hours · Two Responders · Primary "${y.w}" → Secondary NOT contacted`,
+    pReply:y.w, sReply: isBlocked ? '(not contacted — BE Gap, incident stays open)' : '(not contacted — primary cleared)',
+    be:y.be, mw:!!y.mw,
+    status:doneRef?'done':y.be?'pending':'blocked',
+    ref:doneRef||'',
+    incident: isBlocked ? 'bad_response — stays OPEN (BE Gap)' : 'presence_confirmed',
+    flow: isBlocked ? [
+      SETUP_DH2, EVENT,
+      step('s2p', T.motionAlert),
+      step('p2s', `"${y.w}" — primary intends to confirm it was them`),
+      step('s2p', T.help),
+      step('s2sec','✗ Secondary receives NO SMS — bad_response does not escalate to secondary'),
+      step('fm',   '✗ Not sent — :claim_unparseable does not trigger FM notification'),
+      step('slack','✗ Not triggered'),
+      step('incident',`⚠️ bad_response — incident stays OPEN. "${y.w}" not in @valid_claim_accept_responses → :claim_unparseable → help SMS sent to primary.\n\n🎯 DESIRED behavior after backend adds "${y.w}" to alert.ex: cleared SMS to primary, secondary not contacted, incident becomes presence_confirmed`)
+    ] : [
+      SETUP_DH2, EVENT,
+      step('s2p', T.motionAlert),
+      step('p2s', `"${y.w}"`),
+      step('s2p', T.cleared),
+      step('s2sec','✗ Secondary receives ZERO SMS — primary cleared the incident before it could escalate to secondary (verified: 0 messages received by secondary number)'),
+      step('fm',   '✗ Not sent — incident cleared by primary'),
+      step('slack','✗ Not triggered — incident resolved before escalation'),
+      step('incident','✅ presence_confirmed — cleared by primary responder; secondary never involved')
+    ]
+  });
+});
+
+// ── DH-TR PRIMARY NO → SECONDARY YES (108) ───────────────────────────────
+let id2b = 28;
+NO.forEach(n => {
+  YES.forEach(y => {
+    const isDone = n.w==='no' && y.w==='yes';
+    const isBlocked = !y.be;
+    S.push({
+      id:`DH-TR-${pad(id2b++)}`, cat:'DH-TR',
+      name: isBlocked
+        ? `During Hours · Two Responders · Primary "${n.w}" → Secondary "${y.w}" → BE Gap (help SMS sent)`
+        : `During Hours · Two Responders · Primary "${n.w}" → Secondary "${y.w}" → Incident cleared`,
+      pReply:n.w, sReply:y.w, be:n.be&&y.be, mw:!!y.mw,
+      status:isDone?'done':(!y.be?'blocked':'pending'),
+      ref:isDone?'SMS-05':'',
+      incident: isBlocked ? 'bad_response — stays OPEN (BE Gap on secondary word)' : 'presence_confirmed',
+      flow: isBlocked ? [
+        SETUP_DH2, EVENT,
+        step('s2p',   T.motionAlert),
+        step('p2s',   `"${n.w}"`),
+        step('s2p',   T.bridge),
+        step('s2sec', T.motionAlert),
+        step('sec2s', `"${y.w}" — secondary intends to confirm it was them`),
+        step('s2sec', T.help),
+        step('fm',    '✗ Not sent — :claim_unparseable from secondary does not trigger FM notification'),
+        step('slack', '✗ Not triggered'),
+        step('incident',`⚠️ bad_response — incident stays OPEN. Secondary replied "${y.w}" which is NOT in @valid_claim_accept_responses → :claim_unparseable → help SMS sent to secondary instead of clearing.\n\n🎯 DESIRED behavior after backend adds "${y.w}" to alert.ex: secondary gets cleared SMS + cross-notify to primary + incident becomes presence_confirmed`)
+      ] : [
+        SETUP_DH2, EVENT,
+        step('s2p',   T.motionAlert),
+        step('p2s',   `"${n.w}"`),
+        step('s2p',   T.bridge),
+        step('s2sec', T.motionAlert),
+        step('sec2s', `"${y.w}"`),
+        step('s2sec', T.cleared),
+        step('s2cross',T.crossYes),
+        step('fm',    '✗ Not sent — secondary confirmed it was them'),
+        step('slack', '✗ Not triggered — incident cleared by secondary'),
+        step('incident','✅ presence_confirmed — cleared by secondary responder; primary received cross-notification')
+      ]
+    });
+  });
+});
+
+// ── DH-TR PRIMARY NO → SECONDARY NO (16) ─────────────────────────────────
+let id2c = 136;
+NO.forEach(n => {
+  NO.forEach(s => {
+    const isDone = n.w==='no' && s.w==='no';
+    S.push({
+      id:`DH-TR-${pad(id2c++)}`, cat:'DH-TR',
+      name:`During Hours · Two Responders · Primary "${n.w}" → Secondary "${s.w}" → Facility notified`,
+      pReply:n.w, sReply:s.w, be:true, mw:false,
+      status:isDone?'done':'pending', ref:isDone?'SMS-06':'', incident:'denied',
+      flow:[
+        SETUP_DH2, EVENT,
+        step('s2p',   T.motionAlert),
+        step('p2s',   `"${n.w}"`),
+        step('s2p',   T.bridge),
+        step('s2sec', T.motionAlert),
+        step('sec2s', `"${s.w}"`),
+        step('s2sec', T.deniedSingle),
+        step('s2cross',T.crossNo),
+        step('fm',    `✅ Sent: ${T.fm}`),
+        step('slack', '✅ Triggered — both responders denied; facility notified via Slack'),
+        step('incident','⚠️ denied — FM SMS sent, Slack alert triggered; both responders denied the motion event')
+      ]
+    });
+  });
+});
+
+// ── DH-TR P-NO → S-INVALID (4) ───────────────────────────────────────────
+NO.forEach((n,i) => {
+  S.push({
+    id:`DH-TR-${pad(152+i)}`, cat:'DH-TR',
+    name:`During Hours · Two Responders · Primary "${n.w}" → Secondary replies invalid ("HELLO")`,
+    pReply:n.w, sReply:'"HELLO" (invalid)', be:true, mw:false,
+    status:'pending', ref:'', incident:'bad_response (stays open)',
+    flow:[
+      SETUP_DH2, EVENT,
+      step('s2p',   T.motionAlert),
+      step('p2s',   `"${n.w}"`),
+      step('s2p',   T.bridge),
+      step('s2sec', T.motionAlert),
+      step('sec2s', '"HELLO" — does not match any YES or NO keyword'),
+      step('s2sec', T.help),
+      step('fm',    '✗ Not sent — secondary invalid reply classified as :claim_unparseable'),
+      step('slack', '✗ Not triggered'),
+      step('incident','⚠️ bad_response — incident stays OPEN after secondary invalid reply; help SMS sent to secondary')
+    ]
+  });
+});
+
+// ── DH-TR P-NO → S-NO-RESPONSE (4) ──────────────────────────────────────
+NO.forEach((n,i) => {
+  S.push({
+    id:`DH-TR-${pad(156+i)}`, cat:'DH-TR',
+    name:`During Hours · Two Responders · Primary "${n.w}" → Secondary no response (5-min timeout)`,
+    pReply:n.w, sReply:'(no reply — 5-min timeout)', be:true, mw:false,
+    status:'pending', ref:'', incident:'unexplained',
+    flow:[
+      SETUP_DH2, EVENT,
+      step('s2p',   T.motionAlert),
+      step('p2s',   `"${n.w}"`),
+      step('s2p',   T.bridge),
+      step('s2sec', T.motionAlert),
+      step('wait',  '⏳ 5 minutes pass — secondary does not reply; secondary timeout fires'),
+      step('fm',    `✅ Sent after secondary timeout: ${T.fm}`),
+      step('slack', '✅ Triggered after secondary 5-minute no-response timeout'),
+      step('incident','⚠️ unexplained — primary denied, secondary did not respond; facility notified')
+    ]
+  });
+});
+
+// ── DH-TR-160: P-INVALID (1) ─────────────────────────────────────────────
+S.push({
+  id:'DH-TR-160', cat:'DH-TR',
+  name:'During Hours · Two Responders · Primary replies invalid ("HELLO") → Secondary NOT contacted',
+  pReply:'"HELLO" (invalid)', sReply:'(not contacted)', be:true, mw:false,
+  status:'pending', ref:'', incident:'bad_response (stays open)',
+  flow:[
+    SETUP_DH2, EVENT,
+    step('s2p',   T.motionAlert),
+    step('p2s',   '"HELLO" — classified as :claim_unparseable'),
+    step('s2p',   T.help),
+    step('s2sec', '✗ Secondary receives NO SMS — :claim_unparseable from primary does NOT escalate to secondary (secondary only receives SMS after primary :claim_deny)'),
+    step('fm',    '✗ Not sent'),
+    step('slack', '✗ Not triggered'),
+    step('incident','⚠️ bad_response — incident stays OPEN; help SMS sent to primary only')
+  ]
+});
+
+// ── DH-TR P-NO-RESPONSE → S-YES (27) ─────────────────────────────────────
+YES.forEach((y,i) => {
+  const isBlocked = !y.be;
+  S.push({
+    id:`DH-TR-${pad(161+i)}`, cat:'DH-TR',
+    name:`During Hours · Two Responders · Primary no response (timeout) → Secondary "${y.w}"`,
+    pReply:'(no reply — 5-min timeout)', sReply:y.w, be:y.be, mw:!!y.mw,
+    status:y.be?'pending':'blocked', ref:'',
+    incident: isBlocked ? 'bad_response — stays OPEN (BE Gap on secondary word)' : 'presence_confirmed',
+    flow: isBlocked ? [
+      SETUP_DH2, EVENT,
+      step('s2p',   T.motionAlert),
+      step('wait',  '⏳ 5 minutes pass — primary does not reply; system escalates to secondary'),
+      step('s2sec', T.motionAlert + ' (secondary receives motion alert after primary 5-min timeout)'),
+      step('sec2s', `"${y.w}" — secondary intends to confirm it was them`),
+      step('s2sec', T.help),
+      step('fm',    '✗ Not sent — :claim_unparseable from secondary does not trigger FM'),
+      step('slack', '✗ Not triggered'),
+      step('incident',`⚠️ bad_response — incident stays OPEN. Secondary replied "${y.w}" which is NOT in @valid_claim_accept_responses → :claim_unparseable → help SMS sent to secondary.\n\n🎯 DESIRED behavior after backend adds "${y.w}" to alert.ex: secondary gets cleared SMS, primary gets cross-notify, incident becomes presence_confirmed`)
+    ] : [
+      SETUP_DH2, EVENT,
+      step('s2p',   T.motionAlert),
+      step('wait',  '⏳ 5 minutes pass — primary does not reply; system escalates to secondary'),
+      step('s2sec', T.motionAlert + ' (secondary receives motion alert after primary 5-min timeout)'),
+      step('sec2s', `"${y.w}"`),
+      step('s2sec', T.cleared),
+      step('s2cross','"StorageDefender: [Secondary Mobile #] confirmed the Motion Alert in Unit [Unit#]." (cross-notify to primary)'),
+      step('fm',    '✗ Not sent — secondary confirmed it was them'),
+      step('slack', '✗ Not triggered'),
+      step('incident','✅ presence_confirmed — cleared by secondary after primary timeout; primary received cross-notification')
+    ]
+  });
+});
+
+// ── DH-TR P-NO-RESPONSE → S-NO (4) ──────────────────────────────────────
+NO.forEach((n,i) => {
+  S.push({
+    id:`DH-TR-${pad(188+i)}`, cat:'DH-TR',
+    name:`During Hours · Two Responders · Primary no response (timeout) → Secondary "${n.w}"`,
+    pReply:'(no reply — 5-min timeout)', sReply:n.w, be:true, mw:false,
+    status:'pending', ref:'', incident:'denied',
+    flow:[
+      SETUP_DH2, EVENT,
+      step('s2p',   T.motionAlert),
+      step('wait',  '⏳ 5 minutes pass — primary does not reply; system escalates to secondary'),
+      step('s2sec', T.motionAlert + ' (secondary receives alert after primary timeout)'),
+      step('sec2s', `"${n.w}"`),
+      step('s2sec', T.deniedSingle),
+      step('s2cross',T.crossNo),
+      step('fm',    `✅ Sent: ${T.fm}`),
+      step('slack', '✅ Triggered — secondary denied; facility notified'),
+      step('incident','⚠️ denied — FM SMS sent, Slack triggered after secondary denial (primary had timed out)')
+    ]
+  });
+});
+
+// ── DH-TR-192: P-NO-RESPONSE → S-INVALID (1) ─────────────────────────────
+S.push({
+  id:'DH-TR-192', cat:'DH-TR',
+  name:'During Hours · Two Responders · Primary no response (timeout) → Secondary replies invalid ("HELLO")',
+  pReply:'(no reply — timeout)', sReply:'"HELLO" (invalid)', be:true, mw:false,
+  status:'pending', ref:'', incident:'bad_response (stays open)',
+  flow:[
+    SETUP_DH2, EVENT,
+    step('s2p',   T.motionAlert),
+    step('wait',  '⏳ 5 minutes pass — primary does not reply; escalates to secondary'),
+    step('s2sec', T.motionAlert + ' (secondary receives alert after primary timeout)'),
+    step('sec2s', '"HELLO" — secondary sends invalid reply'),
+    step('s2sec', T.help),
+    step('fm',    '✗ Not sent'),
+    step('slack', '✗ Not triggered'),
+    step('incident','⚠️ bad_response — stays OPEN; primary timed out AND secondary sent invalid reply')
+  ]
+});
+
+// ── DH-TR-193: BOTH NO RESPONSE (1) ──────────────────────────────────────
+S.push({
+  id:'DH-TR-193', cat:'DH-TR',
+  name:'During Hours · Two Responders · Primary no response AND Secondary no response (both timeouts fire)',
+  pReply:'(no reply — 5-min timeout)', sReply:'(no reply — 5-min timeout)', be:true, mw:false,
+  status:'pending', ref:'', incident:'unexplained',
+  flow:[
+    SETUP_DH2, EVENT,
+    step('s2p',   T.motionAlert),
+    step('wait',  '⏳ 5 minutes pass — primary does not reply; system escalates to secondary'),
+    step('s2sec', T.motionAlert + ' (secondary receives alert after primary timeout)'),
+    step('wait',  '⏳ Additional 5 minutes pass — secondary also does not reply; secondary timeout fires'),
+    step('fm',    `✅ Sent after both timeouts: ${T.fm}`),
+    step('slack', '✅ Triggered — neither primary nor secondary responded'),
+    step('incident','⚠️ unexplained — no acknowledgement from either responder; facility notified via FM + Slack')
+  ]
+});
+
+// ── DH-TR P-NO → S-INVALID-PHONE (4) ─────────────────────────────────────
+NO.forEach((n,i) => {
+  S.push({
+    id:`DH-TR-${pad(194+i)}`, cat:'DH-TR',
+    name:`During Hours · Two Responders · Primary "${n.w}" → Secondary has invalid/unreachable phone number`,
+    pReply:n.w, sReply:'(delivery fails — invalid phone)', be:true, mw:false,
+    status:'pending', ref:'', incident:'TBD — depends on Twilio delivery-failure handling',
+    flow:[
+      SETUP_DH2, EVENT,
+      step('s2p',   T.motionAlert),
+      step('p2s',   `"${n.w}"`),
+      step('s2p',   T.bridge),
+      step('s2sec', '⚠️ SMS delivery attempt to secondary FAILS — Twilio returns delivery failure (invalid number / unregistered / unreachable)'),
+      step('fm',    'TBD — expected: system detects delivery failure and triggers FM SMS as fallback. Needs verification'),
+      step('slack', 'TBD — expected: Slack triggered due to secondary delivery failure'),
+      step('incident','⚠️ TBD — depends on error-handling path in tod_message_processor for Twilio delivery failures')
+    ]
+  });
+});
+
+// ── DH-TR-198: BOTH INVALID (1) ──────────────────────────────────────────
+S.push({
+  id:'DH-TR-198', cat:'DH-TR',
+  name:'During Hours · Two Responders · Primary invalid ("HELLO") → Secondary also replies invalid ("HELLO")',
+  pReply:'"HELLO" (invalid)', sReply:'"HELLO" (invalid)', be:true, mw:false,
+  status:'pending', ref:'', incident:'bad_response (stays open)',
+  flow:[
+    SETUP_DH2, EVENT,
+    step('s2p',   T.motionAlert),
+    step('p2s',   '"HELLO" — classified as :claim_unparseable by primary'),
+    step('s2p',   T.help + ' (help SMS sent to primary)'),
+    step('s2sec', '⚠️ Note: Need to verify — does :claim_unparseable from primary trigger secondary notification? If YES, secondary receives the below:'),
+    step('sec2s', '"HELLO" — secondary also sends invalid reply (if secondary was notified)'),
+    step('s2sec', T.help + ' (help SMS to secondary, if secondary was notified)'),
+    step('fm',    '✗ Not sent (no :claim_deny from either responder)'),
+    step('slack', '✗ Not triggered'),
+    step('incident','⚠️ bad_response — incident stays OPEN; help SMS sent to both (if secondary was notified)')
+  ]
+});
+
+// ── AH-SR (4) ─────────────────────────────────────────────────────────────
+S.push({
+  id:'AH-SR-001', cat:'AH-SR',
+  name:'After Hours · Single Responder · Motion detected → one-way informational SMS (no YES/NO prompt)',
+  pReply:'— (no reply expected)', sReply:null, be:true, mw:false,
+  status:'done', ref:'ESC-04', incident:'unexplained (duringAccessHours: false)',
+  flow:[
+    SETUP_AH, EVENT,
+    step('s2p',   T.ahInfo + ' (one-way informational — does NOT ask "Was this you? Reply YES/NO")'),
+    step('fm',    '✗ Not sent at incident creation (after-hours occupied-unit pattern differs from during-hours)'),
+    step('slack', '✅ Triggered at incident creation with after-hours priority (priority: low/substantial based on facility settings)'),
+    step('incident','⚠️ unexplained — duringAccessHours: false, one-way SMS sent; no YES/NO flow initiated')
+  ]
+});
+
+S.push({
+  id:'AH-SR-002', cat:'AH-SR',
+  name:'After Hours · Single Responder · Primary replies to after-hours informational SMS (any text)',
+  pReply:'any text (after-hours)', sReply:null, be:true, mw:false,
+  status:'pending', ref:'', incident:'no change (unexplained)',
+  flow:[
+    SETUP_AH, EVENT,
+    step('s2p',   T.ahInfo + ' (already sent — after-hours info SMS)'),
+    step('p2s',   '"[ANY TEXT]" — primary sends any reply to the after-hours informational SMS'),
+    step('s2p',   T.help + ' (after-hours replies are treated the same as invalid; help SMS sent back)'),
+    step('fm',    '✗ Not sent (reply does not change incident state or trigger FM)'),
+    step('slack', '✗ Not re-triggered (Slack already triggered at incident creation)'),
+    step('incident','⚠️ No change — incident remains unexplained; after-hours reply is informational only and does NOT resolve the incident')
+  ]
+});
+
+S.push({
+  id:'AH-SR-003', cat:'AH-SR',
+  name:'After Hours · Single Responder · No response from primary (after-hours info SMS sent, no reply)',
+  pReply:'(no reply)', sReply:null, be:true, mw:false,
+  status:'pending', ref:'', incident:'unexplained — no after-hours escalation',
+  flow:[
+    SETUP_AH, EVENT,
+    step('s2p',   T.ahInfo),
+    step('wait',  '⏳ No reply from primary — after-hours flow does NOT require YES/NO response; no follow-up timer fires'),
+    step('fm',    '✗ Not sent (after-hours one-way SMS is informational only — no FM notification on no-reply)'),
+    step('slack', '✅ Already triggered at incident creation (not re-triggered for no-reply)'),
+    step('incident','⚠️ unexplained — incident stays open, handled per scheduled cleanup or facility staff manual review')
+  ]
+});
+
+S.push({
+  id:'AH-SR-004', cat:'AH-SR',
+  name:'After Hours · Single Responder · Multiple motion events in quick succession (SMS throttle / coalesce behavior)',
+  pReply:'N/A', sReply:null, be:true, mw:false,
+  status:'pending', ref:'', incident:'TBD — coalescing behavior',
+  flow:[
+    SETUP_AH, EVENT,
+    step('s2p',   T.ahInfo + ' (sent for first motion event)'),
+    step('wait',  '⏳ Short delay (within throttle window — e.g. <2 minutes)'),
+    step('event', 'Second motion event published — same device, same facility, within throttle window'),
+    step('s2p',   'TBD: Is second SMS suppressed (coalesced into first incident) or sent separately? Expected behavior: throttle suppresses duplicate SMS'),
+    step('fm',    'TBD — 1 FM notification or 2?'),
+    step('slack', 'TBD — 1 Slack event or 2?'),
+    step('incident','TBD — does system create 1 incident (and update it) or 2 separate incidents for rapid events?')
+  ]
+});
+
+// ── AH-TR (4) ─────────────────────────────────────────────────────────────
+S.push({
+  id:'AH-TR-001', cat:'AH-TR',
+  name:'After Hours · Two Responders · Motion detected → informational SMS (is secondary also notified?)',
+  pReply:'— (no reply expected)', sReply:'TBD — after-hours secondary notify behavior', be:true, mw:false,
+  status:'pending', ref:'', incident:'unexplained (duringAccessHours: false)',
+  flow:[
+    SETUP_AH,
+    step('setup','Two responders configured: Primary (escalationLevel: 1), Secondary (escalationLevel: 2)'),
+    EVENT,
+    step('s2p',   T.ahInfo + ' (primary receives after-hours info SMS)'),
+    step('s2sec', 'TBD: Does secondary receive after-hours SMS immediately (simultaneous with primary) or only after primary ignores it? Need to verify tod_message_processor after-hours escalation logic'),
+    step('fm',    '✗ Not sent at creation'),
+    step('slack', '✅ Triggered at incident creation'),
+    step('incident','⚠️ unexplained — duringAccessHours: false; secondary notification behavior TBD')
+  ]
+});
+
+S.push({
+  id:'AH-TR-002', cat:'AH-TR',
+  name:'After Hours · Two Responders · Primary replies to after-hours SMS (any text)',
+  pReply:'any text', sReply:'— (not affected)', be:true, mw:false,
+  status:'pending', ref:'', incident:'no change',
+  flow:[
+    SETUP_AH, step('setup','Two responders configured; after-hours info SMS already received by primary'),
+    step('p2s',   'Primary sends any reply text to after-hours informational SMS'),
+    step('s2p',   T.help + ' (after-hours reply → help SMS back to primary)'),
+    step('s2sec', '✗ Secondary is NOT additionally notified due to primary reply'),
+    step('fm',    '✗ Not sent'),
+    step('slack', '✗ Not re-triggered'),
+    step('incident','⚠️ No change to incident state — reply is informational only')
+  ]
+});
+
+S.push({
+  id:'AH-TR-003', cat:'AH-TR',
+  name:'After Hours · Two Responders · Secondary replies to after-hours SMS (if secondary was notified)',
+  pReply:'— (not additionally notified)', sReply:'any text', be:true, mw:false,
+  status:'pending', ref:'', incident:'no change',
+  flow:[
+    SETUP_AH, step('setup','Two responders configured; secondary received after-hours SMS (depends on AH-TR-001 finding)'),
+    step('sec2s', 'Secondary sends any reply text to after-hours informational SMS'),
+    step('s2sec', T.help + ' (after-hours reply → help SMS back to secondary)'),
+    step('fm',    '✗ Not sent'),
+    step('slack', '✗ Not re-triggered'),
+    step('incident','⚠️ No change — secondary reply is informational only in after-hours mode')
+  ]
+});
+
+S.push({
+  id:'AH-TR-004', cat:'AH-TR',
+  name:'After Hours · Two Responders · Neither primary nor secondary responds',
+  pReply:'(no reply)', sReply:'(no reply)', be:true, mw:false,
+  status:'pending', ref:'', incident:'unexplained',
+  flow:[
+    SETUP_AH, step('setup','Two responders configured'),
+    EVENT,
+    step('s2p',   T.ahInfo),
+    step('s2sec', 'TBD: secondary SMS sent (see AH-TR-001)'),
+    step('wait',  '⏳ No reply from either responder — after-hours no-response handling (no YES/NO timer in after-hours mode)'),
+    step('fm',    'TBD — after-hours no-reply FM behavior for two-responder facility'),
+    step('slack', '✅ Already triggered at creation'),
+    step('incident','⚠️ unexplained — incident handled per scheduled cleanup; no after-hours follow-up action')
+  ]
+});
+
+// ── VU (2) ─────────────────────────────────────────────────────────────────
+S.push({
+  id:'VU-001', cat:'VU',
+  name:'Vacant Unit · During Access Hours · Motion detected — no tenant, no responder configured',
+  pReply:'N/A (no tenant)', sReply:null, be:true, mw:false,
+  status:'pending', ref:'', incident:'unacknowledged',
+  flow:[
+    SETUP_DH,
+    step('setup','Unit is VACANT: device exists and is active, but NO tenant is assigned and NO responder is configured'),
+    EVENT,
+    step('s2p',   '✗ No responder SMS sent — no responder is configured for this vacant unit'),
+    step('fm',    '✗ No FM SMS sent during access hours for vacant unit (during-hours vacant behavior: incident created, no FM notification)'),
+    step('slack', 'TBD — vacant unit Slack notification during access hours'),
+    step('incident','⚠️ unacknowledged — incident created with no notification path; stays open until manual FM review')
+  ]
+});
+
+S.push({
+  id:'VU-002', cat:'VU',
+  name:'Vacant Unit · After Access Hours · Motion detected — no tenant, no responder configured',
+  pReply:'N/A (no tenant)', sReply:null, be:true, mw:false,
+  status:'pending', ref:'', incident:'unexplained',
+  flow:[
+    SETUP_AH,
+    step('setup','Unit is VACANT: no tenant assigned, no responder configured; facility is after-hours'),
+    EVENT,
+    step('s2p',   '✗ No responder SMS sent — no tenant/responder for this unit'),
+    step('fm',    `✅ FM SMS sent IMMEDIATELY for after-hours vacant unit: ${T.fm} (vacant unit after-hours = immediate FM notification, no waiting for responder reply)`),
+    step('slack', '✅ Triggered — after-hours vacant unit motion is high-priority event'),
+    step('incident','⚠️ unexplained — duringAccessHours: false; FM notified immediately due to vacant unit after-hours policy')
+  ]
+});
+
+// ── OH (3) ─────────────────────────────────────────────────────────────────
+S.push({
+  id:'OH-001', cat:'OH',
+  name:'Occupied Unit · After Access Hours · Motion detected → one-way informational SMS (no YES/NO)',
+  pReply:'— (no reply expected)', sReply:null, be:true, mw:false,
+  status:'done', ref:'ESC-04', incident:'unexplained (duringAccessHours: false)',
+  flow:[
+    SETUP_AH,
+    step('setup','Unit is OCCUPIED: tenant assigned, responder configured. Facility is after-hours'),
+    EVENT,
+    step('s2p',   T.ahInfo + ' (one-way informational SMS — does NOT ask "Was this you? Reply YES/NO")'),
+    step('fm',    '✗ Not sent at initial creation (after-hours occupied-unit: no immediate FM notification)'),
+    step('slack', '✅ Triggered at incident creation with after-hours priority'),
+    step('incident','⚠️ unexplained — duringAccessHours: false; one-way informational SMS sent to tenant; no YES/NO flow')
+  ]
+});
+
+S.push({
+  id:'OH-002', cat:'OH',
+  name:'Occupied Unit · After Hours · Tenant replies to after-hours informational SMS (any text)',
+  pReply:'any text', sReply:null, be:true, mw:false,
+  status:'pending', ref:'', incident:'no change',
+  flow:[
+    SETUP_AH, step('setup','After-hours mode; after-hours info SMS already received by tenant (OH-001)'),
+    step('p2s',   '"[ANY TEXT]" — tenant replies to the after-hours informational SMS'),
+    step('s2p',   T.help + ' (all after-hours replies → help SMS; reply does NOT resolve incident)'),
+    step('fm',    '✗ Not sent (reply does not change incident)'),
+    step('slack', '✗ Not re-triggered'),
+    step('incident','⚠️ No change — incident remains unexplained; reply is informational only')
+  ]
+});
+
+S.push({
+  id:'OH-003', cat:'OH',
+  name:'Occupied Unit · After Hours · Multiple motion events in quick succession (SMS throttle / coalesce)',
+  pReply:'N/A', sReply:null, be:true, mw:false,
+  status:'pending', ref:'', incident:'TBD',
+  flow:[
+    SETUP_AH, step('setup','Occupied unit, after-hours, tenant/responder configured'),
+    EVENT,
+    step('s2p',   T.ahInfo + ' (sent for first motion event)'),
+    step('wait',  '⏳ Short delay (within coalesce window)'),
+    step('event', 'Second motion event from same device within coalesce window'),
+    step('s2p',   'TBD: Is second SMS sent (new notification per event) or throttled (coalesced into first incident)?'),
+    step('fm',    'TBD — 1 FM notification or 2?'),
+    step('slack', 'TBD — 1 Slack event or 2?'),
+    step('incident','TBD — 1 updated incident or 2 separate incidents created for rapid events?')
+  ]
+});
+
+// ── HELPERS ──────────────────────────────────────────────────────────────────
+function pad(n){return String(n).padStart(3,'0')}
+
+// ── RENDER ───────────────────────────────────────────────────────────────────
+const ROLE_LABEL = {
+  setup:'⚙ SETUP', event:'📡 MOTION EVENT',
+  s2p:'🔵 SYSTEM → PRIMARY', p2s:'🟢 PRIMARY REPLIES',
+  s2sec:'🟣 SYSTEM → SECONDARY', sec2s:'🟤 SECONDARY REPLIES',
+  s2cross:'🟠 SYSTEM → PRIMARY (CROSS-NOTIFY)',
+  fm:'🔴 FM SMS', slack:'💜 SLACK', incident:'📋 INCIDENT OUTCOME',
+  wait:'⏳ WAIT'
+};
+
+function renderFlow(flow){
+  return flow.map(f=>{
+    const lbl = ROLE_LABEL[f.role]||f.role.toUpperCase();
+    return `<div class="step r-${f.role}"><div class="step-label">${lbl}</div><div class="step-msg">${f.msg}</div></div>`;
+  }).join('');
+}
+
+function statusBadge(s){
+  if(s==='done')    return '<span class="b b-done">✅ Done</span>';
+  if(s==='pending') return '<span class="b b-pend">🔄 Pending</span>';
+  return '<span class="b b-blok">⛔ Blocked</span>';
+}
+function beBadge(be){ return be?'<span class="b b-be">BE Ready</span>':'<span class="b b-nd">BE Gap</span>'; }
+
+let openRow = null;
+
+function renderTable(data){
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML='';
+  data.forEach((sc,idx)=>{
+    const tr = document.createElement('tr');
+    tr.className='data-row';
+    tr.dataset.idx=idx;
+    tr.innerHTML=`
+      <td class="mono">${sc.id} <span class="expand-icon">▶</span></td>
+      <td><span class="cat-chip cat-${sc.cat}">${sc.cat}</span></td>
+      <td style="max-width:340px;line-height:1.35">${sc.name}${sc.mw?' <span class="b b-nd" style="font-size:.6rem">multi-word</span>':''}</td>
+      <td><span class="word" style="font-size:.73rem">${sc.pReply}</span></td>
+      <td style="color:var(--txt2)">${sc.sReply||'—'}</td>
+      <td style="font-size:.72rem;color:var(--txt2)">${sc.incident}</td>
+      <td>${beBadge(sc.be)}</td>
+      <td>${statusBadge(sc.status)}</td>
+      <td class="mono" style="color:var(--done-tx)">${sc.ref}</td>`;
+    const expTr = document.createElement('tr');
+    expTr.className='expand-row';
+    expTr.innerHTML=`<td colspan="9"><div class="flow-box"><div class="flow-title">End-to-End Flow — ${sc.id}</div><div class="flow-steps">${renderFlow(sc.flow)}</div></div></td>`;
+    tr.addEventListener('click',()=>{
+      const wasOpen = expTr.classList.contains('open');
+      if(openRow && openRow!==expTr){
+        openRow.classList.remove('open');
+        openRow.previousElementSibling&&openRow.previousElementSibling.classList.remove('expanded');
+      }
+      expTr.classList.toggle('open',!wasOpen);
+      tr.classList.toggle('expanded',!wasOpen);
+      openRow = wasOpen?null:expTr;
+    });
+    tbody.appendChild(tr);
+    tbody.appendChild(expTr);
+  });
+  updateStats(data);
+}
+
+function updateStats(data){
+  const total=data.length, done=data.filter(s=>s.status==='done').length,
+    pend=data.filter(s=>s.status==='pending').length,
+    blok=data.filter(s=>s.status==='blocked').length;
+  document.getElementById('statsBar').innerHTML=
+    `<span><strong>${total}</strong> scenarios shown</span>
+     <span><strong style="color:var(--done-tx)">${done}</strong> done</span>
+     <span><strong style="color:var(--pend-tx)">${pend}</strong> pending</span>
+     <span><strong style="color:var(--blok-tx)">${blok}</strong> blocked</span>`;
+  document.getElementById('rowCount').textContent=`${total} of ${S.length} scenarios`;
+}
+
+// Only show scenarios where backend already supports the keywords
+const SUPPORTED = S.filter(sc => sc.status !== 'blocked');
+
+function applyFilters(){
+  const q=document.getElementById('search').value.toLowerCase();
+  const cat=document.getElementById('filterCat').value;
+  const st=document.getElementById('filterStatus').value;
+  const filtered=SUPPORTED.filter(sc=>{
+    if(cat && sc.cat!==cat) return false;
+    if(st && sc.status!==st) return false;
+    if(q && !sc.id.toLowerCase().includes(q) && !sc.name.toLowerCase().includes(q) && !sc.pReply.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  renderTable(filtered);
+}
+
+document.getElementById('search').addEventListener('input',applyFilters);
+document.getElementById('filterCat').addEventListener('change',applyFilters);
+document.getElementById('filterStatus').addEventListener('change',applyFilters);
+
+renderTable(SUPPORTED);
+</script>
+</body>
+</html>
