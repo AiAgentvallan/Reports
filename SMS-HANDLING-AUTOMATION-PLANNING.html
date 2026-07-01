@@ -37,6 +37,7 @@ tr.data-row.expanded td{background:#EFF4FF}
 .word{font-family:'Consolas','SF Mono',monospace;background:#EEF3FF;color:var(--txt);padding:1px 6px;border-radius:3px;font-size:.76rem;font-weight:600}
 .b{display:inline-flex;align-items:center;gap:3px;border-radius:20px;padding:2px 8px;font-size:.67rem;font-weight:700;white-space:nowrap}
 .b-done{background:var(--done-bg);color:var(--done-tx)}
+.b-prog{background:#DBEAFE;color:#1E40AF}
 .b-pend{background:var(--pend-bg);color:var(--pend-tx)}
 .b-blok{background:var(--blok-bg);color:var(--blok-tx)}
 .b-be{background:var(--be-bg);color:var(--be-tx)}
@@ -109,7 +110,7 @@ tr.data-row.expanded td{background:#EFF4FF}
   <label>Status:</label>
   <select id="filterStatus">
     <option value="">All</option>
-    <option value="done">✅ Done</option>
+    <option value="inprogress">🔵 In Progress</option>
     <option value="pending">🔄 Pending</option>
   </select>
   <label style="margin-left:auto;color:#6B8AAD;font-size:.7rem" id="rowCount"></label>
@@ -206,7 +207,7 @@ YES.forEach((y,i) => {
     id:`DH-SR-${pad(i+1)}`, cat:'DH-SR',
     name:`During Hours · Single Responder · Primary replies "${y.w}"`,
     pReply:y.w, sReply:'—', be:y.be, mw:!!y.mw,
-    status: y.doneRef?'done': y.be?'pending':'blocked',
+    status: y.doneRef?'inprogress': y.be?'pending':'blocked',
     ref:y.doneRef||'',
     incident: isBlocked ? 'bad_response — stays OPEN (BE Gap)' : 'presence_confirmed',
     flow: isBlocked ? [
@@ -235,7 +236,7 @@ NO.forEach((n,i) => {
     id:`DH-SR-${pad(28+i)}`, cat:'DH-SR',
     name:`During Hours · Single Responder · Primary replies "${n.w}"`,
     pReply:n.w, sReply:'—', be:true, mw:false,
-    status:n.doneRef?'done':'pending', ref:n.doneRef||'', incident:'denied',
+    status:n.doneRef?'inprogress':'pending', ref:n.doneRef||'', incident:'denied',
     flow:[
       SETUP_DH, EVENT,
       step('s2p', T.motionAlert),
@@ -253,7 +254,7 @@ S.push({
   id:'DH-SR-032', cat:'DH-SR',
   name:'During Hours · Single Responder · Primary sends invalid reply ("HELLO")',
   pReply:'"HELLO" (invalid)', sReply:'—', be:true, mw:false,
-  status:'done', ref:'SMS-03', incident:'bad_response (stays open)',
+  status:'inprogress', ref:'SMS-03', incident:'bad_response (stays open)',
   flow:[
     SETUP_DH, EVENT,
     step('s2p', T.motionAlert),
@@ -269,7 +270,7 @@ S.push({
   id:'DH-SR-033', cat:'DH-SR',
   name:'During Hours · Single Responder · No response — 5-minute timeout fires',
   pReply:'(no reply within 5 min)', sReply:'—', be:true, mw:false,
-  status:'done', ref:'ESC-03', incident:'unexplained',
+  status:'inprogress', ref:'ESC-03', incident:'unexplained',
   flow:[
     SETUP_DH, EVENT,
     step('s2p', T.motionAlert),
@@ -341,7 +342,7 @@ YES.forEach((y,i) => {
     name:`During Hours · Two Responders · Primary "${y.w}" → Secondary NOT contacted`,
     pReply:y.w, sReply: isBlocked ? '(not contacted — BE Gap, incident stays open)' : '(not contacted — primary cleared)',
     be:y.be, mw:!!y.mw,
-    status:doneRef?'done':y.be?'pending':'blocked',
+    status:doneRef?'inprogress':y.be?'pending':'blocked',
     ref:doneRef||'',
     incident: isBlocked ? 'bad_response — stays OPEN (BE Gap)' : 'presence_confirmed',
     flow: isBlocked ? [
@@ -378,7 +379,7 @@ NO.forEach(n => {
         ? `During Hours · Two Responders · Primary "${n.w}" → Secondary "${y.w}" → BE Gap (help SMS sent)`
         : `During Hours · Two Responders · Primary "${n.w}" → Secondary "${y.w}" → Incident cleared`,
       pReply:n.w, sReply:y.w, be:n.be&&y.be, mw:!!y.mw,
-      status:isDone?'done':(!y.be?'blocked':'pending'),
+      status:isDone?'inprogress':(!y.be?'blocked':'pending'),
       ref:isDone?'SMS-05':'',
       incident: isBlocked ? 'bad_response — stays OPEN (BE Gap on secondary word)' : 'presence_confirmed',
       flow: isBlocked ? [
@@ -418,7 +419,7 @@ NO.forEach(n => {
       id:`DH-TR-${pad(id2c++)}`, cat:'DH-TR',
       name:`During Hours · Two Responders · Primary "${n.w}" → Secondary "${s.w}" → Facility notified`,
       pReply:n.w, sReply:s.w, be:true, mw:false,
-      status:isDone?'done':'pending', ref:isDone?'SMS-06':'', incident:'denied',
+      status:isDone?'inprogress':'pending', ref:isDone?'SMS-06':'', incident:'denied',
       flow:[
         SETUP_DH2, EVENT,
         step('s2p',   T.motionAlert),
@@ -635,7 +636,7 @@ S.push({
   id:'AH-SR-001', cat:'AH-SR',
   name:'After Hours · Single Responder · Motion detected → one-way informational SMS (no YES/NO prompt)',
   pReply:'— (no reply expected)', sReply:null, be:true, mw:false,
-  status:'done', ref:'ESC-04', incident:'unexplained (duringAccessHours: false)',
+  status:'inprogress', ref:'ESC-04', incident:'unexplained (duringAccessHours: false)',
   flow:[
     SETUP_AH, EVENT,
     step('s2p',   T.ahInfo + ' (one-way informational — does NOT ask "Was this you? Reply YES/NO")'),
@@ -797,7 +798,7 @@ S.push({
   id:'OH-001', cat:'OH',
   name:'Occupied Unit · After Access Hours · Motion detected → one-way informational SMS (no YES/NO)',
   pReply:'— (no reply expected)', sReply:null, be:true, mw:false,
-  status:'done', ref:'ESC-04', incident:'unexplained (duringAccessHours: false)',
+  status:'inprogress', ref:'ESC-04', incident:'unexplained (duringAccessHours: false)',
   flow:[
     SETUP_AH,
     step('setup','Unit is OCCUPIED: tenant assigned, responder configured. Facility is after-hours'),
@@ -809,38 +810,7 @@ S.push({
   ]
 });
 
-S.push({
-  id:'OH-002', cat:'OH',
-  name:'Occupied Unit · After Hours · Tenant replies to after-hours informational SMS (any text)',
-  pReply:'any text', sReply:null, be:true, mw:false,
-  status:'pending', ref:'', incident:'no change',
-  flow:[
-    SETUP_AH, step('setup','After-hours mode; after-hours info SMS already received by tenant (OH-001)'),
-    step('p2s',   '"[ANY TEXT]" — tenant replies to the after-hours informational SMS'),
-    step('s2p',   T.help + ' (all after-hours replies → help SMS; reply does NOT resolve incident)'),
-    step('fm',    '✗ Not sent (reply does not change incident)'),
-    step('slack', '✗ Not re-triggered'),
-    step('incident','⚠️ No change — incident remains unexplained; reply is informational only')
-  ]
-});
-
-S.push({
-  id:'OH-003', cat:'OH',
-  name:'Occupied Unit · After Hours · Multiple motion events in quick succession (SMS throttle / coalesce)',
-  pReply:'N/A', sReply:null, be:true, mw:false,
-  status:'pending', ref:'', incident:'TBD',
-  flow:[
-    SETUP_AH, step('setup','Occupied unit, after-hours, tenant/responder configured'),
-    EVENT,
-    step('s2p',   T.ahInfo + ' (sent for first motion event)'),
-    step('wait',  '⏳ Short delay (within coalesce window)'),
-    step('event', 'Second motion event from same device within coalesce window'),
-    step('s2p',   'TBD: Is second SMS sent (new notification per event) or throttled (coalesced into first incident)?'),
-    step('fm',    'TBD — 1 FM notification or 2?'),
-    step('slack', 'TBD — 1 Slack event or 2?'),
-    step('incident','TBD — 1 updated incident or 2 separate incidents created for rapid events?')
-  ]
-});
+// OH-002 and OH-003 removed — duplicate of AH-SR-002 and AH-SR-004 respectively
 
 // ── HELPERS ──────────────────────────────────────────────────────────────────
 function pad(n){return String(n).padStart(3,'0')}
@@ -863,8 +833,8 @@ function renderFlow(flow){
 }
 
 function statusBadge(s){
-  if(s==='done')    return '<span class="b b-done">✅ Done</span>';
-  if(s==='pending') return '<span class="b b-pend">🔄 Pending</span>';
+  if(s==='inprogress') return '<span class="b b-prog">🔵 In Progress</span>';
+  if(s==='pending')    return '<span class="b b-pend">🔄 Pending</span>';
   return '<span class="b b-blok">⛔ Blocked</span>';
 }
 function beBadge(be){ return be?'<span class="b b-be">BE Ready</span>':'<span class="b b-nd">BE Gap</span>'; }
@@ -908,14 +878,13 @@ function renderTable(data){
 }
 
 function updateStats(data){
-  const total=data.length, done=data.filter(s=>s.status==='done').length,
-    pend=data.filter(s=>s.status==='pending').length,
-    blok=data.filter(s=>s.status==='blocked').length;
+  const total=data.length,
+    prog=data.filter(s=>s.status==='inprogress').length,
+    pend=data.filter(s=>s.status==='pending').length;
   document.getElementById('statsBar').innerHTML=
     `<span><strong>${total}</strong> scenarios shown</span>
-     <span><strong style="color:var(--done-tx)">${done}</strong> done</span>
-     <span><strong style="color:var(--pend-tx)">${pend}</strong> pending</span>
-     <span><strong style="color:var(--blok-tx)">${blok}</strong> blocked</span>`;
+     <span><strong style="color:#1E40AF">${prog}</strong> in progress</span>
+     <span><strong style="color:var(--pend-tx)">${pend}</strong> pending</span>`;
   document.getElementById('rowCount').textContent=`${total} of ${S.length} scenarios`;
 }
 
