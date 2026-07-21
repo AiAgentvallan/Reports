@@ -1,0 +1,323 @@
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#efefef;padding:16px 40px}
+.page{background:#efefef;max-width:780px;margin:0 auto}
+
+.header-card{background:#0d2a4a;border-radius:14px;padding:14px 18px;margin-bottom:12px;position:relative}
+.sprint-pill{position:absolute;top:0;left:16px;background:#d4edda;color:#155724;border:1px solid #90d4a0;font-size:10px;font-weight:700;padding:3px 10px 4px;border-radius:0 0 8px 8px}
+.sd-tab{position:absolute;top:0;right:16px;background:#fff;font-size:12px;font-weight:700;padding:3px 13px 5px;border-radius:0 0 9px 9px}
+.sd-r{color:#e8312a}.sd-b{color:#0a1a8a}
+.hdr-row{display:flex;align-items:center;gap:14px;margin-top:14px}
+.robot-box{width:46px;height:46px;background:#1e8a4a;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.hdr-text h1{font-size:18px;font-weight:700;color:#fff}
+.hdr-text p{font-size:11px;color:#8ab4d4;margin-top:3px}
+.completed-pill{margin-left:auto;background:#1e8a4a;color:#fff;font-size:11px;font-weight:700;padding:6px 14px;border-radius:20px;white-space:nowrap;border:1px solid #4ab870}
+
+.tags{display:flex;justify-content:center;gap:6px;margin-bottom:12px}
+.tag{background:#fff;border:1px solid #d0d0d0;border-radius:16px;padding:4px 14px;font-size:10.5px;color:#333;white-space:nowrap;flex:1;text-align:center}
+
+.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px}
+.mc{border-radius:12px;padding:16px;text-align:center;background:#fff;border:1px solid #ddd;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:82px}
+.mc .n{font-size:28px;font-weight:700;line-height:1.1}
+.mc .l{font-size:11px;margin-top:5px;font-weight:600;color:#555}
+
+.mid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.card{background:#fff;border-radius:12px;padding:14px;border:1px solid #c2ddf0;display:flex;flex-direction:column;gap:8px}
+.card-title{font-size:12px;font-weight:700;color:#0d2a4a;padding-bottom:6px;border-bottom:1px solid #ddeef8;flex-shrink:0}
+
+.pie-row{display:flex;flex-direction:column;align-items:center;gap:10px}
+.pie-wrap{position:relative;width:130px;height:130px;flex-shrink:0}
+.pie-c{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+.pie-c .pn{font-size:22px;font-weight:700;color:#0d2a4a}
+.pie-c .ps{font-size:9px;color:#6a8aaa}
+.pie-legend-row{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+.leg-item{display:flex;align-items:center;gap:6px;font-size:11px;color:#2a3a4a}
+.ld{width:11px;height:11px;border-radius:2px;flex-shrink:0}
+
+.bars{padding-top:8px;border-top:1px solid #ddeef8;width:100%}
+.br{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.bl{font-size:10px;color:#0d2a4a;width:90px;flex-shrink:0;line-height:1.3}
+.bt{background:#e4f2fb;border-radius:100px;height:8px;flex:1;overflow:hidden}
+.bf{height:8px;border-radius:100px}
+.bp{font-size:10px;color:#1a5a9a;width:32px;text-align:right}
+
+.eboxes{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.eb{flex:1;border-radius:10px;padding:10px 12px;text-align:center}
+.eb-m{background:#fff2f2;border:1px solid #f5c8c8}
+.eb-a{background:#f2faf2;border:1px solid #b0deb0}
+.eb .en{font-size:18px;font-weight:700;line-height:1.2}
+.eb-m .en{color:#7a1010}.eb-a .en{color:#0a4a1a}
+.eb .es{font-size:9px;color:#555;margin-top:3px;line-height:1.4}
+.earr{font-size:16px;color:#c090b0;flex-shrink:0}
+
+.bul{list-style:none}
+.bul li{font-size:11px;color:#1a3a5a;margin-bottom:5px;display:flex;gap:6px;align-items:flex-start;line-height:1.4}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.dg{background:#1e8a4a}.dr{background:#c0392b}.db{background:#1a6faf}.dp{background:#7c3aed}.dm{background:#c0507a}.do{background:#e67e00}
+
+.stat-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;flex-shrink:0}
+.sbox{border-radius:8px;padding:8px 6px;text-align:center;min-height:50px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.sbox .sv{font-size:15px;font-weight:700}
+.sbox .sl{font-size:8.5px;margin-top:2px;line-height:1.2}
+.sb-g{background:#f2faf2;border:1px solid #b0deb0}.sb-g .sv{color:#0a4a1a}.sb-g .sl{color:#1a6a2a}
+.sb-b{background:#eaedff;border:1px solid #a8b4f0}.sb-b .sv{color:#0a1a6a}.sb-b .sl{color:#2a3a9a}
+.sb-o{background:#fff3e0;border:1px solid #ffcc80}.sb-o .sv{color:#7a3800}.sb-o .sl{color:#a05000}
+.sb-p{background:#ead8ff;border:1px solid #c0a0f0}.sb-p .sv{color:#30087a}.sb-p .sl{color:#5a2a9a}
+
+.bottom{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.btcard{background:#fff;border-radius:12px;padding:14px;border:1px solid #c2ddf0;display:flex;flex-direction:column;gap:8px}
+
+.tc-row{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:4px}
+.tc-text{font-size:10px;color:#1a2a3a;line-height:1.4;flex:1;display:flex;align-items:flex-start;gap:5px}
+.badge-done{background:#d4edda;color:#155724;border:1px solid #90d4a0;font-size:8px;font-weight:700;padding:1px 6px;border-radius:10px;flex-shrink:0;white-space:nowrap}
+
+.backlog-inner{background:#ede0ff;border-radius:9px;padding:10px;border:1px solid #c8b8e8}
+.backlog-inner .bul li{color:#2a0a5a;font-size:9.5px;margin-bottom:4px}
+
+.flow-strip{background:#f8eef6;border:1px solid #e2c8da;border-radius:8px;padding:7px;display:flex;align-items:center;gap:3px}
+.fb{background:#fff;border:1px solid #ddbad0;border-radius:7px;padding:5px 3px;text-align:center;flex:1}
+.fb .fi{font-size:12px;line-height:1}
+.fb .ft{font-size:8px;color:#6a2a5a;margin-top:2px;line-height:1.2}
+.fa{font-size:9px;color:#c080a8;flex-shrink:0}
+
+.footer{display:flex;justify-content:space-between;font-size:10px;color:#666;padding-top:9px;border-top:1px solid #d8d8d8;align-items:center}
+.fdot{width:7px;height:7px;background:#1e8a4a;border-radius:50%;display:inline-block;margin-right:5px}
+.dl-btn{max-width:780px;margin:12px auto 0;display:block;width:100%;text-align:center;background:#0d2a4a;color:#fff;font-size:13px;font-weight:700;padding:11px;border-radius:10px;cursor:pointer;border:none;letter-spacing:.3px}
+</style>
+
+<div class="page" id="dashPage">
+
+  <div class="header-card">
+    <div class="sprint-pill">✅ Sprint 8</div>
+    <div class="sd-tab"><span class="sd-r">Storage</span><span class="sd-b">Defender</span></div>
+    <div class="hdr-row">
+      <div class="robot-box">🤖</div>
+      <div class="hdr-text">
+        <h1>Automation Testing Sprint Status</h1>
+        <p>QA Automation · SMS & Device Event Handling Sprint</p>
+      </div>
+      <div class="completed-pill">🎉 Sprint 8 Completed!</div>
+    </div>
+  </div>
+
+  <div class="tags">
+    <span class="tag">✅ Completed Sprint</span>
+    <span class="tag">📱 SMS Handling Automation</span>
+    <span class="tag">⚙️ CI/CD Pipeline</span>
+    <span class="tag">💻 VM-based Execution</span>
+  </div>
+
+  <div class="metrics">
+    <div class="mc"><div class="n" style="color:#1a2a3a">23</div><div class="l">Total test cases</div></div>
+    <div class="mc"><div class="n" style="color:#1e8a4a">23 ✅</div><div class="l">Completed</div></div>
+    <div class="mc"><div class="n" style="color:#1a6faf">100% 🎯</div><div class="l">Sprint progress</div></div>
+  </div>
+
+  <div class="mid">
+
+    <div class="card">
+      <div class="card-title">🥧 Test cases — total count (23)</div>
+      <div class="pie-row">
+        <div class="pie-wrap">
+          <canvas id="pie8" width="130" height="130"></canvas>
+          <div class="pie-c"><div class="pn">23</div><div class="ps">total</div></div>
+        </div>
+        <div class="pie-legend-row">
+          <div class="leg-item"><span class="ld" style="background:#1a6faf"></span>During hours valid — 20</div>
+          <div class="leg-item"><span class="ld" style="background:#e67e00"></span>During & after hours — 3</div>
+        </div>
+      </div>
+      <div class="bars">
+        <div class="br"><span class="bl">During hours valid response</span><div class="bt"><div class="bf" style="width:100%;background:#1a6faf"></div></div><span class="bp">100%</span></div>
+        <div class="br"><span class="bl">During & after hours valid/invalid</span><div class="bt"><div class="bf" style="width:100%;background:#e67e00"></div></div><span class="bp">100%</span></div>
+      </div>
+      <ul class="bul">
+        <li><span class="dot dg"></span>All SMS response-time scenarios validated ✅</li>
+        <li><span class="dot db"></span>Single & multiple responder SMS flows fully automated ✅</li>
+        <li><span class="dot dp"></span>All scripts peer-reviewed & merged to repo ✅</li>
+      </ul>
+      <div style="background:#f0f6ff;border:1px solid #b8d4f8;border-radius:10px;padding:10px 12px;margin-top:2px">
+        <div style="font-size:9.5px;font-weight:700;color:#0d2a4a;margin-bottom:8px;display:flex;align-items:center;gap:5px"><span>🏆</span>Sprint 8 — Achievement summary</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <div style="background:#fff;border:1px solid #ddeef8;border-radius:8px;padding:7px 8px;text-align:center">
+            <div style="font-size:18px;font-weight:700;color:#1a6faf">20</div>
+            <div style="font-size:8px;color:#3a6a9a;margin-top:1px;line-height:1.3">During hours<br>valid response</div>
+          </div>
+          <div style="background:#fff;border:1px solid #ddeef8;border-radius:8px;padding:7px 8px;text-align:center">
+            <div style="font-size:18px;font-weight:700;color:#e67e00">3</div>
+            <div style="font-size:8px;color:#7a4a00;margin-top:1px;line-height:1.3">During & after hours<br>valid/invalid</div>
+          </div>
+          <div style="background:#fff;border:1px solid #ddeef8;border-radius:8px;padding:7px 8px;text-align:center">
+            <div style="font-size:18px;font-weight:700;color:#1e8a4a">23</div>
+            <div style="font-size:8px;color:#0a4a28;margin-top:1px;line-height:1.3">Total test cases<br>automated</div>
+          </div>
+          <div style="background:#fff;border:1px solid #ddeef8;border-radius:8px;padding:7px 8px;text-align:center">
+            <div style="font-size:18px;font-weight:700;color:#7c3aed">2</div>
+            <div style="font-size:8px;color:#4a1a8a;margin-top:1px;line-height:1.3">Time windows<br>covered</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⏱️ Effort comparison (23 cases)</div>
+      <div class="eboxes">
+        <div class="eb eb-m"><div class="en">11h 30m</div><div class="es">Manual effort<br>23 × 30 min = 690 min</div></div>
+        <div class="earr">→</div>
+        <div class="eb eb-a"><div class="en">~20 min 🚀</div><div class="es">Automation run<br>All 23 on VM daily</div></div>
+      </div>
+      <ul class="bul">
+        <li><span class="dot dr"></span><strong>~97% time reduction</strong> achieved via full automation</li>
+        <li><span class="dot dg"></span>VM runs all 23 cases daily — zero intervention ✅</li>
+        <li><span class="dot db"></span>670 min saved per daily run — engineer time freed</li>
+        <li><span class="dot dp"></span>Scripts auto-trigger via CI/CD pipeline on schedule</li>
+        <li><span class="dot dg"></span>SMS response validation fully automated end-to-end</li>
+        <li><span class="dot dm"></span>Pass/fail auto-logged — no manual tracking needed ✅</li>
+      </ul>
+      <div style="background:#fff8f0;border:1px solid #ffc880;border-radius:9px;padding:9px 11px">
+        <div style="font-size:9.5px;font-weight:700;color:#7a3800;margin-bottom:6px">⏳ Why 30 min per case in manual testing?</div>
+        <div style="display:flex;gap:8px">
+          <div style="flex:1;background:#fff2f2;border:1px solid #f5c8c8;border-radius:8px;padding:7px 8px">
+            <div style="font-size:8.5px;font-weight:700;color:#7a1010;margin-bottom:3px">🧑‍💻 Manual</div>
+            <div style="font-size:8.5px;color:#5a2020;line-height:1.4">Device events created manually. Tester must <strong>wait 30 min</strong> before creating the next incident — one by one, sequentially.</div>
+          </div>
+          <div style="flex:1;background:#f2faf2;border:1px solid #b0deb0;border-radius:8px;padding:7px 8px">
+            <div style="font-size:8.5px;font-weight:700;color:#0a4a1a;margin-bottom:3px">🤖 Automated</div>
+            <div style="font-size:8.5px;color:#0a3a18;line-height:1.4">Devices created sequentially, incidents <strong>generated automatically</strong> per scenario. All 23 done in <strong>~20 min</strong> total.</div>
+          </div>
+        </div>
+      </div>
+      <div class="stat-strip" style="margin-bottom:8px">
+        <div class="sbox sb-o"><div class="sv">690</div><div class="sl">Manual mins</div></div>
+        <div class="sbox sb-g"><div class="sv">~20</div><div class="sl">Auto mins</div></div>
+        <div class="sbox sb-b"><div class="sv">~91%</div><div class="sl">Time saved</div></div>
+      </div>
+      <div style="background:#f0f8ff;border:1px solid #b0d4f0;border-radius:9px;padding:9px 11px">
+        <div style="font-size:9.5px;font-weight:700;color:#0d2a4a;margin-bottom:7px">🤖 Automation health — live run status</div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div style="display:flex;align-items:center;gap:7px;font-size:10px;color:#0d2a4a">
+            <span style="font-size:12px">✅</span>23 scripts deployed & running on VM daily
+            <span style="margin-left:auto;font-size:9px;background:#1e8a4a;color:#fff;padding:1px 6px;border-radius:8px;flex-shrink:0">LIVE</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:7px;font-size:10px;color:#0d2a4a">
+            <span style="font-size:12px">⚡</span>Avg execution time — ~52 sec per case
+            <span style="margin-left:auto;font-size:9px;background:#1a6faf;color:#fff;padding:1px 6px;border-radius:8px;flex-shrink:0">FAST</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:7px;font-size:10px;color:#0d2a4a">
+            <span style="font-size:12px">📈</span>100% pass rate on all 23 completed scripts
+            <span style="margin-left:auto;font-size:9px;background:#1e8a4a;color:#fff;padding:1px 6px;border-radius:8px;flex-shrink:0">PASS</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:7px;font-size:10px;color:#0d2a4a">
+            <span style="font-size:12px">🔁</span>CI/CD pipeline auto-reporting configured
+            <span style="margin-left:auto;font-size:9px;background:#7c3aed;color:#fff;padding:1px 6px;border-radius:8px;flex-shrink:0">ACTIVE</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="bottom">
+
+    <div class="btcard" id="c3">
+      <div class="card-title" style="color:#1e5e32">✅ Completed this sprint</div>
+      <div class="tc-row"><div class="tc-text"><span class="dot db" style="margin-top:2px;flex-shrink:0"></span>SMS Handling · Single Responder</div><span class="badge-done">DONE</span></div>
+      <div class="tc-row"><div class="tc-text"><span class="dot do" style="margin-top:2px;flex-shrink:0"></span>SMS Handling · Multiple Responder</div><span class="badge-done">DONE</span></div>
+      <div class="tc-row"><div class="tc-text"><span class="dot dp" style="margin-top:2px;flex-shrink:0"></span>Device Event Creation</div><span class="badge-done">DONE</span></div>
+      <div class="tc-row"><div class="tc-text"><span class="dot dg" style="margin-top:2px;flex-shrink:0"></span>Configurations</div><span class="badge-done">DONE</span></div>
+      <div class="stat-strip">
+        <div class="sbox sb-g"><div class="sv">23</div><div class="sl">Cases Done</div></div>
+        <div class="sbox sb-g"><div class="sv">100%</div><div class="sl">Complete</div></div>
+        <div class="sbox sb-b"><div class="sv">0</div><div class="sl">Remaining</div></div>
+      </div>
+      <div style="background:#edfbf2;border:1px solid #90d4a8;border-radius:9px;padding:9px 11px;margin-top:2px">
+        <div style="font-size:9.5px;font-weight:700;color:#0a4a28;margin-bottom:7px">🚀 Sprint 8 — key wins</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
+          <div style="background:#fff;border:1px solid #b0deb0;border-radius:7px;padding:6px 8px;display:flex;align-items:center;gap:5px">
+            <span style="font-size:14px">📱</span>
+            <div><div style="font-size:9.5px;font-weight:700;color:#0a4a28">SMS Coverage</div><div style="font-size:8px;color:#1e6a3a">Single responder handling</div></div>
+          </div>
+          <div style="background:#fff;border:1px solid #b0deb0;border-radius:7px;padding:6px 8px;display:flex;align-items:center;gap:5px">
+            <span style="font-size:14px">🧪</span>
+            <div><div style="font-size:9.5px;font-weight:700;color:#0a4a28">23 Scenarios</div><div style="font-size:8px;color:#1e6a3a">Full suite automated</div></div>
+          </div>
+          <div style="background:#fff;border:1px solid #b0deb0;border-radius:7px;padding:6px 8px;display:flex;align-items:center;gap:5px">
+            <span style="font-size:14px">🖥️</span>
+            <div><div style="font-size:9.5px;font-weight:700;color:#0a4a28">VM Auto-run</div><div style="font-size:8px;color:#1e6a3a">Zero manual effort</div></div>
+          </div>
+          <div style="background:#fff;border:1px solid #b0deb0;border-radius:7px;padding:6px 8px;display:flex;align-items:center;gap:5px">
+            <span style="font-size:14px">📋</span>
+            <div><div style="font-size:9.5px;font-weight:700;color:#0a4a28">Device Incident</div><div style="font-size:8px;color:#1e6a3a">Event fully automated</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btcard" id="c4">
+      <div class="card-title">📦 Backlog — Sprint 9</div>
+      <div class="backlog-inner">
+        <ul class="bul">
+          <li><span class="dot db"></span>SMS Handling — Multiple Responder edge cases</li>
+          <li><span class="dot do"></span>Remaining API endpoint cases</li>
+          <li><span class="dot dp"></span>Vacant Unit Motion Creation — SMS handling</li>
+          <li><span class="dot dr"></span>After Hours SMS handling</li>
+          <li><span class="dot dg"></span>Demo unit test cases</li>
+        </ul>
+      </div>
+      <div class="flow-strip">
+        <div class="fb"><div class="fi">📝</div><div class="ft">Write<br>Script</div></div>
+        <span class="fa">▶</span>
+        <div class="fb"><div class="fi">🔍</div><div class="ft">Review<br>Script</div></div>
+        <span class="fa">▶</span>
+        <div class="fb"><div class="fi">⚙️</div><div class="ft">VM<br>Execute</div></div>
+        <span class="fa">▶</span>
+        <div class="fb"><div class="fi">✅</div><div class="ft">Validate<br>Pass</div></div>
+        <span class="fa">▶</span>
+        <div class="fb"><div class="fi">📊</div><div class="ft">Log<br>Report</div></div>
+      </div>
+      <div class="stat-strip">
+        <div class="sbox sb-p"><div class="sv">5</div><div class="sl">Backlog Items</div></div>
+        <div class="sbox sb-b"><div class="sv">SMS</div><div class="sl">New Area</div></div>
+        <div class="sbox sb-g"><div class="sv">Sprint 9</div><div class="sl">Target</div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <span><span class="fdot"></span>Sprint 8 Completed · 100% · QA Automation Space 🎊</span>
+    <span>Generated · July 2026</span>
+  </div>
+
+</div>
+
+<button class="dl-btn" id="dlBtn">⬇ Download PNG</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+var done=false;
+new Chart(document.getElementById('pie8'),{
+  type:'doughnut',
+  data:{labels:['During hours valid response','During & after hours valid/invalid'],datasets:[{data:[20,3],backgroundColor:['#1a6faf','#e67e00'],borderColor:'#fff',borderWidth:2}]},
+  options:{responsive:false,cutout:'55%',animation:{onComplete:function(){done=true;}},plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return ' '+c.label+': '+c.parsed;}}}}}
+});
+function equalH(){
+  var a=document.getElementById('c3'),b=document.getElementById('c4');
+  a.style.height='auto';b.style.height='auto';
+  var h=Math.max(a.scrollHeight,b.scrollHeight);
+  a.style.height=h+'px';b.style.height=h+'px';
+}
+window.addEventListener('load',function(){setTimeout(equalH,400);});
+window.addEventListener('resize',equalH);
+document.getElementById('dlBtn').addEventListener('click',function(){
+  var btn=this;btn.textContent='Generating…';btn.disabled=true;
+  function cap(){
+    html2canvas(document.getElementById('dashPage'),{scale:2,useCORS:true,allowTaint:true,backgroundColor:'#efefef',logging:false}).then(function(cv){
+      var a=document.createElement('a');a.download='Sprint8_Completed.png';a.href=cv.toDataURL('image/png');a.click();
+      btn.textContent='⬇ Download PNG';btn.disabled=false;
+    }).catch(function(){btn.textContent='⬇ Download PNG';btn.disabled=false;});
+  }
+  done?setTimeout(cap,100):setTimeout(cap,900);
+});
+</script>
